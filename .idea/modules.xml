@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/sc-java-maven-starter-project.iml" filepath="$PROJECT_DIR$/.idea/sc-java-maven-starter-project.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/flexy-cumulocity-connector.iml" filepath="$PROJECT_DIR$/.idea/flexy-cumulocity-connector.iml" />
     </modules>
   </component>
 </project>

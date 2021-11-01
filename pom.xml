@@ -6,24 +6,24 @@
   <modelVersion>4.0.0</modelVersion>
 
   <!-- PROJECT NAME -->
-  <name>Java Maven Starter Project</name>
+  <name>Ewon Flexy Cumulocity Connector</name>
   <!-- PROJECT VERSION -->
   <version>0.0.1</version>
   <!-- PROJECT GROUP ID (PARENT PACKAGE) -->
   <groupId>com.hms_networks.americas.sc</groupId>
   <!-- PROJECT ARTIFACT ID (ROOT PACKAGE NAME) -->
-  <artifactId>sc-java-maven-starter-project</artifactId>
+  <artifactId>flexy-cumulocity-connector</artifactId>
 
   <!-- PROJECT PROPERTIES -->
   <properties>
     <!-- Ewon Flexy Device Address (IP or URL) -->
-    <ewon.address>172.20.20.6</ewon.address>
+    <ewon.address>172.30.30.6</ewon.address>
     <!-- Ewon Flexy Device Username -->
     <ewon.username>adm</ewon.username>
     <!-- Ewon Flexy Device Password -->
     <ewon.password>adm</ewon.password>
     <!-- Project Main Class -->
-    <project.main.class>com.example.ExampleMain</project.main.class>
+    <project.main.class>com.hms_networks.sc.cumulocity.CConnectorMain</project.main.class>
     <!-- Project Memory Heap Size -->
     <project.heap.size>25M</project.heap.size>
 

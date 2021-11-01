@@ -1,4 +1,4 @@
-# Java Starter Project Contribution Guidelines
+# Ewon Flexy Cumulocity Connector Contribution Guidelines
 
 Thank you for your interest in contributing to the project.
 
@@ -32,9 +32,9 @@ By participating, you are expected to uphold this code. Please report unacceptab
 
 ## Asking Questions
 
-Before asking a question, it is best to search for existing [Issues](https://github.com/hms-networks/sc-java-maven-starter-project/issues) or [Discussions](https://github.com/hms-networks/sc-java-maven-starter-project/discussions) that may help. In case you've found a suitable issue or discussion and still need clarification, you may comment directly on the issue or discussion. It is also advisable to search the internet for answers.
+Before asking a question, it is best to search for existing [Issues](https://github.com/hms-networks/flexy-cumulocity-connector/issues) or [Discussions](https://github.com/hms-networks/flexy-cumulocity-connector/discussions) that may help. In case you've found a suitable issue or discussion and still need clarification, you may comment directly on the issue or discussion. It is also advisable to search the internet for answers.
 
-If you then still have a question or need clarification, you may create a [new discussion](https://github.com/hms-networks/sc-java-maven-starter-project/discussions/new) or [new issue](https://github.com/hms-networks/sc-java-maven-starter-project/issues/new) and provide as much context and detail as possible.
+If you then still have a question or need clarification, you may create a [new discussion](https://github.com/hms-networks/flexy-cumulocity-connector/discussions/new) or [new issue](https://github.com/hms-networks/flexy-cumulocity-connector/issues/new) and provide as much context and detail as possible.
 
 ## How To Contribute
 
@@ -43,7 +43,7 @@ If you then still have a question or need clarification, you may create a [new d
 
 ### Reporting Bugs and Errors
 
-We use GitHub issues to track bugs and errors. If you run into an issue with the project, please create a [new issue](https://github.com/hms-networks/sc-java-maven-starter-project/issues/new) with the following in consideration:
+We use GitHub issues to track bugs and errors. If you run into an issue with the project, please create a [new issue](https://github.com/hms-networks/flexy-cumulocity-connector/issues/new) with the following in consideration:
 
 - Explain the behavior you would expect and the actual behavior.
 - Please provide as much context as possible and describe the *reproduction steps* that someone else can follow to recreate the issue on their own. This usually includes your code. If possible, please isolate the problem and create a test case.
@@ -52,13 +52,13 @@ Once you have submitted an issue on GitHub, we will label it and follow-up accor
 
 ### Suggesting Features or Enhancements
 
-We use GitHub issues to track feature and enhancement requests. If you'd like to suggest a feature or enhancement, please create a [new issue](https://github.com/hms-networks/sc-java-maven-starter-project/issues/new) with the following in consideration:
+We use GitHub issues to track feature and enhancement requests. If you'd like to suggest a feature or enhancement, please create a [new issue](https://github.com/hms-networks/flexy-cumulocity-connector/issues/new) with the following in consideration:
 
 - Make sure that you are using the latest version.
 - Make sure that you are using the latest Ewon firmware.
   - Check for updates at [https://www.ewon.biz/technical-support/pages/firmware](https://www.ewon.biz/technical-support/pages/firmware).
 - Read the [README.md](README.md) carefully to find out if the functionality is already covered.
-- Perform a search for existing [Issues](https://github.com/{APPLICATION NAME}/issues) or [Discussions](https://github.com/hms-networks/sc-java-maven-starter-project/discussions) to see if the feature or enhancement has already been suggested.
+- Perform a search for existing [Issues](https://github.com/hms-networks/flexy-cumulocity-connector/issues) or [Discussions](https://github.com/hms-networks/flexy-cumulocity-connector/discussions) to see if the feature or enhancement has already been suggested.
   - If the feature or enhancement has already been suggested, add a comment to the existing issue or discussion instead of opening a new one.
 - Make sure the feature or enhancement is with the scope and aims of the project. New features shall be useful to the majority of users, not a small subset.
   - If a feature or enhancement targets a minority of users, it is advised to consider writing an add-on or library.
