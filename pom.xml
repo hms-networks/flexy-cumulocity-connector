@@ -173,6 +173,9 @@
           <finalName>${project.artifactId}-${project.version}</finalName>
           <show>private</show>
           <includeDependencySources>true</includeDependencySources>
+          <dependencySourceExcludes>
+            <dependencySourceExclude>com.hms_networks.americas.sc.mvnlibs:ewon-etk:*</dependencySourceExclude>
+          </dependencySourceExcludes>
         </configuration>
         <executions>
           <execution>
