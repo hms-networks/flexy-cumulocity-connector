@@ -1,0 +1,47 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "INSTALL (Upload to Device)",
+            "type": "shell",
+            "command": "mvn install -f pom.xml",
+            "group": "build"
+        },
+        {
+            "label": "PACKAGE (Create JAR)",
+            "type": "shell",
+            "command": "mvn package -f pom.xml",
+            "group": "build"
+        },
+        {
+            "label": "DEPLOY (Run on Device, No Debug)",
+            "type": "shell",
+            "command": "mvn deploy -f pom.xml -P noDebug",
+            "group": "build"
+        },
+        {
+            "label": "DEPLOY (Run on Device, Debug)",
+            "type": "shell",
+            "command": "mvn deploy -f pom.xml -P debug",
+            "group": "build"
+        },
+        {
+            "label": "VERIFY (Verify Project)",
+            "type": "shell",
+            "command": "mvn verify -f pom.xml",
+            "group": "build"
+        },
+        {
+            "label": "CLEAN (Remove Build Output)",
+            "type": "shell",
+            "command": "mvn clean -f pom.xml",
+            "group": "build"
+        },
+        {
+            "label": "UPDATE (Get Latest Dependencies)",
+            "type": "shell",
+            "command": "mvn clean -U -f pom.xml",
+            "group": "build"
+        }
+    ]
+}

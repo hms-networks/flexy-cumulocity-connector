@@ -1,0 +1,75 @@
+# HMS Networks Solution Center
+# Maven Release Push Action for Maven-based Ewon ETK Project Releases
+# Version: 1.0
+#
+# This action is configured to automatically run when a release
+# tag is created in the following syntax: `v*`.
+
+name: Release (Push to Maven Repo)
+
+on:
+  push:
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v2
+        with:
+          path: './project'
+
+      - name: Set Up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 16
+
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.m2/repository
+            ./project/target/buildJdk
+          key: ${{ runner.os }}-maven-${{ hashFiles('./project/**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Compile Java Files With Maven
+        run: mvn package -f ./project/pom.xml
+
+      - name: Get Maven release information
+        run: |
+          echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f ./project/pom.xml)" >> $GITHUB_ENV
+          echo "RELEASE_ARTIFACT_ID=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout -f ./project/pom.xml)" >> $GITHUB_ENV
+
+      - name: Configure Maven Repo deploy key
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.MAVEN_REPO_SSH_PRIVATE_KEY }}
+
+      - name: Clone SC Maven repo
+        uses: actions/checkout@v2
+        with:
+          repository: 'hms-networks/sc-java-maven-repo'
+          fetch-depth: '0'
+          ref: 'main'
+          ssh-key: ${{ secrets.MAVEN_REPO_SSH_PRIVATE_KEY }}
+          path: './mavenRepo'
+
+      - name: Add artifacts to SC Maven repo
+        run: |
+          mvn install:install-file -Dfile=./project/target/${{ env.RELEASE_ARTIFACT_ID }}-${{ env.RELEASE_VERSION }}.jar -DpomFile=./project/pom.xml -Dpackaging=jar -DlocalRepositoryPath=./mavenRepo
+          mvn install:install-file -Dfile=./project/target/${{ env.RELEASE_ARTIFACT_ID }}-${{ env.RELEASE_VERSION }}-sources.jar -DpomFile=./project/pom.xml -Dpackaging=jar -Dclassifier=sources -DlocalRepositoryPath=./mavenRepo
+          mvn install:install-file -Dfile=./project/target/${{ env.RELEASE_ARTIFACT_ID }}-${{ env.RELEASE_VERSION }}-javadoc.jar -DpomFile=./project/pom.xml -Dpackaging=jar -Dclassifier=javadoc -DlocalRepositoryPath=./mavenRepo
+
+      - name: Commit and Push to SC Maven repo
+        run: |
+          cd ./mavenRepo
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Add ${{ env.RELEASE_ARTIFACT_ID }} v${{ env.RELEASE_VERSION }}"
+          git pull --rebase
+          git push
