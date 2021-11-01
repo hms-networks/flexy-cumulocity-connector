@@ -1,4 +1,4 @@
-# Java Starter Project Changelog
+# Ewon Flexy Cumulocity Connector Changelog
 
 ## Version 0.0.1
 ### Features

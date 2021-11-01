@@ -10,10 +10,10 @@ configured for use locally with Ant.
 	<!-- ########  Type your Application/Flexy Parameters ######## -->
 	
 	<!-- The project name -->
-	<property name="ProjectName" value="sc-java-starter-project"/>
+	<property name="ProjectName" value="flexy-cumulocity-connector"/>
 	
 	<!-- The main class to run (where the main function is) -->
-	<property name="MainClass" value="com.example.ExampleMain"/>
+	<property name="MainClass" value="com.hms_networks.sc.cumulocity.CConnectorMain"/>
 	
 	<!-- The JAVA heapsize -->
 	<property name="HeapSize" value="5M"/>

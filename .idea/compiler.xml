@@ -6,11 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="sc-java-maven-starter-project" />
+        <module name="flexy-cumulocity-connector" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="sc-java-maven-starter-project" target="1.4" />
+      <module name="flexy-cumulocity-connector" target="1.4" />
     </bytecodeTargetLevel>
   </component>
 </project>
