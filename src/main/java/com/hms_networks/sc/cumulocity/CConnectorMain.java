@@ -55,6 +55,19 @@ public class CConnectorMain {
   /** The value of the connector halt tag that permits the application to execute. */
   public static final int CONNECTOR_CONTROL_TAG_RUN_VALUE = 0;
 
+  /** The name of the tag that is used to enable/disable connector measurements. */
+  public static final String CONNECTOR_MEASUREMENT_CONTROL_TAG_NAME = "CumulocityMeasurementEnable";
+
+  /** The enable value for the tag that is used to enable/disable connector measurements. */
+  public static final int CONNECTOR_MEASUREMENT_CONTROL_TAG_ENABLE_VALUE = 1;
+
+  /** The type of the tag that is used to enable/disable connector measurements. */
+  public static final int CONNECTOR_MEASUREMENT_CONTROL_TAG_TYPE = 0;
+
+  /** The description of the tag that is used to enable/disable connector measurements. */
+  public static final String CONNECTOR_MEASUREMENT_CONTROL_TAG_DESCRIPTION =
+      "Tag which is used to enable/disable measurements in the Cumulocity connector application.";
+
   /** The interval (in milliseconds) at which the main loop is executed. */
   private static final int MAIN_LOOP_CYCLE_TIME_MILLIS = 1000;
 
@@ -81,6 +94,9 @@ public class CConnectorMain {
   /** Connector control tag object for accessing its value. */
   private static TagControl connectorControlTag = null;
 
+  /** Connector measurement enable control tag object for accessing its value. */
+  private static TagControl connectorMeasurementEnableControlTag = null;
+
   /** Boolean flag to indicate if the connector is running. */
   private static boolean isRunning = true;
 
@@ -91,6 +107,15 @@ public class CConnectorMain {
 
   /** Boolean indicating if the device should be restarted after the connector shuts down. */
   private static boolean restartDeviceAfterShutdown = false;
+
+  /**
+   * Gets the tag control object for the measurement enable control tag.
+   *
+   * @return tag control object for the measurement enable control tag
+   */
+  public static TagControl getConnectorMeasurementEnableControlTag() {
+    return connectorMeasurementEnableControlTag;
+  }
 
   /**
    * Gets the connector MQTT manager.
@@ -251,6 +276,7 @@ public class CConnectorMain {
     boolean startUpSuccess = true;
 
     setUpConnectorControlTag();
+    setupConnectorMeasurementEnableControlTag();
 
     // Run MQTT provisioning manager if provisioning required
     try {
@@ -286,12 +312,22 @@ public class CConnectorMain {
   private static void runMainLoop() {
     Logger.LOG_DEBUG("Running main loop...");
 
-    // Grab latest data and send via MQTT
-    try {
-      CConnectorDataMgr.checkForHistoricalDataAndSend(mqttMgr);
-    } catch (Exception e) {
-      Logger.LOG_CRITICAL("Unable to grab latest data and send via MQTT.");
-      Logger.LOG_EXCEPTION(e);
+    // Grab latest data and send via MQTT (if measurements enabled)
+    boolean measurementsEnabled = true;
+    if (connectorMeasurementEnableControlTag != null) {
+      measurementsEnabled =
+          (connectorMeasurementEnableControlTag.getTagValueAsInt()
+              == CONNECTOR_MEASUREMENT_CONTROL_TAG_ENABLE_VALUE);
+    }
+    if (measurementsEnabled) {
+      try {
+        CConnectorDataMgr.checkForHistoricalDataAndSend(mqttMgr);
+      } catch (Exception e) {
+        Logger.LOG_CRITICAL("Unable to grab latest data and send via MQTT.");
+        Logger.LOG_EXCEPTION(e);
+      }
+    } else {
+      Logger.LOG_DEBUG("Measurements disabled, skipping data processing.");
     }
 
     // Update connector control tag value
@@ -625,6 +661,40 @@ public class CConnectorMain {
                 + CONNECTOR_HALT_TAG_NAME
                 + "`! To control this connector, create a boolean tag with the name `"
                 + CONNECTOR_HALT_TAG_NAME
+                + "`.");
+        Logger.LOG_EXCEPTION(e2);
+      }
+    }
+  }
+
+  /** Sets up the connector control tag and its change listener. */
+  private static void setupConnectorMeasurementEnableControlTag() {
+    // Load connector control tag or create new one if it doesn't exist
+    try {
+      connectorMeasurementEnableControlTag = new TagControl(CONNECTOR_MEASUREMENT_CONTROL_TAG_NAME);
+    } catch (Exception e1) {
+      Logger.LOG_INFO(
+          "Unable to create tag object to track connector measurement enable control tag! "
+              + "Attempting to create `"
+              + CONNECTOR_MEASUREMENT_CONTROL_TAG_NAME
+              + "` tag.");
+      Logger.LOG_EXCEPTION(e1);
+      try {
+        SCTagUtils.createPersistentMemTag(
+            CONNECTOR_MEASUREMENT_CONTROL_TAG_NAME,
+            CONNECTOR_MEASUREMENT_CONTROL_TAG_DESCRIPTION,
+            CONNECTOR_MEASUREMENT_CONTROL_TAG_TYPE);
+        connectorMeasurementEnableControlTag =
+            new TagControl(CONNECTOR_MEASUREMENT_CONTROL_TAG_NAME);
+        connectorMeasurementEnableControlTag.setTagValueAsInt(
+            CONNECTOR_MEASUREMENT_CONTROL_TAG_ENABLE_VALUE);
+        Logger.LOG_INFO("Created `" + CONNECTOR_MEASUREMENT_CONTROL_TAG_NAME + "` tag.");
+      } catch (Exception e2) {
+        Logger.LOG_WARN(
+            "Unable to create tag `"
+                + CONNECTOR_MEASUREMENT_CONTROL_TAG_NAME
+                + "`! To enable/disable measurements, create a boolean tag with the name `"
+                + CONNECTOR_MEASUREMENT_CONTROL_TAG_NAME
                 + "`.");
         Logger.LOG_EXCEPTION(e2);
       }
