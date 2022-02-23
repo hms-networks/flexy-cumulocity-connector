@@ -352,6 +352,19 @@ public class CConnectorApiMessageBuilder {
   // region: Alarm Templates (3xx)
 
   /**
+   * Create an alarm with specified alarm level.
+   *
+   * @param level The level of the alarm.
+   * @param type The type (fragment/series) of the alarm.
+   * @param text The text (hint) of the alarm.
+   * @param time The time of the alarm.
+   * @return The payload for the alarm creation.
+   */
+  private static String createAlarm(String level, String type, String text, String time) {
+    return level + "," + type + ",\"" + text + "\"," + time;
+  }
+
+  /**
    * Create a critical alarm.
    *
    * @param type The type (fragment/series) of the alarm.
@@ -360,7 +373,7 @@ public class CConnectorApiMessageBuilder {
    * @return The payload for the critical alarm creation.
    */
   public static String createCriticalAlarm_301(String type, String text, String time) {
-    return "301," + type + "," + text + "," + time;
+    return createAlarm("301", type, text, time);
   }
 
   /**
@@ -372,7 +385,7 @@ public class CConnectorApiMessageBuilder {
    * @return The payload for the major alarm creation.
    */
   public static String createMajorAlarm_302(String type, String text, String time) {
-    return "302," + type + "," + text + "," + time;
+    return createAlarm("302", type, text, time);
   }
 
   /**
@@ -384,7 +397,7 @@ public class CConnectorApiMessageBuilder {
    * @return The payload for the minor alarm creation.
    */
   public static String createMinorAlarm_303(String type, String text, String time) {
-    return "303," + type + "," + text + "," + time;
+    return createAlarm("303", type, text, time);
   }
 
   /**
@@ -396,7 +409,7 @@ public class CConnectorApiMessageBuilder {
    * @return The payload for the warning alarm creation.
    */
   public static String createWarningAlarm_304(String type, String text, String time) {
-    return "304," + type + "," + text + "," + time;
+    return createAlarm("304", type, text, time);
   }
 
   /**
