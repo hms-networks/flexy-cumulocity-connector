@@ -425,13 +425,27 @@ public class CConnectorApiMessageReader {
       command = command.substring(1, command.length() - 1);
     }
 
+    List topicParts = StringUtils.split(mqttTopic, "/");
+    String childDeviceName;
+    if (topicParts.size() > 2) {
+      childDeviceName = (String) topicParts.get(2);
+    } else {
+      childDeviceName = null;
+    }
+
     // Sp1lit command to parts
     List commandParts = StringUtils.split(command, " ");
 
     // Execute command
     boolean deviceIdMatches = deviceId.equals(expectedDeviceId);
     if (deviceIdMatches) {
-      Logger.LOG_SERIOUS("Executing command: " + command + " on device: " + expectedDeviceId);
+      Logger.LOG_SERIOUS(
+          "Executing command: "
+              + command
+              + " on device: "
+              + expectedDeviceId
+              + (childDeviceName != null ? " (" + childDeviceName + ")" : ""));
+
       // Check if set/setf tag command
       if (command.startsWith("set") || command.startsWith("setf")) {
         String tagName;
@@ -446,6 +460,11 @@ public class CConnectorApiMessageReader {
           } else {
             tagName = (String) commandParts.get(1);
             tagValue = (String) commandParts.get(2);
+          }
+
+          // Append child device name if present/applicable
+          if (childDeviceName != null) {
+            tagName = childDeviceName + CConnectorDataMgr.SPLIT_TAG_NAME_DELIMITER + tagName;
           }
         } catch (IndexOutOfBoundsException e) {
           tagName = null;
