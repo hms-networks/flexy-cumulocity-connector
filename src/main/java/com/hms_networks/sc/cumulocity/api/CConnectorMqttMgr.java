@@ -12,6 +12,7 @@ import com.hms_networks.sc.cumulocity.CConnectorMain;
 import com.hms_networks.sc.cumulocity.api.CConnectorApiMessageBuilder.InstalledSoftware;
 import com.hms_networks.sc.cumulocity.data.CConnectorAlarmMgr;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -81,6 +82,9 @@ public class CConnectorMqttMgr extends MqttManager {
 
   /** String containing the ID of the MQTT client. */
   private final String mqttId;
+
+  /** List of child devices which have been registered to Cumulocity. */
+  private final List registeredChildDevices = new ArrayList();
 
   /**
    * Constructor for the MQTT manager with the given MQTT ID, host, and boolean indicating if UTF-8
@@ -368,10 +372,23 @@ public class CConnectorMqttMgr extends MqttManager {
    */
   public void sendMessageWithChildDeviceRouting(String messagePayload, String childDevice)
       throws EWException, UnsupportedEncodingException {
+    // Register child device if not already registered
+    String childDeviceCumulocityId = null;
+    if (childDevice != null && !registeredChildDevices.contains(childDevice)) {
+      // Register child device
+      childDeviceCumulocityId = mqttId + "_" + childDevice;
+      String childDeviceRegistrationPayload =
+          CConnectorApiMessageBuilder.childDeviceCreation_101(childDeviceCumulocityId, childDevice);
+      mqttPublish(
+          CUMULOCITY_MQTT_TOPIC_SUS, childDeviceRegistrationPayload, MQTT_QOS_LEVEL, MQTT_RETAIN);
+      registeredChildDevices.add(childDevice);
+      Logger.LOG_INFO("Registered child device " + childDevice + " with Cumulocity.");
+    }
+
     // Build topic name to publish method (append child device, if not null)
     String messageTopic = CUMULOCITY_MQTT_TOPIC_SUS;
     if (childDevice != null) {
-      messageTopic += "/" + childDevice;
+      messageTopic += "/" + childDeviceCumulocityId;
     }
 
     // Send message to Cumulocity
