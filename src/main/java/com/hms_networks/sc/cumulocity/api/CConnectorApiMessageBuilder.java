@@ -360,7 +360,7 @@ public class CConnectorApiMessageBuilder {
    * @return The payload for the critical alarm creation.
    */
   public static String createCriticalAlarm_301(String type, String text, String time) {
-    return "301," + type + "," + text + "," + time;
+    return "301," + type + ",\"" + text + "\"," + time;
   }
 
   /**
@@ -372,7 +372,7 @@ public class CConnectorApiMessageBuilder {
    * @return The payload for the major alarm creation.
    */
   public static String createMajorAlarm_302(String type, String text, String time) {
-    return "302," + type + "," + text + "," + time;
+    return "302," + type + ",\"" + text + "\"," + time;
   }
 
   /**
@@ -384,7 +384,7 @@ public class CConnectorApiMessageBuilder {
    * @return The payload for the minor alarm creation.
    */
   public static String createMinorAlarm_303(String type, String text, String time) {
-    return "303," + type + "," + text + "," + time;
+    return "303," + type + ",\"" + text + "\"," + time;
   }
 
   /**
@@ -396,7 +396,7 @@ public class CConnectorApiMessageBuilder {
    * @return The payload for the warning alarm creation.
    */
   public static String createWarningAlarm_304(String type, String text, String time) {
-    return "304," + type + "," + text + "," + time;
+    return "304," + type + ",\"" + text + "\"," + time;
   }
 
   /**
