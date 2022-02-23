@@ -97,6 +97,32 @@ public class CConnectorApiMessageReader {
       "Unable to download and update the device firmware due to an exception.";
 
   /**
+   * The response string used to indicate a failed operation due to an error creating a tag control
+   * object for the measurements enable/disable control tag.
+   */
+  public static final String RESPONSE_UNABLE_SET_MEASUREMENTS_COMMAND_NO_TAG_CTRL =
+      "Unable to process measurements enable/disable command from Cumulocity because a TagControl "
+          + "object cannot be created! Check that the tag creation is successful and no errors "
+          + "occur during connector startup that may prevent this tag from being created.";
+
+  /**
+   * The response string used to indicate a failed operation due to an exception while setting the
+   * measurements enable/disable control tag value.
+   */
+  public static final String RESPONSE_UNABLE_SET_MEASUREMENTS_COMMAND_EXCEPTION =
+      "Unable to process measurements enable/disable command from Cumulocity because an exception "
+          + "occurred while setting the corresponding tag value! Check that the value specified is "
+          + "of the correct type.";
+
+  /**
+   * The response string used to indicate a failed operation due to a formatting error while setting
+   * the measurements enable/disable control tag value.
+   */
+  public static final String RESPONSE_UNABLE_SET_MEASUREMENTS_COMMAND_FORMAT =
+      "Unable to process measurements enable/disable command from Cumulocity because the value was "
+          + "not in the expected format (enable/disable).";
+
+  /**
    * The name of the temporary file used to indicate that the connector is restarting due to a
    * c8y_Restart operation.
    */
@@ -484,6 +510,45 @@ public class CConnectorApiMessageReader {
           String operationResponsePayload =
               CConnectorApiMessageBuilder.setOperationToFailed_502(
                   CUMULOCITY_RUN_COMMAND_OPERATION_ID, RESPONSE_UNABLE_SET_COMMAND_FORMAT);
+          mqttMgr.sendOperationResponse(mqttTopic, operationResponsePayload);
+        }
+      } else if (command.startsWith("measurements")) {
+        try {
+          String measurementEnableFlag = (String) commandParts.get(1);
+          TagControl measurementEnableTag =
+              CConnectorMain.getConnectorMeasurementEnableControlTag();
+          if (measurementEnableTag != null) {
+            if (measurementEnableFlag.equalsIgnoreCase("enable")
+                || measurementEnableFlag.equalsIgnoreCase("disable")) {
+              measurementEnableTag.setTagValueAsInt(
+                  measurementEnableFlag.equalsIgnoreCase("enable") ? 1 : 0);
+              String operationResponsePayload =
+                  CConnectorApiMessageBuilder.setOperationToSuccessful_503(
+                      CUMULOCITY_RUN_COMMAND_OPERATION_ID);
+              mqttMgr.sendOperationResponse(mqttTopic, operationResponsePayload);
+            } else {
+              Logger.LOG_WARN(RESPONSE_UNABLE_SET_MEASUREMENTS_COMMAND_FORMAT);
+              String operationResponsePayload =
+                  CConnectorApiMessageBuilder.setOperationToFailed_502(
+                      CUMULOCITY_RUN_COMMAND_OPERATION_ID,
+                      RESPONSE_UNABLE_SET_MEASUREMENTS_COMMAND_FORMAT);
+              mqttMgr.sendOperationResponse(mqttTopic, operationResponsePayload);
+            }
+
+          } else {
+            Logger.LOG_WARN(RESPONSE_UNABLE_SET_MEASUREMENTS_COMMAND_NO_TAG_CTRL);
+            String operationResponsePayload =
+                CConnectorApiMessageBuilder.setOperationToFailed_502(
+                    CUMULOCITY_RUN_COMMAND_OPERATION_ID,
+                    RESPONSE_UNABLE_SET_MEASUREMENTS_COMMAND_NO_TAG_CTRL);
+            mqttMgr.sendOperationResponse(mqttTopic, operationResponsePayload);
+          }
+        } catch (Exception e) {
+          Logger.LOG_WARN(RESPONSE_UNABLE_SET_MEASUREMENTS_COMMAND_EXCEPTION);
+          String operationResponsePayload =
+              CConnectorApiMessageBuilder.setOperationToFailed_502(
+                  CUMULOCITY_RUN_COMMAND_OPERATION_ID,
+                  RESPONSE_UNABLE_SET_MEASUREMENTS_COMMAND_EXCEPTION);
           mqttMgr.sendOperationResponse(mqttTopic, operationResponsePayload);
         }
       } else {

@@ -226,6 +226,12 @@ The following commands are supported:
         2. The series name
         3. The value to set the tag to
     3. Example: `setf fragmentName seriesName value`
+3. `measurements`
+    1. Using the `measurements` command, you can enable or disable the measurements of the
+       Connector.
+    2. The `measurements` command takes one parameter:
+        1. The enable/disable flag (`enable` or `disable`)
+    3. Example: `measurements enable`
 
 ### Log Output
 
