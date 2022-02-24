@@ -629,7 +629,7 @@ public class CConnectorApiMessageReader {
         // Create temporary file to store in progress configuration reboot operation information
         try {
           FileAccessManager.writeStringToFile(TEMPORARY_CONFIG_RESTART_FILE_PATH, mqttTopic);
-          CConnectorMain.shutdownConnectorAndRestartDevice();
+          CConnectorMain.shutdownAndRestartConnector();
         } catch (IOException e) {
           Logger.LOG_CRITICAL(RESPONSE_TEMPORARY_FILE_CREATE_ERROR);
           Logger.LOG_EXCEPTION(e);
