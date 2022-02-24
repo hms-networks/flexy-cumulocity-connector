@@ -286,19 +286,13 @@ public class CConnectorMqttMgr extends MqttManager {
       String firmwareDownloadUrlVersion = StringUtils.replace(firmwareVersion, ".", "_");
       List serialNumberSplit = StringUtils.split(sysControlBlockInf.getItem("MbSerNum"), "-");
       String firmwareDownloadPCode = serialNumberSplit.get(serialNumberSplit.size() - 1).toString();
+      String firmwareName = "er" + firmwareDownloadUrlVersion + "p" + firmwareDownloadPCode + "_ma";
       String firmwareDownloadUrl =
-          "\""
-              + EWON_FIRMWARE_DOWNLOAD_WEBPAGE_URL
-              + "er"
-              + firmwareDownloadUrlVersion
-              + "p"
-              + firmwareDownloadPCode
-              + "_ma.edf"
-              + "\"";
+          "\"" + EWON_FIRMWARE_DOWNLOAD_WEBPAGE_URL + firmwareName + ".edf" + "\"";
       mqttPublish(
           CUMULOCITY_MQTT_TOPIC_SUS,
           CConnectorApiMessageBuilder.setFirmware_115(
-              "Ewon Firmware", firmwareVersion, firmwareDownloadUrl),
+              firmwareName, firmwareVersion, firmwareDownloadUrl),
           MQTT_QOS_LEVEL,
           MQTT_RETAIN);
     } catch (Exception e) {
