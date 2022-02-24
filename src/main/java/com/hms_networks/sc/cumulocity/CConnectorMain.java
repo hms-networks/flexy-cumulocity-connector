@@ -216,17 +216,6 @@ public class CConnectorMain {
       initializeSuccess = false;
     }
 
-    // Reset connector control tag value
-    if (connectorControlTag != null) {
-      try {
-        connectorControlTag.setTagValueAsInt(CONNECTOR_CONTROL_TAG_RUN_VALUE);
-      } catch (EWException e) {
-        Logger.LOG_CRITICAL("Unable to reset the connector control tag value!");
-        Logger.LOG_EXCEPTION(e);
-        initializeSuccess = false;
-      }
-    }
-
     // Configure Ewon's HTTP timeouts
     try {
       SCHttpUtility.setHttpTimeouts(HTTP_TIMEOUT_SECONDS_STRING);
@@ -697,6 +686,21 @@ public class CConnectorMain {
                 + CONNECTOR_HALT_TAG_NAME
                 + "`.");
         Logger.LOG_EXCEPTION(e2);
+      }
+    }
+
+    // Reset value
+    if (connectorControlTag != null) {
+      try {
+        connectorControlTag.setTagValueAsInt(CONNECTOR_CONTROL_TAG_RUN_VALUE);
+      } catch (EWException e) {
+        Logger.LOG_WARN(
+            "Unable to reset tag `"
+                + CONNECTOR_HALT_TAG_NAME
+                + "` to "
+                + CONNECTOR_CONTROL_TAG_RUN_VALUE
+                + "! The connector may shut down if the halt tag value indicates.");
+        Logger.LOG_EXCEPTION(e);
       }
     }
   }
