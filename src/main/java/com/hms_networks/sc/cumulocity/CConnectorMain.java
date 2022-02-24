@@ -13,6 +13,7 @@ import com.hms_networks.americas.sc.extensions.json.JSONException;
 import com.hms_networks.americas.sc.extensions.logging.Logger;
 import com.hms_networks.americas.sc.extensions.retry.AutomaticRetryCodeExponential;
 import com.hms_networks.americas.sc.extensions.retry.AutomaticRetryState;
+import com.hms_networks.americas.sc.extensions.system.application.SCAppManagement;
 import com.hms_networks.americas.sc.extensions.system.http.SCHttpUtility;
 import com.hms_networks.americas.sc.extensions.system.tags.SCTagUtils;
 import com.hms_networks.americas.sc.extensions.system.time.SCTimeUnit;
@@ -132,6 +133,9 @@ public class CConnectorMain {
 
     // Load configuration file
     initializeSuccess &= loadConfiguration();
+
+    // Enable application auto restart
+    SCAppManagement.enableAppAutoRestart();
 
     // Start thread for default event manager
     boolean autorun = false;
@@ -349,6 +353,9 @@ public class CConnectorMain {
       Logger.LOG_CRITICAL("Failed to clean up " + CONNECTOR_FRIENDLY_NAME + " properly!");
     }
     Logger.LOG_CRITICAL(CONNECTOR_FRIENDLY_NAME + " has finished running.");
+
+    // Disable automatic application restart
+    SCAppManagement.disableAppAutoRestart();
 
     // Trigger a restart of the device (if flag is set)
     if (restartDeviceAfterShutdown) {

@@ -7,6 +7,7 @@ import com.hms_networks.americas.sc.extensions.fileutils.FileAccessManager;
 import com.hms_networks.americas.sc.extensions.json.JSONException;
 import com.hms_networks.americas.sc.extensions.logging.Logger;
 import com.hms_networks.americas.sc.extensions.string.StringUtils;
+import com.hms_networks.americas.sc.extensions.system.application.SCAppManagement;
 import com.hms_networks.americas.sc.extensions.system.http.SCHttpUtility;
 import com.hms_networks.americas.sc.extensions.taginfo.TagInfo;
 import com.hms_networks.americas.sc.extensions.taginfo.TagInfoManager;
@@ -859,6 +860,9 @@ public class CConnectorApiMessageReader {
    */
   private static String downloadFirmwareFile(String remoteFileUrl)
       throws EWException, MalformedURLException, JSONException {
+    // Disable application auto-restart otherwise firmware update gets interrupted.
+    SCAppManagement.disableAppAutoRestart();
+
     // Perform GET request to specified URL
     final String urlAuthNotEncoded =
         CConnectorMain.getConnectorConfig().getCumulocityDeviceTenant()
