@@ -5,25 +5,33 @@ Copyright © 2022 HMS Industrial Networks Inc.
 The Ewon Flexy Cumulocity Connector package provides a connector-based solution to Cumulocity for
 linking Ewon devices using a direct data path with a Flexy Java application.
 
-## Installation
+## Download
 
-Installation of the Ewon Flexy Cumulocity Connector is simple, and requires only the upload of a
-handful of files to your Ewon device.
+Prior to configuration or installation, you must download and extract the Ewon Flexy Cumulocity
+Connector release package.
 
-Using an FTP client of your choice, such as [Filezilla](https://filezilla-project.org/), upload the
-following files to the /usr directory of the Ewon device:
+To download the latest Ewon Flexy Cumulocity Connector release package, visit the repository's
+GitHub Releases page,
+[https://github.com/hms-networks/flexy-cumulocity-connector/releases/latest](https://github.com/hms-networks/flexy-cumulocity-connector/releases/latest)
+.
 
-1. `flexy-cumulocity-connector-{VERSION}-full.jar`
-2. `jvmrun`
-3. `CumulocityConnectorConfig.json`
+Expand the 'Assets' section to see the full list of files for the release, then click to download
+the 'flexy-cumulocity-connector-X.Y.Z.zip' file. *Note: X.Y.Z is the exact version number of the
+release package.*
 
-Note: The `CumulocityConnectorConfig.json` file is optional. If you do not provide this file, the
-connector will use the default Cumulocity configuration and create a new file.
+![Connector Release Zip Download](images/ReleaseDownload.png)
+
+Using the tool of your choice, unzip the 'flexy-cumulocity-connector-X.Y.Z.zip' file.
+
+![Connector Release Zip Extraction](images/ReleaseExtract.png)
+
+After the Ewon Flexy Cumulocity Connector release package is extracted, you may perform
+configuration and installation as described below.
 
 ## Configuration
 
-After the files have been uploaded, a device registration entry must be created in Cumulocity, and
-the connector configuration file updated.
+In order to connect the Ewon Flexy Cumulocity Connector against your Cumulocity Instance, you must
+create a device registration entry in Cumulocity.
 
 ### Cumulocity Registration
 
@@ -54,26 +62,41 @@ button when finished.
 
 ![Registration Page Complete Button](images/RegistrationComplete.png)
 
-After the device registration has been completed, you may start up the Ewon Flexy Cumulocity
-Connector with the corresponding bootstrap credentials and the device will register itself. Once
-registered, it will be pending acceptance in the Cumulocity device registration portal.
+After the device registration has been completed and the remaining steps completed as described
+below, you may start up the Ewon Flexy Cumulocity Connector and the device will register itself.
+Once registered, it will be pending acceptance in the Cumulocity device registration portal.
 
 ### Connector Configuration File
 
-Once the device registration has been created in Cumulocity, the bootstrap credentials must be
-configured in the connector configuration file prior to starting the connector.
+The bootstrap credentials from your Cumulocity tenant must be configured in the connector
+configuration file prior to installing or starting the connector.
 
-Using an FTP client of your choice, download and edit the `CumulocityConnectorConfig.json` file
-located in the `/usr` directory of the Ewon device.
+Using a text editor/IDE of your choice, edit the `CumulocityConnectorConfig.json`
+file located in the `starting-files` directory of the extracted Ewon Flexy Cumulocity Connector
+release package.
 
 Populate the `BootstrapUsername`, `BootstrapPassword`, and `BootstrapTenant` fields with the
 corresponding values for your Cumulocity tenant.
 
 ![Connector Configuration File Bootstrap Edit](images/ConnectorConfigBootstrap.png)
 
-Once populated, save and upload the updated file to the Ewon device and restart the connector. In
-many scenarios, it may be simplest to restart the connector by restarting the entire Ewon device.
+Once populated, save the file and continue with installation.
 
-The device will now automatically register itself with Cumulocity. After it has started up, the
-device will be pending acceptance in Cumulocity. After it is accepted, the device will be properly
-connected and usable.
+## Installation
+
+Installation of the Ewon Flexy Cumulocity Connector is simple, and requires only the upload of a
+handful of files to your Ewon device.
+
+Using an FTP client of your choice, such as [Filezilla](https://filezilla-project.org/), upload the
+following files to the /usr directory of the Ewon device, including the
+populated `CumulocityConnectorConfig.json` from earlier.
+
+1. `flexy-cumulocity-connector-{VERSION}-full.jar`
+    1. Located in the `target` folder
+2. `jvmrun`
+    1. Located in the `starting-files` folder
+3. `CumulocityConnectorConfig.json`
+    1. Located in the `starting-files` folder
+
+Once uploaded, restart the Ewon device and the Ewon Flexy Cumulocity Connector will start up
+automatically (using the uploaded `jvmrun` file).
