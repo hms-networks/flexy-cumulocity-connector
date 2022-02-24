@@ -355,6 +355,7 @@ public class CConnectorMain {
     if (mqttMgr != null) {
       try {
         mqttMgr.disconnect();
+        mqttMgr.stopMqttThread();
       } catch (Exception e) {
         Logger.LOG_CRITICAL("Unable to disconnect from MQTT.");
         shutDownClean = false;
