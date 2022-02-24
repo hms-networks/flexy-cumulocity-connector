@@ -513,7 +513,7 @@ public class CConnectorApiMessageReader {
               }
               String operationResponsePayload =
                   CConnectorApiMessageBuilder.setOperationToSuccessful_503(
-                      CUMULOCITY_RUN_COMMAND_OPERATION_ID);
+                      CUMULOCITY_RUN_COMMAND_OPERATION_ID, new String[] {RESPONSE_SUCCESS});
               mqttMgr.sendOperationResponse(mqttTopic, operationResponsePayload);
             }
           } catch (Exception e) {
@@ -543,7 +543,7 @@ public class CConnectorApiMessageReader {
                   measurementEnableFlag.equalsIgnoreCase("enable") ? 1 : 0);
               String operationResponsePayload =
                   CConnectorApiMessageBuilder.setOperationToSuccessful_503(
-                      CUMULOCITY_RUN_COMMAND_OPERATION_ID);
+                      CUMULOCITY_RUN_COMMAND_OPERATION_ID, new String[] {RESPONSE_SUCCESS});
               mqttMgr.sendOperationResponse(mqttTopic, operationResponsePayload);
             } else {
               Logger.LOG_WARN(RESPONSE_UNABLE_SET_MEASUREMENTS_COMMAND_FORMAT);
