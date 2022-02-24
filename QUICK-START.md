@@ -17,13 +17,11 @@ following files to the /usr directory of the Ewon device:
 2. `jvmrun`
 3. `CumulocityConnectorConfig.json`
 
-Note: The `CumulocityConnectorConfig.json` file is optional. If you do not provide this file, the
-connector will use the default Cumulocity configuration and create a new file.
-
 ## Configuration
 
 After the files have been uploaded, a device registration entry must be created in Cumulocity, and
-the connector configuration file updated.
+the connector configuration file updated. You'll need to know the bootstrap tenant, username, and
+password for your Cumulocity instance prior to configuration.
 
 ### Cumulocity Registration
 
@@ -54,14 +52,14 @@ button when finished.
 
 ![Registration Page Complete Button](images/RegistrationComplete.png)
 
-After the device registration has been completed, you may start up the Ewon Flexy Cumulocity
-Connector with the corresponding bootstrap credentials and the device will register itself. Once
-registered, it will be pending acceptance in the Cumulocity device registration portal.
+After the device registration has been completed and the configuration file has been set up as
+described below, you may start up the Ewon Flexy Cumulocity Connector and the device will register
+itself. Once registered, it will be pending acceptance in the Cumulocity device registration portal.
 
 ### Connector Configuration File
 
-Once the device registration has been created in Cumulocity, the bootstrap credentials must be
-configured in the connector configuration file prior to starting the connector.
+The bootstrap credentials from your Cumulocity tenant must be configured in the connector
+configuration file prior to starting the connector.
 
 Using an FTP client of your choice, download and edit the `CumulocityConnectorConfig.json` file
 located in the `/usr` directory of the Ewon device.
