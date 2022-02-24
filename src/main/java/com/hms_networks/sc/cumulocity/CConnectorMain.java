@@ -108,6 +108,9 @@ public class CConnectorMain {
   /** Boolean indicating if the device should be restarted after the connector shuts down. */
   private static boolean restartDeviceAfterShutdown = false;
 
+  /** Boolean indicating if the connector application should be restarted after it shuts down. */
+  private static boolean restartAppAfterShutdown = false;
+
   /**
    * Gets the tag control object for the measurement enable control tag.
    *
@@ -133,6 +136,13 @@ public class CConnectorMain {
    */
   public static CConnectorConfigFile getConnectorConfig() {
     return connectorConfig;
+  }
+
+  /** Triggers a shutdown and restart of the connector. */
+  public static void shutdownAndRestartConnector() {
+    Logger.LOG_CRITICAL("The connector has been requested to restart...");
+    restartAppAfterShutdown = true;
+    isRunning = false;
   }
 
   /** Triggers a shutdown of the connector and restart of the host device when requested. */
@@ -390,8 +400,15 @@ public class CConnectorMain {
     }
     Logger.LOG_CRITICAL(CONNECTOR_FRIENDLY_NAME + " has finished running.");
 
-    // Disable automatic application restart
-    SCAppManagement.disableAppAutoRestart();
+    // Restart connector if requested, otherwise disable automatic application restart
+    if (restartAppAfterShutdown) {
+      // Exit with non-zero exit code otherwise app auto restart doesnt work
+      final int nonNormalExitCode = -1;
+      Logger.LOG_CRITICAL("Restarting connector!");
+      System.exit(nonNormalExitCode);
+    } else {
+      SCAppManagement.disableAppAutoRestart();
+    }
 
     // Trigger a restart of the device (if flag is set)
     if (restartDeviceAfterShutdown) {
