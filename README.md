@@ -215,17 +215,23 @@ The following commands are supported:
 
 1. `set`
     1. Using the `set` command, you can set the value of a tag.
-    2. The `set` command takes two parameters:
+    2. Tags for child devices may also be set using the `set` command. Simply append the child
+       device name followed by a forward-slash (`/`) to the tag name. For
+       example, `set childName/tagName value`.
+    3. The `set` command takes two parameters:
         1. The tag name
         2. The value to set the tag to
-    3. Example: `set tagName value`
+    4. Example: `set tagName value`
 2. `setf`
     1. Using the `setf` command, you can set the value of a tag by its fragment and series.
-    2. The `setf` command takes three parameters:
+    2. Tags for child devices may also be set using the `setf` command. Simply append the child
+       device name followed by a forward-slash (`/`) to the fragment name. For
+       example, `setf childName/fragmentName seriesName value`.
+    3. The `setf` command takes three parameters:
         1. The fragment name
         2. The series name
         3. The value to set the tag to
-    3. Example: `setf fragmentName seriesName value`
+    4. Example: `setf fragmentName seriesName value`
 3. `measurements`
     1. Using the `measurements` command, you can enable or disable the measurements of the
        Connector.
