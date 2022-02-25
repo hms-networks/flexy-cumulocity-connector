@@ -200,6 +200,18 @@ public class CConnectorConfigFile extends ConfigFile {
   }
 
   /**
+   * Returns a boolean indicating if the bootstrap credentials are configured.
+   *
+   * @return true if the bootstrap credentials are configured, false otherwise
+   * @throws JSONException if unable to get bootstrap credentials from configuration
+   */
+  public boolean isBootstrapConfigured() throws JSONException {
+    return getCumulocityBootstrapTenant().length() > 0
+        && getCumulocityBootstrapUsername().length() > 0
+        && getCumulocityBootstrapPassword().length() > 0;
+  }
+
+  /**
    * Get the configured Cumulocity bootstrap tenant.
    *
    * @return Cumulocity bootstrap tenant
