@@ -169,6 +169,22 @@ public class CConnectorMain {
     // Load configuration file
     initializeSuccess &= loadConfiguration();
 
+    // Check that bootstrap is configured, otherwise cannot continue
+    try {
+      if (!connectorConfig.isBootstrapConfigured()) {
+        Logger.LOG_CRITICAL(
+            "The bootstrap tenant and/or credentials are not configured in the "
+                + "configuration file! Please configure them and restart the connector.");
+        initializeSuccess = false;
+      }
+
+    } catch (JSONException e) {
+      Logger.LOG_CRITICAL(
+          "Unable to check for bootstrap credentials in the connector configuration file!");
+      Logger.LOG_EXCEPTION(e);
+      initializeSuccess = false;
+    }
+
     // Enable application auto restart
     SCAppManagement.enableAppAutoRestart();
 
