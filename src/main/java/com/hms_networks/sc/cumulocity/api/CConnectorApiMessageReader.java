@@ -1,6 +1,7 @@
 package com.hms_networks.sc.cumulocity.api;
 
 import com.ewon.ewonitf.EWException;
+import com.ewon.ewonitf.RuntimeControl;
 import com.ewon.ewonitf.ScheduledActionManager;
 import com.ewon.ewonitf.TagControl;
 import com.hms_networks.americas.sc.extensions.fileutils.FileAccessManager;
@@ -946,6 +947,10 @@ public class CConnectorApiMessageReader {
       throws EWException, MalformedURLException, JSONException {
     // Disable application auto-restart otherwise firmware update gets interrupted.
     SCAppManagement.disableAppAutoRestart();
+
+    // Disable app watchdog otherwise firmware update gets interrupted.
+    final int watchDogTimeoutDisabled = 0;
+    RuntimeControl.configureAppWatchdog(watchDogTimeoutDisabled);
 
     // Perform GET request to specified URL
     final String urlAuthNotEncoded =
