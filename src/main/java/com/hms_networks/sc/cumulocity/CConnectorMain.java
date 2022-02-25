@@ -77,6 +77,9 @@ public class CConnectorMain {
    */
   public static final String HTTP_TIMEOUT_SECONDS_STRING = "10";
 
+  /** Application watchdog timeout */
+  public static final int APP_WATCHDOG_TIMEOUT_MIN = 5;
+
   /**
    * The prefix appended to the front of the Ewon Flexy's serial number to form the MQTT client ID.
    */
@@ -184,6 +187,9 @@ public class CConnectorMain {
       Logger.LOG_EXCEPTION(e);
       initializeSuccess = false;
     }
+
+    // Configure the application watchdog
+    RuntimeControl.configureAppWatchdog(APP_WATCHDOG_TIMEOUT_MIN);
 
     // Enable application auto restart
     SCAppManagement.enableAppAutoRestart();
@@ -399,6 +405,10 @@ public class CConnectorMain {
       }
     }
 
+    // Disable app watchdog
+    final int watchDogTimeoutDisabled = 0;
+    RuntimeControl.configureAppWatchdog(watchDogTimeoutDisabled);
+
     if (cleanUpSuccess) {
       Logger.LOG_CRITICAL("Finished cleaning up " + CONNECTOR_FRIENDLY_NAME + ".");
     } else {
@@ -442,6 +452,9 @@ public class CConnectorMain {
     if (initialized && startedUp) {
       // Cyclically run main loop and sleep while connector is running
       while (isRunning) {
+        // Service the watchdog
+        RuntimeControl.refreshWatchdog();
+
         runMainLoop();
         try {
           Thread.sleep(MAIN_LOOP_CYCLE_TIME_MILLIS);
