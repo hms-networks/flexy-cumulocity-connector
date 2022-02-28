@@ -125,6 +125,10 @@ configured prior to running the connector.
 Parameter to specify the bootstrap tenant to use when registering to Cumulocity. This must be
 configured prior to running the connector.
 
+#### Subscribe to Errors (SubscribeToErrors)
+
+Parameter to enable subscribing to errors from the Cumulocity server.
+
 #### Device Username (DeviceUsername)
 
 This configuration field is filled automatically by the connector application, and is the device

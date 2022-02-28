@@ -48,6 +48,9 @@ public class CConnectorConfigFile extends ConfigFile {
   /** Key for accessing the 'Host' object in the configuration file. */
   private static final String CONFIG_FILE_HOST_KEY = "Host";
 
+  /** Key for accessing the 'SubscribeToErrors' object in the configuration file. */
+  private static final String CONFIG_FILE_SUBSCRIBE_TO_ERRORS_KEY = "SubscribeToErrors";
+
   /** Key for accessing the 'LogLevel' object in the configuration file. */
   private static final String CONFIG_FILE_LOG_LEVEL_KEY = "LogLevel";
 
@@ -76,6 +79,9 @@ public class CConnectorConfigFile extends ConfigFile {
 
   /** The default interval (in milliseconds) to poll the historical data queue. */
   private static final long QUEUE_DATA_POLL_INTERVAL_MILLIS_DEFAULT = 10000;
+
+  /** The default value for the subscribe to errors setting. */
+  private static final boolean SUBSCRIBE_TO_ERRORS_DEFAULT = false;
 
   /**
    * Default value of boolean flag indicating if string history data should be retrieved from the
@@ -185,6 +191,13 @@ public class CConnectorConfigFile extends ConfigFile {
    */
   private static final String CUMULOCITY_HOST_CONFIG_NAME =
       CONFIG_FILE_CUMULOCITY_KEY + "/" + CONFIG_FILE_HOST_KEY;
+
+  /**
+   * The configuration field name used for the Cumulocity subscribe to errors setting when
+   * communicating with Cumulocity.
+   */
+  private static final String CUMULOCITY_SUBSCRIBE_TO_ERRORS_CONFIG_NAME =
+      CONFIG_FILE_CUMULOCITY_KEY + "/" + CONFIG_FILE_SUBSCRIBE_TO_ERRORS_KEY;
 
   /**
    * Returns a boolean indicating if device provisioning is required.
@@ -332,6 +345,27 @@ public class CConnectorConfigFile extends ConfigFile {
     return configurationObject
         .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
         .getString(CONFIG_FILE_HOST_KEY);
+  }
+
+  /**
+   * Gets the Cumulocity subscribe to errors setting.
+   *
+   * @return Cumulocity subscribe to errors setting
+   */
+  public boolean getCumulocitySubscribeToErrors() {
+    boolean subscribeToErrors = SUBSCRIBE_TO_ERRORS_DEFAULT;
+    try {
+      subscribeToErrors =
+          configurationObject
+              .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
+              .getBoolean(CONFIG_FILE_SUBSCRIBE_TO_ERRORS_KEY);
+    } catch (JSONException e) {
+      Logger.LOG_DEBUG(
+          CONFIG_FILE_SUBSCRIBE_TO_ERRORS_KEY
+              + " not found in configuration file. Using default: "
+              + subscribeToErrors);
+    }
+    return subscribeToErrors;
   }
 
   /**
@@ -580,6 +614,13 @@ public class CConnectorConfigFile extends ConfigFile {
         configurationObject
             .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
             .put(CONFIG_FILE_HOST_KEY, configFileEscapedStringLineValue);
+      } else if (configFileEscapedStringLineKey.equals(
+          CUMULOCITY_SUBSCRIBE_TO_ERRORS_CONFIG_NAME)) {
+        configurationObject
+            .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
+            .put(
+                CONFIG_FILE_SUBSCRIBE_TO_ERRORS_KEY,
+                configFileEscapedStringLineValue.equals("true"));
       }
     }
     trySave();
@@ -775,6 +816,19 @@ public class CConnectorConfigFile extends ConfigFile {
       configFileEscapedString.append("\n");
     }
 
+    // Add Cumulocity/SubscribeToErrors
+    if (configurationObject
+        .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
+        .has(CONFIG_FILE_SUBSCRIBE_TO_ERRORS_KEY)) {
+      configFileEscapedString.append(CUMULOCITY_SUBSCRIBE_TO_ERRORS_CONFIG_NAME);
+      configFileEscapedString.append("=");
+      configFileEscapedString.append(
+          configurationObject
+              .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
+              .getString(CONFIG_FILE_SUBSCRIBE_TO_ERRORS_KEY));
+      configFileEscapedString.append("\n");
+    }
+
     return configFileEscapedString.toString();
   }
 
@@ -828,6 +882,8 @@ public class CConnectorConfigFile extends ConfigFile {
     defaultCumulocityConfigurationObject.put(
         CONFIG_FILE_DEVICE_TENANT_KEY, CONFIG_FILE_AUTOMATICALLY_FILLED_TEXT);
     defaultCumulocityConfigurationObject.put(CONFIG_FILE_HOST_KEY, "");
+    defaultCumulocityConfigurationObject.put(
+        CONFIG_FILE_SUBSCRIBE_TO_ERRORS_KEY, SUBSCRIBE_TO_ERRORS_DEFAULT);
 
     // Add default Cumulocity object and Connector object to a root object and return
     JSONObject defaultConfigObject = new JSONObject();
