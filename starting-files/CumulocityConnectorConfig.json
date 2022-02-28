@@ -1,0 +1,19 @@
+{
+   "Connector": {
+      "LogLevel": 4,
+      "UTF8StringSupport": true,
+      "QueueDataPollIntervalMillis": 10000,
+      "QueueEnableDiagnosticTags": false,
+      "QueueEnableStringHistory": false,
+      "QueueDataPollSizeMins": 1
+   },
+   "Cumulocity": {
+      "DeviceUsername": "<automatically filled>",
+      "BootstrapUsername": "",
+      "DevicePassword": "<automatically filled>",
+      "Host": "",
+      "BootstrapPassword": "",
+      "BootstrapTenant": "",
+      "DeviceTenant": "<automatically filled>"
+   }
+}
