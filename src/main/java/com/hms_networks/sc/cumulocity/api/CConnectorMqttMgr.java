@@ -167,7 +167,12 @@ public class CConnectorMqttMgr extends MqttManager {
     // Subscribe to Cumulocity MQTT topics
     if (!subscribedToTopics) {
       try {
-        subscribe("s/e", MQTT_QOS_LEVEL);
+        // Subscribe to Cumulocity error topic if enabled
+        if (CConnectorMain.getConnectorConfig().getCumulocitySubscribeToErrors()) {
+          Logger.LOG_INFO("Subscribing to Cumulocity error topic.");
+          subscribe("s/e", MQTT_QOS_LEVEL);
+        }
+
         subscribe(CUMULOCITY_MQTT_TOPIC_SDS, MQTT_QOS_LEVEL);
         subscribe(CUMULOCITY_MQTT_TOPIC_SDS + "/*", MQTT_QOS_LEVEL);
         subscribedToTopics = true;

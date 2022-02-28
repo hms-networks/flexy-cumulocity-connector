@@ -14,6 +14,7 @@
       "Host": "",
       "BootstrapPassword": "",
       "BootstrapTenant": "",
-      "DeviceTenant": "<automatically filled>"
+      "DeviceTenant": "<automatically filled>",
+      "SubscribeToErrors": false
    }
 }
