@@ -218,7 +218,8 @@ public class CConnectorMqttMgr extends MqttManager {
     Logger.LOG_DEBUG("Initializing MQTT connection...");
 
     // Configure MQTT
-    setPortNonSecureDefault();
+    setPortSecureDefault();
+    setCAFilePath(CConnectorApiCertificateMgr.getRootCaFilePath());
     setTLSVersion(MQTT_TLS_VERSION);
 
     // Get provisioner information
