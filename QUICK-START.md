@@ -14,8 +14,10 @@ Using an FTP client of your choice, such as [Filezilla](https://filezilla-projec
 following files to the /usr directory of the Ewon device:
 
 1. `flexy-cumulocity-connector-{VERSION}-full.jar`
-2. `jvmrun`
-3. `CumulocityConnectorConfig.json`
+2. `jvmrun` 
+   1. Located in the `starting-files` folder
+3. `CumulocityConnectorConfig.json` 
+   1. Located in the `starting-files` folder
 
 ## Configuration
 
