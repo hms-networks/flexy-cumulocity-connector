@@ -1,6 +1,6 @@
 # Ewon Flexy Cumulocity Connector Changelog
 
-## Version 0.0.1
+## Version 1.0.0
 ### Features
 - Initial Release
 ### Bug Fixes
