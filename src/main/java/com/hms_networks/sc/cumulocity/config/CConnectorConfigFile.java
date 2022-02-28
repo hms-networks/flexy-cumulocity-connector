@@ -75,7 +75,7 @@ public class CConnectorConfigFile extends ConfigFile {
   private static final long QUEUE_DATA_POLL_SIZE_MINS_DEFAULT = 1;
 
   /** The default interval (in milliseconds) to poll the historical data queue. */
-  private static final long QUEUE_DATA_POLL_INTERVAL_MILLIS_DEFAULT = 30000;
+  private static final long QUEUE_DATA_POLL_INTERVAL_MILLIS_DEFAULT = 10000;
 
   /**
    * Default value of boolean flag indicating if string history data should be retrieved from the
