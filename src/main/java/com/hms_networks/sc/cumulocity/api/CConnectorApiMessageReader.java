@@ -434,7 +434,7 @@ public class CConnectorApiMessageReader {
       childDeviceName = null;
     }
 
-    // Sp1lit command to parts
+    // Split command to parts
     List commandParts = StringUtils.split(command, " ");
 
     // Execute command
