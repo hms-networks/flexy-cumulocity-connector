@@ -164,7 +164,10 @@ public class CConnectorMain {
     isRunning = false;
   }
 
-  /** Triggers a shutdown of the connector and restart of the host device when requested. */
+  /**
+   * Sets the {@link #restartDeviceAfterShutdown} flag to <code>true</code> to trigger a shutdown of
+   * the connector and restart of the host device when requested.
+   */
   public static void shutdownConnectorAndRestartDevice() {
     Logger.LOG_CRITICAL("The connector has been requested to shut down and restart the device...");
     restartDeviceAfterShutdown = true;
