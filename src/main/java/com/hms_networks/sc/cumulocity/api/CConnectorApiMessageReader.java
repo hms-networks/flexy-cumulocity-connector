@@ -716,7 +716,16 @@ public class CConnectorApiMessageReader {
               + ") from "
               + firmwareUrl);
       try {
-        downloadFirmwareFile(firmwareUrl);
+        /* Perform firmware download and if unsuccessful, store the returned result. If successful,
+        the method does not return because the application will be terminated. */
+        String result = downloadFirmwareFile(firmwareUrl);
+
+        // Update state to failed with result (device reboots instead of returning when successful)
+        String operationResponsePayload =
+            CConnectorApiMessageBuilder.setOperationToFailed_502(
+                CUMULOCITY_FIRMWARE_OPERATION_ID, result);
+        mqttMgr.sendOperationResponse(mqttTopic, operationResponsePayload);
+        Logger.LOG_SERIOUS(result);
       } catch (Exception e) {
         String operationResponsePayload =
             CConnectorApiMessageBuilder.setOperationToFailed_502(
