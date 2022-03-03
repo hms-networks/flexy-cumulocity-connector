@@ -975,27 +975,48 @@ public class CConnectorApiMessageReader {
             remoteFileUrl, "GET", authHeader, "", "", "/ewonfwr.edf");
 
     // Read response contents and return
-    String resultString = null;
-    if (httpStatus == SCHttpUtility.HTTPX_CODE_EWON_ERROR) {
-      resultString =
-          "An Ewon error ("
-              + httpStatus
-              + ") was encountered while attempting to download a firmware file.";
-    } else if (httpStatus == SCHttpUtility.HTTPX_CODE_AUTH_ERROR) {
-      resultString =
-          "An authentication error ("
-              + httpStatus
-              + ") was encountered while attempting to download a firmware file.";
-    } else if (httpStatus == SCHttpUtility.HTTPX_CODE_CONNECTION_ERROR) {
-      resultString =
-          "A connection error ("
-              + httpStatus
-              + ") was encountered while attempting to download a firmware file.";
-    } else if (httpStatus != SCHttpUtility.HTTPX_CODE_NO_ERROR) {
-      resultString =
-          "An unknown error ("
-              + httpStatus
-              + ") was encountered while attempting to download a firmware file.";
+    String resultString;
+    switch (httpStatus) {
+      case SCHttpUtility.HTTPX_CODE_EWON_ERROR:
+        resultString =
+            "An Ewon error ("
+                + httpStatus
+                + ") was encountered while attempting to download a firmware file.";
+        break;
+      case SCHttpUtility.HTTPX_CODE_AUTH_ERROR:
+        resultString =
+            "An authentication error ("
+                + httpStatus
+                + ") was encountered while attempting to download a firmware file.";
+        break;
+      case SCHttpUtility.HTTPX_CODE_CONNECTION_ERROR:
+        resultString =
+            "A connection error ("
+                + httpStatus
+                + ") was encountered while attempting to download a firmware file.";
+        break;
+      case SCHttpUtility.HTTPX_CODE_NO_ERROR:
+        // Get device serial and P-Code
+        String serialNumber = CConnectorMain.getEwonSerialNumber();
+        List serialNumberSplit = StringUtils.split(serialNumber, "-");
+        String firmwareDownloadPCode =
+            serialNumberSplit.get(serialNumberSplit.size() - 1).toString();
+
+        // Build error message with device serial and P-Code
+        resultString =
+            "The firmware update was declined by the Ewon device. Verify that the firmware file is "
+                + "not corrupt and is valid for the destination device (Serial: "
+                + serialNumber
+                + ", P-Code: "
+                + firmwareDownloadPCode
+                + ").";
+        break;
+      default:
+        resultString =
+            "An unknown error ("
+                + httpStatus
+                + ") was encountered while attempting to download a firmware file.";
+        break;
     }
     return resultString;
   }
