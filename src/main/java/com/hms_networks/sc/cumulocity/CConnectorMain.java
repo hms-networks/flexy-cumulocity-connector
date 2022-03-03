@@ -115,6 +115,17 @@ public class CConnectorMain {
   private static boolean restartAppAfterShutdown = false;
 
   /**
+   * Gets the serial number of the host Ewon device which is populated during the initialization of
+   * the connector.
+   *
+   * @return the serial number of the host Ewon device
+   * @see #ewonSerialNumber
+   */
+  public static String getEwonSerialNumber() {
+    return ewonSerialNumber;
+  }
+
+  /**
    * Gets the tag control object for the measurement enable control tag or null if the tag control
    * object cannot be created.
    *
