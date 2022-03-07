@@ -1,5 +1,13 @@
 # Ewon Flexy Cumulocity Connector Changelog
 
+## Version 1.0.2
+### Features
+- N/A
+### Bug Fixes
+- Fixed bug with queue diagnostic tags not being updated
+### Other
+- N/A
+
 ## Version 1.0.1
 ### Features
 - N/A
