@@ -434,13 +434,12 @@ public class CConnectorDataMgr {
     if (queueDiagnosticTagsEnabled) {
       // Configure queue running behind diagnostic tag
       try {
-        tryCreateDiagnosticTag(
-            QUEUE_DIAGNOSTIC_TAG_RUNNING_BEHIND_SECONDS_NAME,
-            QUEUE_DIAGNOSTIC_TAG_RUNNING_BEHIND_SECONDS_DESC,
-            QUEUE_DIAGNOSTIC_TAG_IO_SERVER,
-            QUEUE_DIAGNOSTIC_TAG_RUNNING_BEHIND_SECONDS_TYPE);
         queueDiagnosticRunningBehindSecondsTag =
-            new TagControl(QUEUE_DIAGNOSTIC_TAG_RUNNING_BEHIND_SECONDS_NAME);
+            tryCreateDiagnosticTag(
+                QUEUE_DIAGNOSTIC_TAG_RUNNING_BEHIND_SECONDS_NAME,
+                QUEUE_DIAGNOSTIC_TAG_RUNNING_BEHIND_SECONDS_DESC,
+                QUEUE_DIAGNOSTIC_TAG_IO_SERVER,
+                QUEUE_DIAGNOSTIC_TAG_RUNNING_BEHIND_SECONDS_TYPE);
       } catch (Exception e) {
         Logger.LOG_WARN(
             "Unable to create tag `"
@@ -454,11 +453,12 @@ public class CConnectorDataMgr {
 
       // Configure queue reset tag
       try {
-        tryCreateDiagnosticTag(
-            QUEUE_DIAGNOSTIC_TAG_FORCE_RESET_NAME,
-            QUEUE_DIAGNOSTIC_TAG_FORCE_RESET_DESC,
-            QUEUE_DIAGNOSTIC_TAG_IO_SERVER,
-            QUEUE_DIAGNOSTIC_TAG_FORCE_RESET_TYPE);
+        queueDiagnosticForceResetTag =
+            tryCreateDiagnosticTag(
+                QUEUE_DIAGNOSTIC_TAG_FORCE_RESET_NAME,
+                QUEUE_DIAGNOSTIC_TAG_FORCE_RESET_DESC,
+                QUEUE_DIAGNOSTIC_TAG_IO_SERVER,
+                QUEUE_DIAGNOSTIC_TAG_FORCE_RESET_TYPE);
       } catch (Exception e) {
         Logger.LOG_WARN(
             "Unable to create tag `"
@@ -472,11 +472,12 @@ public class CConnectorDataMgr {
 
       // Configure queue poll count tag
       try {
-        tryCreateDiagnosticTag(
-            QUEUE_DIAGNOSTIC_TAG_POLL_COUNT_NAME,
-            QUEUE_DIAGNOSTIC_TAG_POLL_COUNT_DESC,
-            QUEUE_DIAGNOSTIC_TAG_IO_SERVER,
-            QUEUE_DIAGNOSTIC_TAG_POLL_COUNT_TYPE);
+        queueDiagnosticPollCountTag =
+            tryCreateDiagnosticTag(
+                QUEUE_DIAGNOSTIC_TAG_POLL_COUNT_NAME,
+                QUEUE_DIAGNOSTIC_TAG_POLL_COUNT_DESC,
+                QUEUE_DIAGNOSTIC_TAG_IO_SERVER,
+                QUEUE_DIAGNOSTIC_TAG_POLL_COUNT_TYPE);
       } catch (Exception e) {
         Logger.LOG_WARN(
             "Unable to create tag `"
