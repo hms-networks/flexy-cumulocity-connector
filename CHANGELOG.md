@@ -1,5 +1,13 @@
 # Ewon Flexy Cumulocity Connector Changelog
 
+## Version 1.0.3
+### Features
+- N/A
+### Bug Fixes
+- N/A
+### Other
+- Made jar and jvmrun file available directly from connector releases
+
 ## Version 1.0.2
 ### Features
 - N/A
