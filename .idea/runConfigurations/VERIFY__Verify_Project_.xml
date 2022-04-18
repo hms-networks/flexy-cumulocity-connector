@@ -11,6 +11,7 @@
           <option name="goals">
             <list>
               <option value="verify" />
+              <option value="-Dmaven.javadoc.skip=true" />
             </list>
           </option>
           <option name="pomFileName" value="pom.xml" />
