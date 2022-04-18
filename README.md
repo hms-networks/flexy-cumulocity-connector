@@ -33,6 +33,10 @@ linking Ewon devices using a direct data path with a Flexy Java application.
 - [Runtime](#runtime)
     - [Connector Halt Tag](#connector-halt-tag)
     - [Commands from Cumulocity](#commands-from-cumulocity)
+    - [REST API](#rest-api)
+        - [Control Endpoints](#control-endpoints)
+        - [Status Endpoints](#status-endpoints)
+        - [Response Format](#response-format)
     - [Log Output](#log-output)
         - [Configured Logging Level](#configured-logging-level)
         - [Logging Performance](#logging-performance)
@@ -242,6 +246,61 @@ The following commands are supported:
     2. The `measurements` command takes one parameter:
         1. The enable/disable flag (`enable` or `disable`)
     3. Example: `measurements enable`
+
+### REST API
+
+The Ewon Flexy Cumulocity Connector application supports a REST API that allows you to control the
+connector and see basic status information. The REST API is secured by the same login mechanism as
+the Ewon Flexy's web interface.
+
+#### Control Endpoints
+
+1. Shutdown (shutdown)
+    - Performs a shutdown of the connector.
+    - `http://{EWON-HOST-ADDRESS}/rcgi.bin/jvmForm?formName=controlApi&shutdown=true`
+2. Restart (restart)
+    - Performs a restart of the connector.
+    - `http://{EWON-HOST-ADDRESS}/rcgi.bin/jvmForm?formName=controlApi&restart=true`
+
+#### Status Endpoints
+
+1. Get Config (getConfig)
+    - Returns the configuration of the connector.
+    - `http://{EWON-HOST-ADDRESS}/rcgi.bin/jvmForm?formName=statusApi&getConfig=true`
+2. Get Version (getVersion)
+    - Returns the version number of the connector.
+    - `http://{EWON-HOST-ADDRESS}/rcgi.bin/jvmForm?formName=statusApi&getVersion=true`
+
+#### Response Format
+
+The Ewon Flexy Cumulocity Connector application REST API returns JSON formatted responses in the
+following formats:
+
+1. Success response format:
+
+```json
+{
+    "status": "ok"
+}
+```
+
+2. Success response format with content:
+
+```json
+{
+  "status": "ok",
+  "response": "{RESPONSE}"
+}
+```
+
+3. Error response format:
+
+```json
+{
+  "status": "error",
+  "error": "{ERROR}"
+}
+```
 
 ### Log Output
 
