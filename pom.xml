@@ -43,6 +43,8 @@
     <maven.compiler.source>${project.java.version}</maven.compiler.source>
     <!-- Maven Compiler Target Version -->
     <maven.compiler.target>${project.java.version}</maven.compiler.target>
+    <!-- Shutdown API URL -->
+    <project.shutdown.url>http://${ewon.address}/rcgi.bin/jvmForm?formName=controlApi&amp;shutdown=true</project.shutdown.url>
   </properties>
 
   <!-- CUSTOM MAVEN REPOSITORIES FOR PROJECT -->
@@ -174,7 +176,8 @@
           <show>private</show>
           <includeDependencySources>true</includeDependencySources>
           <dependencySourceExcludes>
-            <dependencySourceExclude>com.hms_networks.americas.sc.mvnlibs:ewon-etk:*</dependencySourceExclude>
+            <dependencySourceExclude>com.hms_networks.americas.sc.mvnlibs:ewon-etk:*
+            </dependencySourceExclude>
           </dependencySourceExcludes>
         </configuration>
         <executions>
@@ -215,6 +218,23 @@
         <artifactId>maven-antrun-plugin</artifactId>
         <version>3.0.0</version>
         <executions>
+          <execution>
+            <id>deploy-shutdown-connector</id>
+            <phase>deploy</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <get username="${ewon.username}" password="${ewon.password}"
+                  dest="shutdown-connector.log" verbose="true"
+                  src="${project.shutdown.url}"
+                  maxtime="2000"/>
+                <sleep seconds="2"/>
+              </target>
+              <failOnError>false</failOnError>
+            </configuration>
+          </execution>
           <execution>
             <id>deploy-stop-execution</id>
             <phase>deploy</phase>
