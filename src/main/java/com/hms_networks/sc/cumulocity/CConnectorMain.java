@@ -20,6 +20,7 @@ import com.hms_networks.americas.sc.extensions.system.time.SCTimeUnit;
 import com.hms_networks.americas.sc.extensions.system.time.SCTimeUtils;
 import com.hms_networks.sc.cumulocity.api.CConnectorMqttMgr;
 import com.hms_networks.sc.cumulocity.api.CConnectorProvisionMqttMgr;
+import com.hms_networks.sc.cumulocity.api.CConnectorWebApiListener;
 import com.hms_networks.sc.cumulocity.config.CConnectorConfigFile;
 import com.hms_networks.sc.cumulocity.data.CConnectorAlarmMgr;
 import com.hms_networks.sc.cumulocity.data.CConnectorDataMgr;
@@ -115,6 +116,12 @@ public class CConnectorMain {
   private static boolean restartAppAfterShutdown = false;
 
   /**
+   * Gets the friendly name for the connector application in the format: %Title%, version %Version%.
+   */
+  public static String getConnectorFriendlyName() {
+    return CONNECTOR_FRIENDLY_NAME;
+  }
+  /**
    * Gets the serial number of the host Ewon device which is populated during the initialization of
    * the connector.
    *
@@ -185,6 +192,16 @@ public class CConnectorMain {
   public static void shutdownConnectorAndRestartDevice() {
     Logger.LOG_CRITICAL("The connector has been requested to shut down and restart the device...");
     restartDeviceAfterShutdown = true;
+    isRunning = false;
+  }
+
+  /**
+   * Sets the {@link #isRunning} flag to <code>false</code> to trigger a shutdown of the connector
+   * when requested.
+   */
+  public static void shutdownConnector() {
+    Logger.LOG_CRITICAL("The connector has been requested to shut down...");
+    restartDeviceAfterShutdown = false;
     isRunning = false;
   }
 
@@ -314,6 +331,15 @@ public class CConnectorMain {
       Logger.LOG_CRITICAL("Failed to configure the queue diagnostic tags enabled option!");
       Logger.LOG_EXCEPTION(e);
       initializeSuccess = false;
+    }
+
+    try {
+      Logger.LOG_CRITICAL("Configuring the connector control web API...");
+      DefaultEventHandler.setDefaultWebFormtListener(new CConnectorWebApiListener());
+      Logger.LOG_CRITICAL("Configured the connector control web API successfully!");
+    } catch (Exception e) {
+      Logger.LOG_CRITICAL("Failed to configure the connector control web API!");
+      Logger.LOG_EXCEPTION(e);
     }
 
     if (initializeSuccess) {
