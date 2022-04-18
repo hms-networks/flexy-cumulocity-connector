@@ -13,7 +13,6 @@
     </RunnerSettings>
     <method v="2">
       <option name="RunConfigurationTask" enabled="true" run_configuration_name="DEPLOY (Run on Device, Debug)" run_configuration_type="MavenRunConfiguration" />
-      <option name="RunConfigurationTask" enabled="true" run_configuration_name="VERIFY (Verify Project)" run_configuration_type="MavenRunConfiguration" />
     </method>
   </configuration>
 </component>
