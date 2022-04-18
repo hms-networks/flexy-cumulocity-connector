@@ -396,12 +396,60 @@
       <properties>
         <project.build.exec.url>http://${ewon.address}/rcgi.bin/jvmCmd?cmd=start&amp;runCmd=%20-heapsize%20${project.heap.size}%20-classpath%20/usr/${project.artifactId}-${project.version}-full.jar%20-emain%20${project.main.class}%20-debugger%20-port%20${project.build.debug.port}</project.build.exec.url>
       </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>3.0.0</version>
+            <executions>
+              <execution>
+                <id>debug-delay</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target>
+                    <sleep seconds="5"/>
+                  </target>
+                  <failOnError>true</failOnError>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
     <profile>
       <id>debugNoSuspend</id>
       <properties>
         <project.build.exec.url>http://${ewon.address}/rcgi.bin/jvmCmd?cmd=start&amp;runCmd=%20-heapsize%20${project.heap.size}%20-classpath%20/usr/${project.artifactId}-${project.version}-full.jar%20-emain%20${project.main.class}%20-debugger%20-port%20${project.build.debug.port}%20-nosuspend</project.build.exec.url>
       </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>3.0.0</version>
+            <executions>
+              <execution>
+                <id>debug-delay</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target>
+                    <sleep seconds="5"/>
+                  </target>
+                  <failOnError>true</failOnError>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 
