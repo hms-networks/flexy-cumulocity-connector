@@ -297,8 +297,13 @@
             <include>
               .idea${file.separator}runConfigurations${file.separator}DEBUG__Run_on_Device__Remote_JVM_.xml
             </include>
+            <include>starting-files${file.separator}jvmrun</include>
           </includes>
           <replacements>
+            <replacement>
+              <token>-classpath /usr/.*-full\.jar</token>
+              <value>-classpath /usr/${project.artifactId}-${project.version}-full.jar</value>
+            </replacement>
             <replacement>
               <token>key="port" value=".*"</token>
               <value>key="port" value="${project.build.debug.port}"</value>
