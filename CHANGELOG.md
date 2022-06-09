@@ -1,5 +1,13 @@
 # Ewon Flexy Cumulocity Connector Changelog
 
+## Version 1.2.0
+### Features
+- Added option to change MQTT port in configuration file
+### Bug Fixes
+- N/A
+### Other
+- N/A
+
 ## Version 1.1.1
 ### Features
 - N/A
