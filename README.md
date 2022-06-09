@@ -9,6 +9,7 @@ linking Ewon devices using a direct data path with a Flexy Java application.
 
 - [Installation](#installation)
     - [Required Ewon Firmware Version](#required-ewon-firmware-version)
+    - [Network Requirements](#network-requirements)
 - [Configuration](#configuration)
     - [Connector](#connector)
         - [Log Level (LogLevel)](#log-level-loglevel)
@@ -19,6 +20,7 @@ linking Ewon devices using a direct data path with a Flexy Java application.
         - [Queue Data Poll Interval (QueueDataPollIntervalMillis)](#queue-data-poll-interval-queuedatapollintervalmillis)
     - [Cumulocity](#cumulocity)
         - [Host (Host)](#host-host)
+        - [Port (Port)](#port-port)
         - [Bootstrap Username (BootstrapUsername)](#bootstrap-username-bootstrapusername)
         - [Bootstrap Password (BootstrapPassword)](#bootstrap-password-bootstrappassword)
         - [Bootstrap Tenant (BootstrapTenant)](#bootstrap-tenant-bootstraptenant)
@@ -65,6 +67,13 @@ the [QUICK-START.md](QUICK-START.md) quick start guide.
 
 This project requires a minimum Ewon firmware version of 14.5 or higher. Older firmware versions may
 be incompatible and are not supported.
+
+### Network Requirements
+
+By default, this project connects to Cumulocity using MQTT over port 8883. Port 8883 must be
+permitted on the connected Ewon network(s). If the port has been changed, as described in
+the [Port (Port) configuration section](#port-port), the desired port must be permitted on the
+connected Ewon network(s).
 
 ## Configuration
 
@@ -113,6 +122,10 @@ This section contains configuration fields which are used to configure the conne
 
 Parameter to specify the host name of the Cumulocity server. This must be configured prior to
 running the connector.
+
+#### Port (Port)
+
+Optional string parameter to specify the port of the Cumulocity server. Default: "8883"
 
 #### Bootstrap Username (BootstrapUsername)
 
@@ -280,7 +293,7 @@ following formats:
 
 ```json
 {
-    "status": "ok"
+  "status": "ok"
 }
 ```
 

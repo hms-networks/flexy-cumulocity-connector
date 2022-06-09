@@ -48,6 +48,9 @@ public class CConnectorConfigFile extends ConfigFile {
   /** Key for accessing the 'Host' object in the configuration file. */
   private static final String CONFIG_FILE_HOST_KEY = "Host";
 
+  /** Key for accessing the 'Port' object in the configuration file. */
+  private static final String CONFIG_FILE_PORT_KEY = "Port";
+
   /** Key for accessing the 'SubscribeToErrors' object in the configuration file. */
   private static final String CONFIG_FILE_SUBSCRIBE_TO_ERRORS_KEY = "SubscribeToErrors";
 
@@ -82,6 +85,9 @@ public class CConnectorConfigFile extends ConfigFile {
 
   /** The default value for the subscribe to errors setting. */
   private static final boolean SUBSCRIBE_TO_ERRORS_DEFAULT = false;
+
+  /** The default value for the port setting. */
+  private static final String PORT_DEFAULT = "8883";
 
   /**
    * Default value of boolean flag indicating if string history data should be retrieved from the
@@ -191,6 +197,13 @@ public class CConnectorConfigFile extends ConfigFile {
    */
   private static final String CUMULOCITY_HOST_CONFIG_NAME =
       CONFIG_FILE_CUMULOCITY_KEY + "/" + CONFIG_FILE_HOST_KEY;
+
+  /**
+   * The configuration field name used for the Cumulocity port setting when communicating with
+   * Cumulocity.
+   */
+  private static final String CUMULOCITY_PORT_CONFIG_NAME =
+      CONFIG_FILE_CUMULOCITY_KEY + "/" + CONFIG_FILE_PORT_KEY;
 
   /**
    * The configuration field name used for the Cumulocity subscribe to errors setting when
@@ -366,6 +379,35 @@ public class CConnectorConfigFile extends ConfigFile {
               + subscribeToErrors);
     }
     return subscribeToErrors;
+  }
+
+  /**
+   * Gets the Cumulocity port setting.
+   *
+   * @return Cumulocity port setting
+   */
+  public String getCumulocityPort() {
+    String port = PORT_DEFAULT;
+    try {
+      port =
+          configurationObject
+              .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
+              .getString(CONFIG_FILE_PORT_KEY);
+
+      // Test that port can be parsed as integer
+      int tryParsePort = Integer.parseInt(port);
+    } catch (JSONException e) {
+      Logger.LOG_DEBUG(
+          CONFIG_FILE_PORT_KEY + " not found in configuration file. Using default: " + port);
+    } catch (NumberFormatException e) {
+      port = PORT_DEFAULT;
+      Logger.LOG_DEBUG(
+          CONFIG_FILE_PORT_KEY
+              + " does not contain a valid port number. The port must be a valid number between 0 "
+              + "and 65535, enclosed in a string. Using default: "
+              + port);
+    }
+    return port;
   }
 
   /**
@@ -614,6 +656,10 @@ public class CConnectorConfigFile extends ConfigFile {
         configurationObject
             .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
             .put(CONFIG_FILE_HOST_KEY, configFileEscapedStringLineValue);
+      } else if (configFileEscapedStringLineKey.equals(CUMULOCITY_PORT_CONFIG_NAME)) {
+        configurationObject
+            .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
+            .put(CONFIG_FILE_PORT_KEY, configFileEscapedStringLineValue);
       } else if (configFileEscapedStringLineKey.equals(
           CUMULOCITY_SUBSCRIBE_TO_ERRORS_CONFIG_NAME)) {
         configurationObject
@@ -816,6 +862,17 @@ public class CConnectorConfigFile extends ConfigFile {
       configFileEscapedString.append("\n");
     }
 
+    // Add Cumulocity/Port
+    if (configurationObject.getJSONObject(CONFIG_FILE_CUMULOCITY_KEY).has(CONFIG_FILE_PORT_KEY)) {
+      configFileEscapedString.append(CUMULOCITY_PORT_CONFIG_NAME);
+      configFileEscapedString.append("=");
+      configFileEscapedString.append(
+          configurationObject
+              .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
+              .getString(CONFIG_FILE_PORT_KEY));
+      configFileEscapedString.append("\n");
+    }
+
     // Add Cumulocity/SubscribeToErrors
     if (configurationObject
         .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
@@ -882,6 +939,7 @@ public class CConnectorConfigFile extends ConfigFile {
     defaultCumulocityConfigurationObject.put(
         CONFIG_FILE_DEVICE_TENANT_KEY, CONFIG_FILE_AUTOMATICALLY_FILLED_TEXT);
     defaultCumulocityConfigurationObject.put(CONFIG_FILE_HOST_KEY, "");
+    defaultCumulocityConfigurationObject.put(CONFIG_FILE_PORT_KEY, PORT_DEFAULT);
     defaultCumulocityConfigurationObject.put(
         CONFIG_FILE_SUBSCRIBE_TO_ERRORS_KEY, SUBSCRIBE_TO_ERRORS_DEFAULT);
 
