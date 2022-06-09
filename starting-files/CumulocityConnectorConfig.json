@@ -15,6 +15,7 @@
       "BootstrapPassword": "",
       "BootstrapTenant": "",
       "DeviceTenant": "<automatically filled>",
-      "SubscribeToErrors": false
+      "SubscribeToErrors": false,
+      "Port": "8883"
    }
 }
