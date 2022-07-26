@@ -75,7 +75,7 @@ Using a text editor/IDE of your choice, edit the `CumulocityConnectorConfig.json
 file located in the `starting-files` directory of the extracted Ewon Flexy Cumulocity Connector
 release package.
 
-Populate the `BootstrapUsername`, `BootstrapPassword`, and `BootstrapTenant` fields with the
+Populate the `Host`, `BootstrapUsername`, `BootstrapPassword`, and `BootstrapTenant` fields with the
 corresponding values for your Cumulocity tenant.
 
 ![Connector Configuration File Bootstrap Edit](images/ConnectorConfigBootstrap.png)
