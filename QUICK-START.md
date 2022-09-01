@@ -76,7 +76,10 @@ file located in the `starting-files` directory of the extracted Ewon Flexy Cumul
 release package.
 
 Populate the `Host`, `BootstrapUsername`, `BootstrapPassword`, and `BootstrapTenant` fields with the
-corresponding values for your Cumulocity tenant.
+corresponding values for your Cumulocity tenant. The `Host` field should be populated with the
+MQTT broker's host for your Cumulocity instance, for example, `mqtt.eu-latest.cumulocity.com` or
+`mqtt.us-latest.cumulocity.com`. Do not include the scheme or port as they are automatically 
+selected to be https:// and 8883.
 
 ![Connector Configuration File Bootstrap Edit](images/ConnectorConfigBootstrap.png)
 
