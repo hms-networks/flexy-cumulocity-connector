@@ -33,6 +33,9 @@ linking Ewon devices using a direct data path with a Flexy Java application.
             - [Tag Data Types](#tag-data-types)
                 - [String Tag History](#string-tag-history)
 - [Runtime](#runtime)
+    - [Child Device Support](#child-device-support)
+      - [Child Device Tag Name Syntax](#child-device-tag-name-syntax)
+      - [Child Device Tag Name Examples](#child-device-tag-name-examples)
     - [Connector Halt Tag](#connector-halt-tag)
     - [Commands from Cumulocity](#commands-from-cumulocity)
     - [REST API](#rest-api)
@@ -218,6 +221,60 @@ Note: *This setting should be configured prior to installing the application, as
 of the Ewon is necessary to apply this setting.*
 
 ## Runtime
+
+### Child Device Support
+
+The Ewon Flexy does not have a defined syntax for creating child devices. The Ewon Flexy Cumulocity
+Connector application implements child devices using a tag name format.
+
+#### Child Device Tag Name Syntax
+
+The following syntax can be used to create child devices:
+
+- Tags that contain no "/" character<br>
+  -> This data belongs directly to the gateway<br>
+  -> The Cumulocity fragment name is the tag name<br>
+  -> The Cumulocity series will automatically be "0"<br>
+  -> Example: "One"<br>
+
+- Tags that contain one (1) "/" character<br>
+  -> This data belongs directly to the gateway<br>
+  -> The Cumulocity fragment name is the tag name part before the "/"<br>
+  -> The Cumulocity series is the tag name part after the "/"<br>
+  -> Example: "One/2"<br>
+
+- Tags that contain two (2) "/" characters<br>
+  -> This data belongs to the child device named after the tag name part before the first "/"<br>
+  -> The Cumulocity fragment name is the tag name part between the two "/" characters<br>
+  -> The Cumulocity series is the tag name part after the second "/"
+  -> Example: "One/Two/3"<br>
+
+- Tags that contain three (3) or more "/" characters<br>
+  -> Only the last three (3) "/" characters are used to determine the child device, fragment name,
+  and series
+  -> Example: "Extra/One/Two/3"<br>
+
+#### Child Device Tag Name Examples
+
+Using the syntax described in the [Child Device Tag Name Syntax](#child-device-tag-name-syntax) section,
+the following examples are valid:
+
+- "One"<br>
+  a. Child Device: (none)<br>
+- b. Fragment Name: "One"<br>
+  c. Series: "0"<br>
+- "One/2"<br>
+  a. Child Device: (none)<br>
+  b. Fragment Name: "One"<br>
+  c. Series: "2"<br>
+- "One/Two/3"<br>
+  a. Child Device: "One"<br>
+  b. Fragment Name: "Two"<br>
+  c. Series: "3"<br>
+- "Extra/One/Two/3"<br>
+  a. Child Device: "One"<br>
+  b. Fragment Name: "Two"<br>
+  c. Series: "3"<br>
 
 ### Connector Halt Tag
 
