@@ -5,7 +5,10 @@ Copyright © 2022 HMS Industrial Networks Inc.
 The Ewon Flexy Cumulocity Connector package provides a connector-based solution to Cumulocity for
 linking Ewon devices using a direct data path with a Flexy Java application.
 
-**Note**: This document provides a quick start guide for using this connector. For a more comprehensive description of this process and the connector, please check out the [Installation and Configuration Guide](https://hmsnetworks.blob.core.windows.net/www/docs/librariesprovider10/downloads-monitored/software/flexy-cumulocity-integration-installation-and-configuration-guide-v1.0.pdf?sfvrsn=1490cbd7_5) and the [Technical Documentation](https://hmsnetworks.blob.core.windows.net/www/docs/librariesprovider10/downloads-monitored/software/solution-pack---ewon-cumulocity-connector---technical-documentation.pdf).
+**Note**: This document provides a quick start guide for using this connector. For a more comprehensive
+description of this process and the connector, please check out the [Installation and Configuration Guide](https://hmsnetworks.blob.core.windows.net/www/docs/librariesprovider10/downloads-monitored/software/flexy-cumulocity-integration-installation-and-configuration-guide-v1.0.pdf?sfvrsn=1490cbd7_5),
+the [Technical Documentation](https://hmsnetworks.blob.core.windows.net/www/docs/librariesprovider10/downloads-monitored/software/solution-pack---ewon-cumulocity-connector---technical-documentation.pdf),
+and the [Quick Start Demo Video](https://www.youtube.com/watch?v=LBy9LZPgM1U&ab_channel=CumulocityIoT).
 
 ## Download
 
@@ -84,13 +87,15 @@ MQTT broker's host for your Cumulocity instance, for example, `mqtt.eu-latest.cu
 
 ![Connector Configuration File Bootstrap Edit](images/ConnectorConfigBootstrap.png)
 
-Typically, the following example values are the standard values for all public Cumulocity instances maintained by SoftwareAG on its **European** server,
+Typically, the following example values are the standard values for all public Cumulocity instances
+maintained by SoftwareAG on its **EU** or **US** servers,
 
 The `BootstrapTenant` is the bootstrap tenantID which is `management`;
 
 The `BootstrapUsername` is the bootstrap username, which is `devicebootstrap`;
 
-The `Host` is `mqtt.eu-latest.cumulocity.com`;
+The `Host` for the EU server is `mqtt.eu-latest.cumulocity.com`;
+the `Host` for the US server is `mqtt.us-latest.cumulocity.com`;
 
 And the `BootstrapPassword` is `Fhdt1bb1f`.
 
