@@ -1,10 +1,9 @@
 package com.hms_networks.sc.cumulocity.api;
 
-import com.ewon.ewonitf.DefaultEventHandler;
 import com.ewon.ewonitf.MqttMessage;
 import com.hms_networks.americas.sc.extensions.json.JSONException;
 import com.hms_networks.americas.sc.extensions.logging.Logger;
-import com.hms_networks.americas.sc.extensions.mqtt.MqttManager;
+import com.hms_networks.americas.sc.extensions.mqtt.ConstrainedMqttManager;
 import com.hms_networks.americas.sc.extensions.string.StringUtils;
 import com.hms_networks.sc.cumulocity.CConnectorMain;
 import java.util.List;
@@ -15,7 +14,7 @@ import java.util.List;
  * @author HMS Networks, MU Americas Solution Center
  * @since 1.0.0
  */
-public class CConnectorProvisionMqttMgr extends MqttManager {
+public class CConnectorProvisionMqttMgr extends ConstrainedMqttManager {
 
   /** QOS Level for MQTT connections. Azure IoT Hub requires QOS Level 1. */
   public static final int MQTT_QOS_LEVEL = 1;
@@ -56,11 +55,14 @@ public class CConnectorProvisionMqttMgr extends MqttManager {
    */
   public static final long MQTT_LOOP_WAIT_MILLIS = 5000;
 
+  /**
+   * Boolean indicating of the MQTT manager should wait for a WAN IP address to be available before
+   * initializing.
+   */
+  private static final boolean MQTT_WAIT_FOR_WAN_IP = true;
+
   /** The boolean value indicating whether the application is provisioned to Cumulocity or not. */
   private boolean isProvisioned = false;
-
-  /** Boolean flag to track subscribing to the required MQTT topics. */
-  private boolean subscribedToTopics = false;
 
   /**
    * Constructor for the MQTT provisioning manager with the given MQTT ID, host, and boolean
@@ -71,15 +73,32 @@ public class CConnectorProvisionMqttMgr extends MqttManager {
    * @param enableUtf8 Boolean indicating if UTF-8 support is enabled.
    * @throws Exception if unable to create the MQTT client.
    */
-  public CConnectorProvisionMqttMgr(String mqttId, String mqttHost, boolean enableUtf8)
+  public CConnectorProvisionMqttMgr(
+      String mqttId,
+      String mqttHost,
+      boolean enableUtf8,
+      String port,
+      String rootCaFilePath,
+      String mqttUsername,
+      String mqttPassword)
       throws Exception {
-    super(mqttId, mqttHost, enableUtf8);
+    super(
+        mqttId,
+        mqttHost,
+        enableUtf8,
+        port,
+        rootCaFilePath,
+        MQTT_TLS_VERSION,
+        mqttUsername,
+        mqttPassword,
+        MQTT_QOS_LEVEL,
+        MQTT_WAIT_FOR_WAN_IP);
+
+    // Subscribe to the MQTT topics
+    addSubscription(CUMULOCITY_MQTT_TOPIC_DCR);
 
     // Configure desired MQTT loop sleep interval
     setMqttThreadSleepIntervalMs(MQTT_LOOP_WAIT_MILLIS);
-
-    // Add MQTT listener to default event handler
-    DefaultEventHandler.addMqttListener(this);
   }
 
   /**
@@ -148,7 +167,7 @@ public class CConnectorProvisionMqttMgr extends MqttManager {
    */
   public void runOnMqttLoop(int currentMqttStatus) {
     // Send empty message to Cumulocity (if subscribed to receive response)
-    if (subscribedToTopics) {
+    if (getMqttSubscribed()) {
       try {
         mqttPublish(CUMULOCITY_MQTT_TOPIC_UCR, "", MQTT_QOS_LEVEL, true);
       } catch (Exception e) {
@@ -170,18 +189,6 @@ public class CConnectorProvisionMqttMgr extends MqttManager {
   /** Method for processing a successful MQTT connection. */
   public void onConnect() {
     Logger.LOG_CRITICAL("MQTT device provisioning client is connected!");
-
-    // Subscribe to Cumulocity MQTT topics
-    if (!subscribedToTopics) {
-      try {
-        subscribe(CUMULOCITY_MQTT_TOPIC_DCR, MQTT_QOS_LEVEL);
-        subscribedToTopics = true;
-      } catch (Exception e) {
-        Logger.LOG_CRITICAL(
-            "Unable to subscribe to Cumulocity MQTT topic: " + CUMULOCITY_MQTT_TOPIC_DCR);
-        Logger.LOG_EXCEPTION(e);
-      }
-    }
   }
 
   /**
@@ -194,32 +201,5 @@ public class CConnectorProvisionMqttMgr extends MqttManager {
     if (!isProvisioned) {
       wait();
     }
-  }
-
-  /**
-   * Method for initializing connection
-   *
-   * @throws Exception if unable to initialize connection
-   */
-  public void initConnection() throws Exception {
-    Logger.LOG_DEBUG("Initializing MQTT device provisioning connection...");
-
-    // Configure MQTT
-    setPort(CConnectorMain.getConnectorConfig().getCumulocityPort());
-    setCAFilePath(CConnectorApiCertificateMgr.getRootCaFilePath());
-    setTLSVersion(MQTT_TLS_VERSION);
-
-    // Get provisioner information
-    String authPassword = CConnectorMain.getConnectorConfig().getCumulocityBootstrapPassword();
-    String authUsername = CConnectorMain.getConnectorConfig().getCumulocityBootstrapUsername();
-    String authTenant = CConnectorMain.getConnectorConfig().getCumulocityBootstrapTenant();
-
-    // Apply provisioning information, if present/required
-    setAuthUsername(authTenant + "/" + authUsername);
-    setAuthPassword(authPassword);
-
-    // Attempt connection to MQTT
-    connect();
-    Logger.LOG_DEBUG("Finished initializing MQTT device provisioning connection.");
   }
 }

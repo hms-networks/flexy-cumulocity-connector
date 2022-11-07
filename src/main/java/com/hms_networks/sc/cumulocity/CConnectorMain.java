@@ -12,12 +12,12 @@ import com.hms_networks.americas.sc.extensions.historicaldata.HistoricalDataQueu
 import com.hms_networks.americas.sc.extensions.json.JSONException;
 import com.hms_networks.americas.sc.extensions.logging.Logger;
 import com.hms_networks.americas.sc.extensions.retry.AutomaticRetryCodeExponential;
-import com.hms_networks.americas.sc.extensions.retry.AutomaticRetryState;
 import com.hms_networks.americas.sc.extensions.system.application.SCAppManagement;
 import com.hms_networks.americas.sc.extensions.system.http.SCHttpUtility;
 import com.hms_networks.americas.sc.extensions.system.tags.SCTagUtils;
 import com.hms_networks.americas.sc.extensions.system.time.SCTimeUnit;
 import com.hms_networks.americas.sc.extensions.system.time.SCTimeUtils;
+import com.hms_networks.sc.cumulocity.api.CConnectorApiCertificateMgr;
 import com.hms_networks.sc.cumulocity.api.CConnectorMqttMgr;
 import com.hms_networks.sc.cumulocity.api.CConnectorProvisionMqttMgr;
 import com.hms_networks.sc.cumulocity.api.CConnectorWebApiListener;
@@ -418,8 +418,7 @@ public class CConnectorMain {
     // Disconnect from MQTT
     if (mqttMgr != null) {
       try {
-        mqttMgr.disconnect();
-        mqttMgr.stopMqttThread();
+        mqttMgr.stop();
       } catch (Exception e) {
         Logger.LOG_CRITICAL("Unable to disconnect from MQTT.");
         shutDownClean = false;
@@ -444,16 +443,6 @@ public class CConnectorMain {
         DefaultEventHandler.delTagAlarmListener(alarmMgr);
       } catch (Exception e) {
         Logger.LOG_CRITICAL("Unable to unregister tag alarm manager from event handler.");
-        cleanUpSuccess = false;
-      }
-    }
-
-    // Unregister MQTT from event handler
-    if (mqttMgr != null) {
-      try {
-        DefaultEventHandler.delMqttListener(mqttMgr);
-      } catch (Exception e) {
-        Logger.LOG_CRITICAL("Unable to unregister MQTT manager from event handler.");
         cleanUpSuccess = false;
       }
     }
@@ -531,9 +520,7 @@ public class CConnectorMain {
   public static boolean rerunProvisioning() {
     // Shutdown existing MQTT manager
     if (mqttMgr != null) {
-      DefaultEventHandler.delMqttListener(mqttMgr);
-      mqttMgr.disconnect();
-      mqttMgr.stopMqttThread();
+      mqttMgr.stop();
       mqttMgr = null;
     }
 
@@ -552,59 +539,39 @@ public class CConnectorMain {
    * @return true if provisioning was successful, false otherwise
    */
   public static boolean runProvisioningMqtt() {
-    // Create device provisioning MQTT setup retry-able task
-    AutomaticRetryCodeExponential provisioningMqttRetryTask =
-        new AutomaticRetryCodeExponential() {
-          protected long getMaxDelayMillisBeforeRetry() {
-            return SCTimeUnit.SECONDS.toMillis(
-                CConnectorProvisionMqttMgr.MAX_SECONDS_BETWEEN_RETRIES);
-          }
-
-          protected int getMaxRetries() {
-            return MAX_RETRIES_UNLIMITED_VALUE;
-          }
-
-          protected void codeToRetry() {
-            try {
-              Logger.LOG_DEBUG("Starting device provisioning MQTT...");
-              final String mqttHost = connectorConfig.getCumulocityHost();
-
-              Logger.LOG_DEBUG("Creating device provisioning MQTT manager and starting it...");
-              final String mqttClientId = MQTT_CLIENT_ID_SERIAL_PREFIX + ewonSerialNumber;
-              CConnectorProvisionMqttMgr provisioningMqttMgr =
-                  new CConnectorProvisionMqttMgr(
-                      mqttClientId, mqttHost, connectorConfig.getStringUtf8Support());
-              provisioningMqttMgr.startMqttThread();
-              provisioningMqttMgr.initConnection();
-              Logger.LOG_DEBUG("Finished creating and starting device provisioning MQTT manager.");
-
-              provisioningMqttMgr.awaitProvisioning();
-              provisioningMqttMgr.disconnect();
-              provisioningMqttMgr.stopMqttThread();
-              setState(AutomaticRetryState.FINISHED);
-              Logger.LOG_DEBUG("Finished device provisioning MQTT.");
-            } catch (Exception e) {
-              final int currentTryNumber = getCurrentTryNumber();
-              final long delaySecsBeforeRetry =
-                  SCTimeUnit.MILLISECONDS.toSeconds(getDelayMillisBeforeRetry(currentTryNumber));
-              Logger.LOG_CRITICAL(
-                  "MQTT device provisioning encountered an error and failed to complete! (Attempt #"
-                      + currentTryNumber
-                      + ") Retrying in "
-                      + delaySecsBeforeRetry
-                      + " seconds.");
-              Logger.LOG_EXCEPTION(e);
-              setState(AutomaticRetryState.ERROR_RETRY);
-            }
-          }
-        };
-
-    // Run MQTT device provisioning task
     boolean mqttProvisionSuccess = true;
     try {
-      provisioningMqttRetryTask.run();
-    } catch (InterruptedException e) {
-      Logger.LOG_CRITICAL("Failed to run MQTT device provisioning due to an InterruptedException!");
+      Logger.LOG_DEBUG("Starting device provisioning MQTT...");
+      final String mqttHost = connectorConfig.getCumulocityHost();
+
+      Logger.LOG_DEBUG("Creating device provisioning MQTT manager and starting it...");
+      final String mqttClientId = MQTT_CLIENT_ID_SERIAL_PREFIX + ewonSerialNumber;
+      final String mqttPort = connectorConfig.getCumulocityPort();
+      final String mqttUsername =
+          connectorConfig.getCumulocityBootstrapTenant()
+              + "/"
+              + connectorConfig.getCumulocityBootstrapUsername();
+      final String mqttPassword = connectorConfig.getCumulocityBootstrapPassword();
+      final String mqttRootCaFilePath = CConnectorApiCertificateMgr.getRootCaFilePath();
+      CConnectorProvisionMqttMgr provisioningMqttMgr =
+          new CConnectorProvisionMqttMgr(
+              mqttClientId,
+              mqttHost,
+              connectorConfig.getStringUtf8Support(),
+              mqttPort,
+              mqttRootCaFilePath,
+              mqttUsername,
+              mqttPassword);
+      provisioningMqttMgr.startWithExponentialRetry(
+          AutomaticRetryCodeExponential.MAX_RETRIES_UNLIMITED_VALUE,
+          SCTimeUnit.SECONDS.toMillis(CConnectorProvisionMqttMgr.MAX_SECONDS_BETWEEN_RETRIES));
+      Logger.LOG_DEBUG("Finished creating and starting device provisioning MQTT manager.");
+
+      provisioningMqttMgr.awaitProvisioning();
+      provisioningMqttMgr.stop();
+      Logger.LOG_DEBUG("Finished device provisioning MQTT.");
+    } catch (Exception e) {
+      Logger.LOG_CRITICAL("Exception occurred, failed to run MQTT device provisioning!");
       Logger.LOG_EXCEPTION(e);
       mqttProvisionSuccess = false;
     }
@@ -617,56 +584,33 @@ public class CConnectorMain {
    * @return true if setup and initialization was successful, false otherwise
    */
   public static boolean setUpMqtt() {
-    // Create MQTT setup retry-able task
-    AutomaticRetryCodeExponential mqttSetUpRetryTask =
-        new AutomaticRetryCodeExponential() {
-          protected long getMaxDelayMillisBeforeRetry() {
-            return SCTimeUnit.SECONDS.toMillis(CConnectorMqttMgr.MAX_SECONDS_BETWEEN_RETRIES);
-          }
-
-          protected int getMaxRetries() {
-            return MAX_RETRIES_UNLIMITED_VALUE;
-          }
-
-          protected void codeToRetry() {
-            try {
-              Logger.LOG_DEBUG("Setting up MQTT...");
-              final String mqttHost = connectorConfig.getCumulocityHost();
-
-              Logger.LOG_DEBUG("Creating MQTT manager and starting it...");
-              final String mqttClientId = MQTT_CLIENT_ID_SERIAL_PREFIX + ewonSerialNumber;
-              mqttMgr =
-                  new CConnectorMqttMgr(
-                      mqttClientId, mqttHost, connectorConfig.getStringUtf8Support());
-              mqttMgr.startMqttThread();
-              mqttMgr.initConnection();
-
-              Logger.LOG_DEBUG("Finished creating and starting MQTT manager.");
-              setState(AutomaticRetryState.FINISHED);
-              Logger.LOG_DEBUG("Finished setting up MQTT.");
-            } catch (Exception e) {
-              final int currentTryNumber = getCurrentTryNumber();
-              final long delaySecsBeforeRetry =
-                  SCTimeUnit.MILLISECONDS.toSeconds(getDelayMillisBeforeRetry(currentTryNumber));
-              Logger.LOG_CRITICAL(
-                  "MQTT setup encountered an error and failed to complete! (Attempt #"
-                      + currentTryNumber
-                      + ") Retrying in "
-                      + delaySecsBeforeRetry
-                      + " seconds.");
-              Logger.LOG_EXCEPTION(e);
-              mqttMgr = null;
-              setState(AutomaticRetryState.ERROR_RETRY);
-            }
-          }
-        };
-
-    // Run MQTT setup task
     boolean mqttSetUpSuccess = true;
     try {
-      mqttSetUpRetryTask.run();
-    } catch (InterruptedException e) {
-      Logger.LOG_CRITICAL("Failed to run MQTT setup due to an InterruptedException!");
+      final String mqttHost = connectorConfig.getCumulocityHost();
+
+      Logger.LOG_DEBUG("Creating MQTT manager and starting it...");
+      final String mqttClientId = MQTT_CLIENT_ID_SERIAL_PREFIX + ewonSerialNumber;
+      final String mqttPort = connectorConfig.getCumulocityPort();
+      final String mqttUsername =
+          connectorConfig.getCumulocityDeviceTenant()
+              + "/"
+              + connectorConfig.getCumulocityDeviceUsername();
+      final String mqttPassword = connectorConfig.getCumulocityDevicePassword();
+      final String mqttRootCaFilePath = CConnectorApiCertificateMgr.getRootCaFilePath();
+      mqttMgr =
+          new CConnectorMqttMgr(
+              mqttClientId,
+              mqttHost,
+              connectorConfig.getStringUtf8Support(),
+              mqttPort,
+              mqttRootCaFilePath,
+              mqttUsername,
+              mqttPassword);
+      mqttMgr.startWithExponentialRetry(
+          AutomaticRetryCodeExponential.MAX_RETRIES_UNLIMITED_VALUE,
+          SCTimeUnit.SECONDS.toMillis(CConnectorMqttMgr.MAX_SECONDS_BETWEEN_RETRIES));
+    } catch (Exception e) {
+      Logger.LOG_CRITICAL("Exception occurred, failed to run MQTT setup!");
       Logger.LOG_EXCEPTION(e);
       mqttSetUpSuccess = false;
     }
@@ -680,15 +624,21 @@ public class CConnectorMain {
    */
   public static boolean restartMqtt() {
     // Shutdown and cleanup existing MQTT manager
+    boolean restartSuccess = true;
     if (mqttMgr != null) {
-      DefaultEventHandler.delMqttListener(mqttMgr);
-      mqttMgr.disconnect();
-      mqttMgr.stopMqttThread();
-      mqttMgr = null;
+      try {
+        mqttMgr.restart();
+      } catch (Exception e) {
+        restartSuccess = false;
+        Logger.LOG_SERIOUS("An exception occurred while restarting the MQTT manager!");
+        Logger.LOG_EXCEPTION(e);
+      }
+    } else {
+      // Set up new MQTT manager
+      restartSuccess = setUpMqtt();
     }
 
-    // Set up new MQTT manager
-    return setUpMqtt();
+    return restartSuccess;
   }
 
   /**
