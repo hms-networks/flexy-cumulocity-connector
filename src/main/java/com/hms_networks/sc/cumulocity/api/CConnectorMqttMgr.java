@@ -5,7 +5,7 @@ import com.ewon.ewonitf.EWException;
 import com.ewon.ewonitf.MqttMessage;
 import com.ewon.ewonitf.SysControlBlock;
 import com.hms_networks.americas.sc.extensions.logging.Logger;
-import com.hms_networks.americas.sc.extensions.mqtt.MqttManager;
+import com.hms_networks.americas.sc.extensions.mqtt.ConstrainedMqttManager;
 import com.hms_networks.americas.sc.extensions.mqtt.MqttStatusCode;
 import com.hms_networks.americas.sc.extensions.string.StringUtils;
 import com.hms_networks.sc.cumulocity.CConnectorMain;
@@ -21,7 +21,7 @@ import java.util.List;
  * @author HMS Networks, MU Americas Solution Center
  * @since 1.0.0
  */
-public class CConnectorMqttMgr extends MqttManager {
+public class CConnectorMqttMgr extends ConstrainedMqttManager {
 
   /** The array of supported operations to be sent to Cumulocity. */
   public static final String[] CONNECTOR_SUPPORTED_OPERATIONS = {
@@ -71,17 +71,17 @@ public class CConnectorMqttMgr extends MqttManager {
    */
   private static final boolean MQTT_RETAIN = false;
 
+  /**
+   * Boolean indicating of the MQTT manager should wait for a WAN IP address to be available before
+   * initializing.
+   */
+  private static final boolean MQTT_WAIT_FOR_WAN_IP = true;
+
   /** MQTT loop attempt count. Used for retry backoff in {@link #runOnMqttLoop(int)} */
   private int mqttLoopAttemptCount = 0;
 
   /** MQTT loop limit, before triggering a reprovision event */
   private int mqttLoopAttemptLimit = 15;
-
-  /** Boolean flag to track subscribing to the required MQTT topics. */
-  private boolean subscribedToTopics = false;
-
-  /** String containing the ID of the MQTT client. */
-  private final String mqttId;
 
   /** List of child devices which have been registered to Cumulocity. */
   private final List registeredChildDevices = new ArrayList();
@@ -95,15 +95,37 @@ public class CConnectorMqttMgr extends MqttManager {
    * @param enableUtf8 Boolean indicating if UTF-8 support is enabled.
    * @throws Exception if unable to create the MQTT client.
    */
-  public CConnectorMqttMgr(String mqttId, String mqttHost, boolean enableUtf8) throws Exception {
-    super(mqttId, mqttHost, enableUtf8);
-    this.mqttId = mqttId;
+  public CConnectorMqttMgr(
+      String mqttId,
+      String mqttHost,
+      boolean enableUtf8,
+      String port,
+      String rootCaFilePath,
+      String mqttUsername,
+      String mqttPassword)
+      throws Exception {
+    super(
+        mqttId,
+        mqttHost,
+        enableUtf8,
+        port,
+        rootCaFilePath,
+        MQTT_TLS_VERSION,
+        mqttUsername,
+        mqttPassword,
+        MQTT_QOS_LEVEL,
+        MQTT_WAIT_FOR_WAN_IP);
+
+    // Configure subscriptions
+    if (CConnectorMain.getConnectorConfig().getCumulocitySubscribeToErrors()) {
+      Logger.LOG_INFO("Subscribing to Cumulocity error topic.");
+      addSubscription("s/e");
+    }
+    addSubscription(CUMULOCITY_MQTT_TOPIC_SDS);
+    addSubscription(CUMULOCITY_MQTT_TOPIC_SDS + "/*");
 
     // Configure desired MQTT loop sleep interval
     setMqttThreadSleepIntervalMs(MQTT_LOOP_WAIT_MILLIS);
-
-    // Add MQTT listener to default event handler
-    DefaultEventHandler.addMqttListener(this);
 
     // Add alarm listener to default event handler
     DefaultEventHandler.setDefaultTagAlarmListener(new CConnectorAlarmMgr());
@@ -128,7 +150,7 @@ public class CConnectorMqttMgr extends MqttManager {
     // Pass message to API message reader/parser
     String mqttMessagePayload = new String(mqttMessage.getPayload());
     CConnectorApiMessageReader.parseMessage(
-        this, mqttMessage.getTopic(), mqttMessagePayload, mqttId);
+        this, mqttMessage.getTopic(), mqttMessagePayload, getMqttId());
   }
 
   /**
@@ -161,29 +183,6 @@ public class CConnectorMqttMgr extends MqttManager {
   public void onConnect() {
     Logger.LOG_CRITICAL("MQTT client is connected!");
 
-    // Subscribe to Cumulocity MQTT topics
-    if (!subscribedToTopics) {
-      try {
-        // Subscribe to Cumulocity error topic if enabled
-        if (CConnectorMain.getConnectorConfig().getCumulocitySubscribeToErrors()) {
-          Logger.LOG_INFO("Subscribing to Cumulocity error topic.");
-          subscribe("s/e", MQTT_QOS_LEVEL);
-        }
-
-        subscribe(CUMULOCITY_MQTT_TOPIC_SDS, MQTT_QOS_LEVEL);
-        subscribe(CUMULOCITY_MQTT_TOPIC_SDS + "/*", MQTT_QOS_LEVEL);
-        subscribedToTopics = true;
-      } catch (Exception e) {
-        Logger.LOG_CRITICAL(
-            "Unable to subscribe to Cumulocity MQTT topics: "
-                + CUMULOCITY_MQTT_TOPIC_SDS
-                + " and "
-                + CUMULOCITY_MQTT_TOPIC_SDS
-                + "/*");
-        Logger.LOG_EXCEPTION(e);
-      }
-    }
-
     // Finish operations which required reboot
     CConnectorApiMessageReader.finalizeRebootOperations(this);
 
@@ -206,33 +205,6 @@ public class CConnectorMqttMgr extends MqttManager {
     }
   }
 
-  /**
-   * Method for initializing connection
-   *
-   * @throws Exception if unable to initialize connection
-   */
-  public void initConnection() throws Exception {
-    Logger.LOG_DEBUG("Initializing MQTT connection...");
-
-    // Configure MQTT
-    setPort(CConnectorMain.getConnectorConfig().getCumulocityPort());
-    setCAFilePath(CConnectorApiCertificateMgr.getRootCaFilePath());
-    setTLSVersion(MQTT_TLS_VERSION);
-
-    // Get provisioner information
-    String authPassword = CConnectorMain.getConnectorConfig().getCumulocityDevicePassword();
-    String authUsername = CConnectorMain.getConnectorConfig().getCumulocityDeviceUsername();
-    String authTenant = CConnectorMain.getConnectorConfig().getCumulocityDeviceTenant();
-
-    // Apply provisioning information, if present/required
-    setAuthUsername(authTenant + "/" + authUsername);
-    setAuthPassword(authPassword);
-
-    // Attempt connection to MQTT
-    connect();
-    Logger.LOG_DEBUG("Finished initializing MQTT connection.");
-  }
-
   /** Sends basic information about the connector, hardware, and other software to Cumulocity. */
   public void sendInformationToCumulocity() {
     // Get connector information for adding software/agent information
@@ -247,7 +219,7 @@ public class CConnectorMqttMgr extends MqttManager {
       String agentInfoPayload =
           CConnectorApiMessageBuilder.buildC8YAgentPayload(
               connectorName, connectorVersion, connectorDownloadUrl);
-      String agentInfoTopic = CUMULOCITY_MQTT_TOPIC_AGENT_INFO_PREFIX + mqttId;
+      String agentInfoTopic = CUMULOCITY_MQTT_TOPIC_AGENT_INFO_PREFIX + getMqttId();
       mqttPublish(agentInfoTopic, agentInfoPayload, MQTT_QOS_LEVEL, MQTT_RETAIN);
     } catch (Exception e) {
       Logger.LOG_CRITICAL("Unable to send agent information to Cumulocity!");
@@ -373,7 +345,7 @@ public class CConnectorMqttMgr extends MqttManager {
   public void sendMessageWithChildDeviceRouting(String messagePayload, String childDevice)
       throws EWException, UnsupportedEncodingException {
     // Register child device if not already registered
-    String childDeviceCumulocityId = mqttId + "_" + childDevice;
+    String childDeviceCumulocityId = getMqttId() + "_" + childDevice;
     if (childDevice != null && !registeredChildDevices.contains(childDevice)) {
       // Register child device
       String childDeviceRegistrationPayload =
