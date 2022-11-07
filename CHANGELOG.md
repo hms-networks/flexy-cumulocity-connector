@@ -1,5 +1,14 @@
 # Ewon Flexy Cumulocity Connector Changelog
 
+## Version 1.3.0
+### Features
+- Added option to change Cumulocity server certificate in configuration file
+- Update MQTT to use new library ConstrainedMqttManager.java which simplifies and improves error handling
+### Bug Fixes
+- N/A
+### Other
+- Updated com.hms_networks.americas.sc:extensions library to version 1.12.0
+
 ## Version 1.2.0
 ### Features
 - Added option to change MQTT port in configuration file
