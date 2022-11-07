@@ -48,6 +48,9 @@ public class CConnectorConfigFile extends ConfigFile {
   /** Key for accessing the 'Host' object in the configuration file. */
   private static final String CONFIG_FILE_HOST_KEY = "Host";
 
+  /** Key for accessing the 'CertificateUrl' object in the configuration file. */
+  private static final String CONFIG_FILE_CERTIFICATE_URL_KEY = "CertificateUrl";
+
   /** Key for accessing the 'Port' object in the configuration file. */
   private static final String CONFIG_FILE_PORT_KEY = "Port";
 
@@ -85,6 +88,10 @@ public class CConnectorConfigFile extends ConfigFile {
 
   /** The default value for the subscribe to errors setting. */
   private static final boolean SUBSCRIBE_TO_ERRORS_DEFAULT = false;
+
+  /** The default value for the certificate URL setting. */
+  private static final String CERTIFICATE_URL_DEFAULT =
+      "https://certs.godaddy.com/repository/gdroot-g2.crt";
 
   /** The default value for the port setting. */
   private static final String PORT_DEFAULT = "8883";
@@ -197,6 +204,13 @@ public class CConnectorConfigFile extends ConfigFile {
    */
   private static final String CUMULOCITY_HOST_CONFIG_NAME =
       CONFIG_FILE_CUMULOCITY_KEY + "/" + CONFIG_FILE_HOST_KEY;
+
+  /**
+   * The configuration field name used for the Cumulocity host setting when communicating with
+   * Cumulocity.
+   */
+  private static final String CUMULOCITY_CERTIFICATE_URL_CONFIG_NAME =
+      CONFIG_FILE_CUMULOCITY_KEY + "/" + CONFIG_FILE_CERTIFICATE_URL_KEY;
 
   /**
    * The configuration field name used for the Cumulocity port setting when communicating with
@@ -358,6 +372,60 @@ public class CConnectorConfigFile extends ConfigFile {
     return configurationObject
         .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
         .getString(CONFIG_FILE_HOST_KEY);
+  }
+
+  /**
+   * Sets the configured Cumulocity certificate URL.
+   *
+   * @param cumulocityCertificateUrl Cumulocity certificate URL
+   * @throws JSONException if unable to set Cumulocity certificate URL in configuration
+   */
+  public void setCumulocityCertificateUrl(String cumulocityCertificateUrl) throws JSONException {
+    configurationObject
+        .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
+        .put(CONFIG_FILE_CERTIFICATE_URL_KEY, cumulocityCertificateUrl);
+    trySave();
+  }
+
+  /**
+   * Gets the configured Cumulocity certificate URL.
+   *
+   * @return Cumulocity certificate URL
+   */
+  public String getCumulocityCertificateUrl() {
+    String cumulocityCertificateUrl;
+    try {
+      // Set to default if not present
+      if (!configurationObject
+          .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
+          .has(CONFIG_FILE_CERTIFICATE_URL_KEY)) {
+        Logger.LOG_DEBUG(
+            "No value was specified for \""
+                + CONFIG_FILE_CERTIFICATE_URL_KEY
+                + "\" in the configuration file. Defaulting to "
+                + CERTIFICATE_URL_DEFAULT
+                + ".");
+        setCumulocityCertificateUrl(CERTIFICATE_URL_DEFAULT);
+      }
+
+      // Get the value
+      cumulocityCertificateUrl =
+          configurationObject
+              .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
+              .getString(CONFIG_FILE_CERTIFICATE_URL_KEY);
+    } catch (Exception e) {
+      Logger.LOG_SERIOUS(
+          "An error occurred while attempting to get the value for \""
+              + CONFIG_FILE_CERTIFICATE_URL_KEY
+              + "\" from the configuration file. Defaulting to "
+              + CERTIFICATE_URL_DEFAULT
+              + ".");
+      Logger.LOG_EXCEPTION(e);
+
+      cumulocityCertificateUrl = CERTIFICATE_URL_DEFAULT;
+    }
+
+    return cumulocityCertificateUrl;
   }
 
   /**
@@ -656,6 +724,10 @@ public class CConnectorConfigFile extends ConfigFile {
         configurationObject
             .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
             .put(CONFIG_FILE_HOST_KEY, configFileEscapedStringLineValue);
+      } else if (configFileEscapedStringLineKey.equals(CUMULOCITY_CERTIFICATE_URL_CONFIG_NAME)) {
+        configurationObject
+            .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
+            .put(CONFIG_FILE_CERTIFICATE_URL_KEY, configFileEscapedStringLineValue);
       } else if (configFileEscapedStringLineKey.equals(CUMULOCITY_PORT_CONFIG_NAME)) {
         configurationObject
             .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
@@ -862,6 +934,19 @@ public class CConnectorConfigFile extends ConfigFile {
       configFileEscapedString.append("\n");
     }
 
+    // Add Cumulocity/CertificateUrl
+    if (configurationObject
+        .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
+        .has(CONFIG_FILE_CERTIFICATE_URL_KEY)) {
+      configFileEscapedString.append(CUMULOCITY_CERTIFICATE_URL_CONFIG_NAME);
+      configFileEscapedString.append("=");
+      configFileEscapedString.append(
+          configurationObject
+              .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
+              .getString(CONFIG_FILE_CERTIFICATE_URL_KEY));
+      configFileEscapedString.append("\n");
+    }
+
     // Add Cumulocity/Port
     if (configurationObject.getJSONObject(CONFIG_FILE_CUMULOCITY_KEY).has(CONFIG_FILE_PORT_KEY)) {
       configFileEscapedString.append(CUMULOCITY_PORT_CONFIG_NAME);
@@ -939,6 +1024,8 @@ public class CConnectorConfigFile extends ConfigFile {
     defaultCumulocityConfigurationObject.put(
         CONFIG_FILE_DEVICE_TENANT_KEY, CONFIG_FILE_AUTOMATICALLY_FILLED_TEXT);
     defaultCumulocityConfigurationObject.put(CONFIG_FILE_HOST_KEY, "");
+    defaultCumulocityConfigurationObject.put(
+        CONFIG_FILE_CERTIFICATE_URL_KEY, CERTIFICATE_URL_DEFAULT);
     defaultCumulocityConfigurationObject.put(CONFIG_FILE_PORT_KEY, PORT_DEFAULT);
     defaultCumulocityConfigurationObject.put(
         CONFIG_FILE_SUBSCRIBE_TO_ERRORS_KEY, SUBSCRIBE_TO_ERRORS_DEFAULT);

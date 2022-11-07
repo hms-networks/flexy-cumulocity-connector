@@ -130,6 +130,14 @@ running the connector.
 
 Optional string parameter to specify the port of the Cumulocity server. Default: "8883"
 
+#### Certificate URL (CertificateUrl)
+
+Optional string parameter to specify the URL of the Cumulocity server's certificate. 
+Default: "https://certs.godaddy.com/repository/gdroot-g2.crt"
+
+This parameter is useful when connecting to Cumulocity Edge servers which use a self-signed
+certificate. 
+
 #### Bootstrap Username (BootstrapUsername)
 
 Parameter to specify the bootstrap username to use when registering to Cumulocity. This must be
