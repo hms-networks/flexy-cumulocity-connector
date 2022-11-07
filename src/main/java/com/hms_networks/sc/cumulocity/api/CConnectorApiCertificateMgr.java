@@ -1,9 +1,9 @@
 package com.hms_networks.sc.cumulocity.api;
 
-import com.ewon.ewonitf.EWException;
-import com.ewon.ewonitf.ScheduledActionManager;
+import com.hms_networks.americas.sc.extensions.fileutils.FileAccessManager;
 import com.hms_networks.americas.sc.extensions.logging.Logger;
 import com.hms_networks.americas.sc.extensions.system.http.SCHttpUtility;
+import com.hms_networks.sc.cumulocity.CConnectorMain;
 import java.io.File;
 
 /**
@@ -15,15 +15,16 @@ import java.io.File;
  */
 public class CConnectorApiCertificateMgr {
 
-  /** The host which serves the Cumulocity Root CA. */
-  public static final String CUMULOCITY_ROOT_CA_DOWNLOAD_HOST = "https://certs.godaddy.com";
-
-  /** The path to download the Cumulocity Root CA. */
-  public static final String CUMULOCITY_ROOT_CA_DOWNLOAD_PATH = "/repository/gdroot-g2.crt";
-
   /** The file path for storing the downloaded Cumulocity Root CA. */
   public static final String CUMULOCITY_ROOT_CA_CERT_FILE_PATH =
       "/usr/CumulocityCertificates/rootCA.crt";
+
+  /**
+   * The file path for storing the URL used to download the stored Cumulocity Root CA. This is used
+   * to determine if the certificate needs to be re-downloaded.
+   */
+  public static final String CUMULOCITY_ROOT_CA_CERT_URL_CACHE_FILE_PATH =
+      CUMULOCITY_ROOT_CA_CERT_FILE_PATH + ".url";
 
   /**
    * Return a boolean representing if the Cumulocity Root CA certificate file is present in the file
@@ -36,47 +37,55 @@ public class CConnectorApiCertificateMgr {
     return rootCaFile.isFile();
   }
 
-  /** Downloads the Cumulocity Root CA certificate to file. */
-  private static void downloadRootCaToFile() {
+  /**
+   * Return a boolean representing if the stored Cumulocity Root CA certificate is from the same
+   * download URL as the specified download URL. This is used to determine if the certificate needs
+   * to be re-downloaded.
+   *
+   * @param downloadUrl the URL to check
+   * @return true if the stored certificate is from the same URL
+   */
+  private static boolean isRootCaFromSameDownloadUrl(String downloadUrl) {
+    boolean isRootCaFromSameDownloadUrl = false;
+    File rootCaUrlCacheFile = new File(CUMULOCITY_ROOT_CA_CERT_URL_CACHE_FILE_PATH);
+    if (rootCaUrlCacheFile.isFile()) {
+      try {
+        String lastUrl =
+            FileAccessManager.readFileToString(CUMULOCITY_ROOT_CA_CERT_URL_CACHE_FILE_PATH);
+        if (lastUrl.equals(downloadUrl)) {
+          isRootCaFromSameDownloadUrl = true;
+        }
+      } catch (Exception e) {
+        Logger.LOG_WARN(
+            "Failed to read the download URL of the stored Cumulocity Root CA certificate.");
+        Logger.LOG_EXCEPTION(e);
+      }
+    }
+    return isRootCaFromSameDownloadUrl;
+  }
+
+  /**
+   * Downloads the Cumulocity Root CA certificate to file.
+   *
+   * @param cumulocityCertificateUrl the configured URL to download the certificate from
+   */
+  private static void downloadRootCaToFile(String cumulocityCertificateUrl) {
     // Verify download location exists
     File downloadFolder = new File(CUMULOCITY_ROOT_CA_CERT_FILE_PATH).getParentFile();
     downloadFolder.mkdirs();
 
     // Download to file
-    int result = SCHttpUtility.HTTPX_CODE_NO_ERROR;
     try {
-      result =
-          ScheduledActionManager.GetHttp(
-              CUMULOCITY_ROOT_CA_DOWNLOAD_HOST,
-              CUMULOCITY_ROOT_CA_CERT_FILE_PATH,
-              CUMULOCITY_ROOT_CA_DOWNLOAD_PATH);
-    } catch (EWException e) {
+      SCHttpUtility.httpGet(cumulocityCertificateUrl, "", "", CUMULOCITY_ROOT_CA_CERT_FILE_PATH);
+
+      // Write URL to file
+      FileAccessManager.writeStringToFile(
+          CUMULOCITY_ROOT_CA_CERT_URL_CACHE_FILE_PATH, cumulocityCertificateUrl);
+    } catch (Exception e) {
       Logger.LOG_SERIOUS(
           "Unable to download Cumulocity Root CA certificate to file. MQTT connections "
               + "may fail!");
       Logger.LOG_EXCEPTION(e);
-    }
-
-    // Log error(s) (if necessary/applicable)
-    if (result != SCHttpUtility.HTTPX_CODE_NO_ERROR) {
-      if (result == SCHttpUtility.HTTPX_CODE_CONNECTION_ERROR) {
-        Logger.LOG_SERIOUS(
-            "A connection error has occurred while downloading the Cumulocity Root CA "
-                + "certificate.");
-      } else if (result == SCHttpUtility.HTTPX_CODE_AUTH_ERROR) {
-        Logger.LOG_SERIOUS(
-            "An authentication error has occurred while downloading the Cumulocity Root CA "
-                + "certificate.");
-      } else if (result == SCHttpUtility.HTTPX_CODE_EWON_ERROR) {
-        Logger.LOG_SERIOUS(
-            "An Ewon error has occurred while downloading the Cumulocity Root CA "
-                + "certificate.");
-      } else {
-        Logger.LOG_SERIOUS(
-            "A generic error has occurred while downloading the Cumulocity Root CA "
-                + "certificate. Error Code: "
-                + result);
-      }
     }
   }
 
@@ -87,9 +96,26 @@ public class CConnectorApiCertificateMgr {
    * @return Cumulocity Root CA certificate file path
    */
   public static String getRootCaFilePath() {
-    // Ensure certificate exists on file system
+    // Get certificate URL
+    String cumulocityCertificateUrl =
+        CConnectorMain.getConnectorConfig().getCumulocityCertificateUrl();
+
+    // Ensure certificate exists on file system and is from the same URL
+    boolean downloadCertificate = false;
     if (!isRootCaWrittenToFile()) {
-      downloadRootCaToFile();
+      Logger.LOG_INFO("Cumulocity Root CA certificate not found on file system. Downloading...");
+      downloadCertificate = true;
+    } else if (!isRootCaFromSameDownloadUrl(cumulocityCertificateUrl)) {
+      Logger.LOG_INFO(
+          "Cumulocity Root CA certificate found on file system, but is from a different URL. "
+              + "Downloading...");
+      downloadCertificate = true;
+    }
+
+    // Download certificate if needed
+    if (downloadCertificate) {
+      downloadRootCaToFile(cumulocityCertificateUrl);
+      Logger.LOG_INFO("Cumulocity Root CA certificate downloaded to file system.");
     }
 
     // Return path
