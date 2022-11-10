@@ -71,7 +71,7 @@ public class CConnectorMqttMgr extends MqttManager {
    */
   private static final boolean MQTT_RETAIN = false;
 
-  /** MQTT loop attempt count. Used for retry backoff in {@link #runOnMqttLoop()} */
+  /** MQTT loop attempt count. Used for retry backoff in {@link #runOnMqttLoop(int)} */
   private int mqttLoopAttemptCount = 0;
 
   /** MQTT loop limit, before triggering a reprovision event */
@@ -131,23 +131,20 @@ public class CConnectorMqttMgr extends MqttManager {
         this, mqttMessage.getTopic(), mqttMessagePayload, mqttId);
   }
 
-  /** Method for processing or performing tasks on the looping MQTT thread. */
-  public void runOnMqttLoop() {
-    try {
-      if (getStatus() != MqttStatusCode.CONNECTED) {
-        // Increment loop attempt count
-        mqttLoopAttemptCount++;
-        if (mqttLoopAttemptCount > mqttLoopAttemptLimit) {
-          Logger.LOG_CRITICAL(
-              "MQTT disconnected for "
-                  + mqttLoopAttemptCount
-                  + " cycles, triggering a reprovision.");
-          CConnectorMain.rerunProvisioning();
-        }
+  /**
+   * Method for processing or performing tasks on the looping MQTT thread.
+   *
+   * @param currentMqttStatus the current MQTT status integer
+   */
+  public void runOnMqttLoop(int currentMqttStatus) {
+    if (currentMqttStatus != MqttStatusCode.CONNECTED) {
+      // Increment loop attempt count
+      mqttLoopAttemptCount++;
+      if (mqttLoopAttemptCount > mqttLoopAttemptLimit) {
+        Logger.LOG_CRITICAL(
+            "MQTT disconnected for " + mqttLoopAttemptCount + " cycles, triggering a reprovision.");
+        CConnectorMain.rerunProvisioning();
       }
-    } catch (EWException ew) {
-      Logger.LOG_SERIOUS("Exception getting MQTT status!");
-      Logger.LOG_EXCEPTION(ew);
     }
   }
 
