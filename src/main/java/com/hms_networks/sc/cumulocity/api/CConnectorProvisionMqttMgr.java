@@ -141,8 +141,12 @@ public class CConnectorProvisionMqttMgr extends MqttManager {
     }
   }
 
-  /** Method for processing or performing tasks on the looping MQTT thread. */
-  public void runOnMqttLoop() {
+  /**
+   * Method for processing or performing tasks on the looping MQTT thread.
+   *
+   * @param currentMqttStatus the current MQTT status integer
+   */
+  public void runOnMqttLoop(int currentMqttStatus) {
     // Send empty message to Cumulocity (if subscribed to receive response)
     if (subscribedToTopics) {
       try {
