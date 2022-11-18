@@ -1,5 +1,15 @@
 # Ewon Flexy Cumulocity Connector Changelog
 
+## Version 1.3.1
+### Features
+- N/A
+### Bug Fixes
+- N/A
+### Other
+- Updated GitHub Actions to use the latest available versions from sc-java-maven-starter-project
+  - Files from the starting-files folder are now supplied as release artifacts
+  - Documentation is now supplied in PDF format as release artifacts
+
 ## Version 1.3.0
 ### Features
 - Added option to change Cumulocity server certificate in configuration file
