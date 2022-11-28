@@ -21,6 +21,7 @@ linking Ewon devices using a direct data path with a Flexy Java application.
     - [Cumulocity](#cumulocity)
         - [Host (Host)](#host-host)
         - [Port (Port)](#port-port)
+        - [Certificate URL (CertificateUrl)](#certificate-url-certificateurl)
         - [Bootstrap Username (BootstrapUsername)](#bootstrap-username-bootstrapusername)
         - [Bootstrap Password (BootstrapPassword)](#bootstrap-password-bootstrappassword)
         - [Bootstrap Tenant (BootstrapTenant)](#bootstrap-tenant-bootstraptenant)
