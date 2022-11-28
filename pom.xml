@@ -16,12 +16,6 @@
 
   <!-- PROJECT PROPERTIES -->
   <properties>
-    <!-- Ewon Flexy Device Address (IP or URL) -->
-    <ewon.address>ah-flexy.116.com</ewon.address>
-    <!-- Ewon Flexy Device Username -->
-    <ewon.username>adm</ewon.username>
-    <!-- Ewon Flexy Device Password -->
-    <ewon.password>adm</ewon.password>
     <!-- Project Main Class -->
     <project.main.class>com.hms_networks.sc.cumulocity.CConnectorMain</project.main.class>
     <!-- Project Memory Heap Size -->
@@ -44,6 +38,7 @@
     <!-- Maven Compiler Target Version -->
     <maven.compiler.target>${project.java.version}</maven.compiler.target>
     <!-- Shutdown API URL -->
+    <!--suppress UnresolvedMavenProperty -->
     <project.shutdown.url>http://${ewon.address}/rcgi.bin/jvmForm?formName=controlApi&amp;shutdown=true</project.shutdown.url>
   </properties>
 
@@ -344,6 +339,26 @@
           </execution>
         </executions>
       </plugin>
+
+      <!-- Read properties from external file -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>properties-maven-plugin</artifactId>
+        <version>1.0.0</version>
+        <executions>
+          <execution>
+            <phase>initialize</phase>
+            <goals>
+              <goal>read-project-properties</goal>
+            </goals>
+            <configuration>
+              <files>
+                <file>${project.basedir}/flexy.properties</file>
+              </files>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
 
     <extensions>
@@ -393,12 +408,14 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
+        <!--suppress UnresolvedMavenProperty -->
         <project.build.exec.url>http://${ewon.address}/rcgi.bin/jvmCmd?cmd=start&amp;runCmd=%20-heapsize%20${project.heap.size}%20-classpath%20/usr/${project.artifactId}-${project.version}-full.jar%20-emain%20${project.main.class}</project.build.exec.url>
       </properties>
     </profile>
     <profile>
       <id>debug</id>
       <properties>
+        <!--suppress UnresolvedMavenProperty -->
         <project.build.exec.url>http://${ewon.address}/rcgi.bin/jvmCmd?cmd=start&amp;runCmd=%20-heapsize%20${project.heap.size}%20-classpath%20/usr/${project.artifactId}-${project.version}-full.jar%20-emain%20${project.main.class}%20-debugger%20-port%20${project.build.debug.port}</project.build.exec.url>
       </properties>
       <build>
@@ -429,6 +446,7 @@
     <profile>
       <id>debugNoSuspend</id>
       <properties>
+        <!--suppress UnresolvedMavenProperty -->
         <project.build.exec.url>http://${ewon.address}/rcgi.bin/jvmCmd?cmd=start&amp;runCmd=%20-heapsize%20${project.heap.size}%20-classpath%20/usr/${project.artifactId}-${project.version}-full.jar%20-emain%20${project.main.class}%20-debugger%20-port%20${project.build.debug.port}%20-nosuspend</project.build.exec.url>
       </properties>
       <build>
