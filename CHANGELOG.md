@@ -1,5 +1,15 @@
 # Ewon Flexy Cumulocity Connector Changelog
 
+## Version 1.3.2
+### Features
+- Added support for queueing messages to be retried when MQTT connection is lost or not available
+  - Upon reconnection, the queued messages will be sent
+### Bug Fixes
+- Fixed an issue where the connector improperly attempted provisioning when disconnected from MQTT
+- Fixed an issue where the connector watchdog was not services during provisioning
+### Other
+- Added documentation for accessing the REST API via M2Web
+
 ## Version 1.3.1
 ### Features
 - N/A
