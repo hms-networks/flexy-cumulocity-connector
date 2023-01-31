@@ -145,6 +145,7 @@ public class CConnectorAlarmMgr extends AlarmMonitor {
                 + alarmedTagValue
                 + "]");
         Logger.LOG_EXCEPTION(e);
+        mqttMgr.addMessageToRetryPending(alarmMessage, childDevice);
       }
     } else {
       Logger.LOG_SERIOUS(
