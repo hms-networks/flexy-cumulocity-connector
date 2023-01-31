@@ -411,13 +411,14 @@ public class CConnectorDataMgr {
       Object[] childDeviceMessageMapKeysArray = childDeviceMessageMap.keySet().toArray();
       for (int x = 0; x < childDeviceMessageMapKeysArray.length; x++) {
         // Send payload with child device name if present
+        String childDevice = (String) childDeviceMessageMapKeysArray[x];
+        String payloadString = (String) childDeviceMessageMap.get(childDevice);
         try {
-          String childDevice = (String) childDeviceMessageMapKeysArray[x];
-          String payloadString = (String) childDeviceMessageMap.get(childDevice);
           mqttMgr.sendMessageWithChildDeviceRouting(payloadString, childDevice);
         } catch (Exception e) {
           Logger.LOG_CRITICAL("Unable to send data point to MQTT broker.");
           Logger.LOG_EXCEPTION(e);
+          mqttMgr.addMessageToRetryPending(payloadString, childDevice);
         }
       }
     }

@@ -513,27 +513,6 @@ public class CConnectorMain {
   }
 
   /**
-   * Method for rerunning the connector provisioning process.
-   *
-   * @return boolean indicating if provisioning and MQTT setup were successful
-   */
-  public static boolean rerunProvisioning() {
-    // Shutdown existing MQTT manager
-    if (mqttMgr != null) {
-      mqttMgr.stop();
-      mqttMgr = null;
-    }
-
-    // Run provisioning
-    boolean success = runProvisioningMqtt();
-
-    // Setup new MQTT manager
-    success &= setUpMqtt();
-
-    return success;
-  }
-
-  /**
    * Performs device provisioning to Cumulocity via the configured bootstrap credentials and tenant.
    *
    * @return true if provisioning was successful, false otherwise
@@ -615,30 +594,6 @@ public class CConnectorMain {
       mqttSetUpSuccess = false;
     }
     return mqttSetUpSuccess;
-  }
-
-  /**
-   * Shuts down the existing MQTT manager and creates a new one.
-   *
-   * @return true if the MQTT manager was successfully shut down and recreated, false otherwise
-   */
-  public static boolean restartMqtt() {
-    // Shutdown and cleanup existing MQTT manager
-    boolean restartSuccess = true;
-    if (mqttMgr != null) {
-      try {
-        mqttMgr.restart();
-      } catch (Exception e) {
-        restartSuccess = false;
-        Logger.LOG_SERIOUS("An exception occurred while restarting the MQTT manager!");
-        Logger.LOG_EXCEPTION(e);
-      }
-    } else {
-      // Set up new MQTT manager
-      restartSuccess = setUpMqtt();
-    }
-
-    return restartSuccess;
   }
 
   /**

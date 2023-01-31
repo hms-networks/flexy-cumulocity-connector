@@ -11,9 +11,11 @@ import com.hms_networks.americas.sc.extensions.string.StringUtils;
 import com.hms_networks.sc.cumulocity.CConnectorMain;
 import com.hms_networks.sc.cumulocity.api.CConnectorApiMessageBuilder.InstalledSoftware;
 import com.hms_networks.sc.cumulocity.data.CConnectorAlarmMgr;
+import com.hms_networks.sc.cumulocity.data.CConnectorRetryMessage;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * The MQTT management class for the Cumulocity Connector.
@@ -77,14 +79,17 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
    */
   private static final boolean MQTT_WAIT_FOR_WAN_IP = true;
 
-  /** MQTT loop attempt count. Used for retry backoff in {@link #runOnMqttLoop(int)} */
-  private int mqttLoopAttemptCount = 0;
-
-  /** MQTT loop limit, before triggering a reprovision event */
-  private int mqttLoopAttemptLimit = 15;
+  /**
+   * The maximum number of times to retry sending a message to Cumulocity before giving up and
+   * discarding the message (with warning).
+   */
+  private static final int PENDING_RETRY_MESSAGE_MAX_RETRY_COUNT = 16;
 
   /** List of child devices which have been registered to Cumulocity. */
   private final List registeredChildDevices = new ArrayList();
+
+  /** Stack of {@link CConnectorRetryMessage}s which have been queued for retry. */
+  private final Stack pendingRetryMessages = new Stack();
 
   /**
    * Constructor for the MQTT manager with the given MQTT ID, host, and boolean indicating if UTF-8
@@ -159,14 +164,47 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
    * @param currentMqttStatus the current MQTT status integer
    */
   public void runOnMqttLoop(int currentMqttStatus) {
-    if (currentMqttStatus != MqttStatusCode.CONNECTED) {
-      // Increment loop attempt count
-      mqttLoopAttemptCount++;
-      if (mqttLoopAttemptCount > mqttLoopAttemptLimit) {
-        Logger.LOG_CRITICAL(
-            "MQTT disconnected for " + mqttLoopAttemptCount + " cycles, triggering a reprovision.");
-        CConnectorMain.rerunProvisioning();
+    // Retry pending payloads if connected to MQTT
+    if (currentMqttStatus == MqttStatusCode.CONNECTED) {
+      if (!pendingRetryMessages.empty()) {
+        // Get the first pending retry message
+        CConnectorRetryMessage retryPayload = (CConnectorRetryMessage) pendingRetryMessages.peek();
+
+        // Retry the payload and pop from stack if successful
+        try {
+          retryPayload.incrementRetryCount();
+          String childDevice = (String) retryPayload.getChildDevice();
+          String payloadString = (String) retryPayload.getMessagePayload();
+          sendMessageWithChildDeviceRouting(payloadString, childDevice);
+          pendingRetryMessages.pop();
+          Logger.LOG_DEBUG(
+              "Successfully sent payload to Cumulocity after "
+                  + retryPayload.getRetryCount()
+                  + " retries: "
+                  + payloadString);
+          Logger.LOG_DEBUG("Pending retry payloads remaining: " + pendingRetryMessages.size());
+        } catch (Exception e) {
+          Logger.LOG_CRITICAL(
+              "Unable to send message to MQTT broker. [Retry: "
+                  + retryPayload.getRetryCount()
+                  + "]");
+          Logger.LOG_EXCEPTION(e);
+
+          // If the retry count has been exceeded, discard the message
+          if (retryPayload.getRetryCount() >= PENDING_RETRY_MESSAGE_MAX_RETRY_COUNT) {
+            Logger.LOG_CRITICAL(
+                "The maximum number of retries has been exceeded for the following message: "
+                    + retryPayload.getMessagePayload());
+            pendingRetryMessages.pop();
+            Logger.LOG_CRITICAL("The message has been discarded.");
+          }
+        }
       }
+    } else {
+      Logger.LOG_DEBUG(
+          "The MQTT client is not connected. There are currently "
+              + pendingRetryMessages.size()
+              + " pending messages to send upon reconnect.");
     }
   }
 
@@ -328,6 +366,22 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
       Logger.LOG_CRITICAL("Unable to send the current configuration to Cumulocity!");
       Logger.LOG_EXCEPTION(e);
     }
+  }
+
+  /**
+   * Adds the specified message and child device (if not null) to the stack of pending messages to
+   * be retried later. The most recent message is retried each time the MQTT loop executes while
+   * connected, up to a maximum of {@link #PENDING_RETRY_MESSAGE_MAX_RETRY_COUNT} times. If the
+   * maximum retry count is reached, the message is discarded.
+   *
+   * <p>If the retry is successful, the message is removed from the stack and the next message will
+   * be retried on the next MQTT loop execution.
+   *
+   * @param messagePayload the message payload to send
+   * @param childDevice the child device to route the message to (if not null)
+   */
+  public void addMessageToRetryPending(String messagePayload, String childDevice) {
+    pendingRetryMessages.push(new CConnectorRetryMessage(messagePayload, childDevice));
   }
 
   /**

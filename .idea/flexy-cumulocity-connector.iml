@@ -13,6 +13,6 @@
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.13.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-core:1.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.hms_networks.americas.sc.mvnlibs:ewon-etk:1.4.4" level="project" />
-    <orderEntry type="library" name="Maven: com.hms_networks.americas.sc:extensions:1.12.0" level="project" />
+    <orderEntry type="library" name="Maven: com.hms_networks.americas.sc:extensions:1.13.4" level="project" />
   </component>
 </module>
