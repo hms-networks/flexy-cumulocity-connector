@@ -1,6 +1,7 @@
 package com.hms_networks.sc.cumulocity.api;
 
 import com.ewon.ewonitf.MqttMessage;
+import com.ewon.ewonitf.RuntimeControl;
 import com.hms_networks.americas.sc.extensions.json.JSONException;
 import com.hms_networks.americas.sc.extensions.logging.Logger;
 import com.hms_networks.americas.sc.extensions.mqtt.ConstrainedMqttManager;
@@ -175,6 +176,9 @@ public class CConnectorProvisionMqttMgr extends ConstrainedMqttManager {
         Logger.LOG_EXCEPTION(e);
       }
     }
+
+    // Service application watchdog
+    RuntimeControl.refreshWatchdog();
   }
 
   /**
