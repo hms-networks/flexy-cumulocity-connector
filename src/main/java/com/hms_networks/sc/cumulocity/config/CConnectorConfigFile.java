@@ -261,6 +261,19 @@ public class CConnectorConfigFile extends ConfigFile {
   }
 
   /**
+   * Resets the device authentication configuration (tenant, username, and password) to the default
+   * values.
+   *
+   * @throws JSONException if unable to reset the device authentication configuration
+   */
+  public void resetDeviceAuthenticationConfiguration() throws JSONException {
+    configurationObject.put(CONFIG_FILE_DEVICE_USERNAME_KEY, CONFIG_FILE_AUTOMATICALLY_FILLED_TEXT);
+    configurationObject.put(CONFIG_FILE_DEVICE_PASSWORD_KEY, CONFIG_FILE_AUTOMATICALLY_FILLED_TEXT);
+    configurationObject.put(CONFIG_FILE_DEVICE_TENANT_KEY, CONFIG_FILE_AUTOMATICALLY_FILLED_TEXT);
+    trySave();
+  }
+
+  /**
    * Returns a boolean indicating if the bootstrap credentials are configured.
    *
    * @return true if the bootstrap credentials are configured, false otherwise

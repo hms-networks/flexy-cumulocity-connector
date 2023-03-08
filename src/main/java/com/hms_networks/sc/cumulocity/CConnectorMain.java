@@ -15,6 +15,7 @@ import com.hms_networks.americas.sc.extensions.retry.AutomaticRetryCodeExponenti
 import com.hms_networks.americas.sc.extensions.system.application.SCAppManagement;
 import com.hms_networks.americas.sc.extensions.system.http.SCHttpUtility;
 import com.hms_networks.americas.sc.extensions.system.tags.SCTagUtils;
+import com.hms_networks.americas.sc.extensions.system.threading.SCCountdownLatch;
 import com.hms_networks.americas.sc.extensions.system.time.SCTimeUnit;
 import com.hms_networks.americas.sc.extensions.system.time.SCTimeUtils;
 import com.hms_networks.sc.cumulocity.api.CConnectorApiCertificateMgr;
@@ -89,6 +90,12 @@ public class CConnectorMain {
   /** MQTT manager */
   private static CConnectorMqttMgr mqttMgr;
 
+  /**
+   * Provisioning MQTT manager. Note: this variable is always {@code null} unless provisioning is
+   * currently in progress.
+   */
+  private static CConnectorProvisionMqttMgr provisioningMqttMgr = null;
+
   /** Alarm manager */
   private static CConnectorAlarmMgr alarmMgr;
 
@@ -117,6 +124,9 @@ public class CConnectorMain {
 
   /** Boolean indicating if the connector application should be restarted after it shuts down. */
   private static boolean restartAppAfterShutdown = false;
+
+  /** Count down latch used to wait for the connector to be bootstrapped. */
+  private static SCCountdownLatch bootstrapConfigurationLatch = null;
 
   /**
    * Gets the friendly name for the connector application in the format: %Title%, version %Version%.
@@ -188,6 +198,66 @@ public class CConnectorMain {
   }
 
   /**
+   * Gets a boolean indicating if the connector bootstrap process has been completed.
+   *
+   * @return true if the connector bootstrap process has been completed, false otherwise
+   */
+  public static boolean isBootstrapComplete() {
+    return bootstrapConfigurationLatch.getCount() == 0;
+  }
+
+  /**
+   * Sets the connector bootstrap configuration and returns a boolean indicating if the operation
+   * was successful.
+   *
+   * @param host the Cumulocity host to configure
+   * @param port the Cumulocity port to configure
+   * @param bootstrapTenant the Cumulocity bootstrap tenant to configure
+   * @param bootstrapUsername the Cumulocity bootstrap username to configure
+   * @param bootstrapPassword the Cumulocity bootstrap password to configure
+   * @param resetDeviceAuthentication boolean indicating if the device authentication configuration
+   *     should be reset. This is used when the bootstrap configuration is being overwritten.
+   * @return true if the configuration was set successfully, false otherwise
+   */
+  public static boolean setBootstrapConfiguration(
+      String host,
+      String port,
+      String bootstrapTenant,
+      String bootstrapUsername,
+      String bootstrapPassword,
+      boolean resetDeviceAuthentication) {
+    boolean success = false;
+    if (connectorConfig != null) {
+      try {
+        // Reset device authentication configuration (if requested)
+        if (resetDeviceAuthentication) {
+          connectorConfig.resetDeviceAuthenticationConfiguration();
+        }
+
+        // Parse the port number to check if valid
+        Integer.parseInt(port);
+
+        // Set the bootstrap configuration
+        connectorConfig.setCumulocityHost(host);
+        connectorConfig.setCumulocityPort(port);
+        connectorConfig.setCumulocityBootstrapTenant(bootstrapTenant);
+        connectorConfig.setCumulocityBootstrapUsername(bootstrapUsername);
+        connectorConfig.setCumulocityBootstrapPassword(bootstrapPassword);
+
+        // Countdown the bootstrap latch to indicate that the bootstrap configuration has been set
+        bootstrapConfigurationLatch.countDown();
+
+        // Set the success flag to true
+        success = true;
+      } catch (Exception e) {
+        Logger.LOG_CRITICAL("Failed to set the bootstrap configuration!");
+        Logger.LOG_EXCEPTION(e);
+      }
+    }
+    return success;
+  }
+
+  /**
    * Sets the {@link #restartAppAfterShutdown} flag to <code>true</code> to trigger a shutdown and
    * restart of the connector.
    */
@@ -195,6 +265,11 @@ public class CConnectorMain {
     Logger.LOG_CRITICAL("The connector has been requested to restart...");
     restartAppAfterShutdown = true;
     isRunning = false;
+
+    // Stop provisioning if it is in progress
+    if (provisioningMqttMgr != null) {
+      provisioningMqttMgr.cancelProvisioning();
+    }
   }
 
   /**
@@ -205,6 +280,11 @@ public class CConnectorMain {
     Logger.LOG_CRITICAL("The connector has been requested to shut down and restart the device...");
     restartDeviceAfterShutdown = true;
     isRunning = false;
+
+    // Stop provisioning if it is in progress
+    if (provisioningMqttMgr != null) {
+      provisioningMqttMgr.cancelProvisioning();
+    }
   }
 
   /**
@@ -215,6 +295,11 @@ public class CConnectorMain {
     Logger.LOG_CRITICAL("The connector has been requested to shut down...");
     restartDeviceAfterShutdown = false;
     isRunning = false;
+
+    // Stop provisioning if it is in progress
+    if (provisioningMqttMgr != null) {
+      provisioningMqttMgr.cancelProvisioning();
+    }
   }
 
   /** Method for performing connector application initialization steps. */
@@ -235,20 +320,22 @@ public class CConnectorMain {
     initializeSuccess &= loadConfiguration();
 
     // Check that bootstrap is configured, otherwise cannot continue
+    int bootstrapConfigurationLatchCount = 0;
     try {
-      if (!connectorConfig.isBootstrapConfigured()) {
+      if (!connectorConfig.isProvisioned() && !connectorConfig.isBootstrapConfigured()) {
         Logger.LOG_CRITICAL(
             "The bootstrap tenant and/or credentials are not configured in the "
-                + "configuration file! Please configure them and restart the connector.");
-        initializeSuccess = false;
+                + "configuration file! Please configure them using the remote API or "
+                + "modify the configuration file and restart the connector.");
+        bootstrapConfigurationLatchCount = 1;
       }
-
     } catch (JSONException e) {
       Logger.LOG_CRITICAL(
           "Unable to check for bootstrap credentials in the connector configuration file!");
       Logger.LOG_EXCEPTION(e);
       initializeSuccess = false;
     }
+    bootstrapConfigurationLatch = new SCCountdownLatch(bootstrapConfigurationLatchCount);
 
     // Configure the application watchdog
     RuntimeControl.configureAppWatchdog(APP_WATCHDOG_TIMEOUT_MIN);
@@ -394,6 +481,11 @@ public class CConnectorMain {
     // Run MQTT provisioning manager if provisioning required
     try {
       if (!connectorConfig.isProvisioned()) {
+        if (bootstrapConfigurationLatch.getCount() > 0) {
+          Logger.LOG_CRITICAL(
+              "Awaiting remote API configuration of bootstrap before continuing...");
+          bootstrapConfigurationLatch.await();
+        }
         startUpSuccess &= runProvisioningMqtt();
       }
     } catch (Exception e) {
@@ -565,7 +657,7 @@ public class CConnectorMain {
               + connectorConfig.getCumulocityBootstrapUsername();
       final String mqttPassword = connectorConfig.getCumulocityBootstrapPassword();
       final String mqttRootCaFilePath = CConnectorApiCertificateMgr.getRootCaFilePath();
-      CConnectorProvisionMqttMgr provisioningMqttMgr =
+      provisioningMqttMgr =
           new CConnectorProvisionMqttMgr(
               mqttClientId,
               mqttHost,
@@ -582,6 +674,7 @@ public class CConnectorMain {
       provisioningMqttMgr.awaitProvisioning();
       provisioningMqttMgr.stop();
       Logger.LOG_DEBUG("Finished device provisioning MQTT.");
+      provisioningMqttMgr = null;
     } catch (Exception e) {
       Logger.LOG_CRITICAL("Exception occurred, failed to run MQTT device provisioning!");
       Logger.LOG_EXCEPTION(e);
