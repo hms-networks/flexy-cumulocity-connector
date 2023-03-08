@@ -43,6 +43,7 @@ linking Ewon devices using a direct data path with a Flexy Java application.
     - [REST API](#rest-api)
         - [Control Endpoints](#control-endpoints)
         - [Status Endpoints](#status-endpoints)
+        - [Bootstrap/Provisioning Endpoints](#bootstrapprovisioning-endpoints)
         - [Response Format](#response-format)
     - [Log Output](#log-output)
         - [Configured Logging Level](#configured-logging-level)
@@ -360,6 +361,30 @@ the Ewon Flexy's web interface.
     - Returns the version number of the connector.
     - `http://{EWON-HOST-ADDRESS}/rcgi.bin/jvmForm?formName=statusApi&getVersion=true`
     - via M2Web: `https://m2web.talk2m.com/t2mapi/get/MyeWON/rcgi.bin/jvmForm?formName=statusApi&getVersion=true`
+
+#### Bootstrap/Provisioning Endpoints
+
+1. Set Bootstrap Authentication (setBootstrapAuth)
+    - Sets the bootstrap authentication configuration of the connector.
+    - `http://{EWON-HOST-ADDRESS}/rcgi.bin/jvmForm?formName=setBootstrapAuth&host={host}&port={port}&tenant={tenant}&username={username}&password={password}`
+    - via M2Web: `https://m2web.talk2m.com/t2mapi/get/{ewon-name}/rcgi.bin/jvmForm?formName=setBootstrapAuth&host={host}&port={port}&tenant={tenant}&username={username}&password={password}`
+    - Parameters:
+        - `host`: The host name of the Cumulocity server.
+        - `port`: The port number of the Cumulocity server.
+        - `tenant`: The boostrap tenant name of the Cumulocity server.
+        - `username`: The boostrap username of the Cumulocity server.
+        - `password`: The boostrap password of the Cumulocity server.
+   
+2. Overwrite Bootstrap Authentication (overwriteBootstrapAuth)
+    - Sets the bootstrap authentication configuration of the connector, overwriting any existing configuration. If an existing configuration is overwritten, the connector will be restarted to apply the new configuration.
+    - `http://{EWON-HOST-ADDRESS}/rcgi.bin/jvmForm?formName=overwriteBootstrapAuth&host={host}&port={port}&tenant={tenant}&username={username}&password={password}`
+    - via M2Web: `https://m2web.talk2m.com/t2mapi/get/{ewon-name}/rcgi.bin/jvmForm?formName=overwriteBootstrapAuth&host={host}&port={port}&tenant={tenant}&username={username}&password={password}`
+    - Parameters:
+        - `host`: The host name of the Cumulocity server.
+        - `port`: The port number of the Cumulocity server.
+        - `tenant`: The boostrap tenant name of the Cumulocity server.
+        - `username`: The boostrap username of the Cumulocity server.
+        - `password`: The boostrap password of the Cumulocity server.
 
 #### Response Format
 
