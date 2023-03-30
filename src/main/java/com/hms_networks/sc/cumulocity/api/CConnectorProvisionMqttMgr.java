@@ -93,13 +93,11 @@ public class CConnectorProvisionMqttMgr extends ConstrainedMqttManager {
         mqttUsername,
         mqttPassword,
         MQTT_QOS_LEVEL,
+        MQTT_LOOP_WAIT_MILLIS,
         MQTT_WAIT_FOR_WAN_IP);
 
     // Subscribe to the MQTT topics
     addSubscription(CUMULOCITY_MQTT_TOPIC_DCR);
-
-    // Configure desired MQTT loop sleep interval
-    setMqttThreadSleepIntervalMs(MQTT_LOOP_WAIT_MILLIS);
   }
 
   /**

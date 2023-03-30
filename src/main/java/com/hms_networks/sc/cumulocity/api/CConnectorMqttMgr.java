@@ -119,6 +119,7 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
         mqttUsername,
         mqttPassword,
         MQTT_QOS_LEVEL,
+        MQTT_LOOP_WAIT_MILLIS,
         MQTT_WAIT_FOR_WAN_IP);
 
     // Configure subscriptions
@@ -128,9 +129,6 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
     }
     addSubscription(CUMULOCITY_MQTT_TOPIC_SDS);
     addSubscription(CUMULOCITY_MQTT_TOPIC_SDS + "/*");
-
-    // Configure desired MQTT loop sleep interval
-    setMqttThreadSleepIntervalMs(MQTT_LOOP_WAIT_MILLIS);
 
     // Add alarm listener to default event handler
     DefaultEventHandler.setDefaultTagAlarmListener(new CConnectorAlarmMgr());
