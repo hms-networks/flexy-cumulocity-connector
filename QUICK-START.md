@@ -82,22 +82,23 @@ release package.
 
 Populate the `Host`, `BootstrapUsername`, `BootstrapPassword`, and `BootstrapTenant` fields with the
 corresponding values for your Cumulocity tenant. The `Host` field should be populated with the
-MQTT broker's host for your Cumulocity instance, for example, `mqtt.eu-latest.cumulocity.com` or
-`mqtt.us-latest.cumulocity.com`. Do not include the scheme or port as they are automatically selected to be https:// and 8883.
+MQTT broker's host URL for your Cumulocity instance, for example, `mqtt.eu-latest.cumulocity.com` or
+`mqtt.us.cumulocity.com`. Do not include the scheme or port as they are automatically selected to be https:// and 8883.
 
 ![Connector Configuration File Bootstrap Edit](images/ConnectorConfigBootstrap.png)
 
-Typically, the following example values are the standard values for all public Cumulocity instances
-maintained by SoftwareAG on its **EU** or **US** servers,
+The following example values are the standard values for public Cumulocity instances maintained by 
+SoftwareAG on its **EU** or **US** servers. Dedicated and "Experimental" instances may have different values.
 
-The `BootstrapTenant` is the bootstrap tenantID which is `management`;
+The `BootstrapTenant` is the bootstrap tenantID, which is `management`.
 
-The `BootstrapUsername` is the bootstrap username, which is `devicebootstrap`;
+The `BootstrapUsername` is the bootstrap username, which is `devicebootstrap`.
 
-The `Host` for the EU server is `mqtt.eu-latest.cumulocity.com`;
-the `Host` for the US server is `mqtt.us-latest.cumulocity.com`;
+The `Host` for the EU server is `mqtt.eu-latest.cumulocity.com`.
 
-And the `BootstrapPassword` is `Fhdt1bb1f`.
+The `Host` for the US server is `mqtt.us.cumulocity.com`.
+
+The `BootstrapPassword` for public cloud tenant instances `Fhdt1bb1f`.
 
 Once populated, save the file and continue with installation.
 
