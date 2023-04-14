@@ -1,6 +1,7 @@
 import { Octokit } from "octokit";
-import { writeFileSync } from "fs";
+import { writeFileSync, readFileSync } from "fs";
 import { tryPut, tryPutRemote } from "./fileaws.js";
+import sgMail from "@sendgrid/mail";
 
 const MIME_JSON = "application/json";
 const MANIFEST_FILE_NAME = "manifest.json";
@@ -327,6 +328,59 @@ const uploadReleaseAssets = (assets) => {
   }
 };
 
+/**
+ * Send email with summary via SendGrid
+ *
+ */
+const sendNotification = () => {
+  const file_content = readFileSync("./index.js", "utf-8");
+  const content = Buffer.from(file_content).toString("base64");
+  const target_emails = process.env.SENDGRID_TARGET_LIST;
+  let to_list;
+
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+  if (target_emails === undefined) {
+    console.error(
+      "Notification canceled because SENDGRID_TARTGET_LIST environment var was not set."
+    );
+    return;
+  }
+  try {
+    to_list = JSON.parse(process.env.SENDGRID_TARGET_LIST);
+  } catch (error) {
+    console.error(`JSON parsing error on string ${target_emails}`);
+    console.error(error);
+    return;
+  }
+
+  const msg = {
+    to: to_list,
+    from: "no-reply@hmsamericas.com",
+    subject: `Connector update for ${process.env.GITHUB_REPOSITORY} `,
+    html: `<div><p>Greetings,</p><p>This is an automated email. The S3 repo ${S3_BASE_URL} for project ${process.env.GITHUB_REPOSITORY} has been updated. The manifest file is attached to this email.</p></div>`,
+    attachments: [
+      {
+        content: content,
+        filename: "manifest.json",
+        type: MIME_JSON,
+        disposition: "attachment",
+      },
+    ],
+  };
+
+  sgMail
+    .send(msg)
+    .then((response) => {
+      console.log(response[0].statusCode);
+      console.log(response[0].headers);
+    })
+    .catch((error) => {
+      console.error(error);
+      console.error(error.response.body);
+    });
+};
+
 const { fileWriteSuccess, releaseData } = await writeReleaseManifestAndLatest();
 if (fileWriteSuccess) {
   uploadManifestAndLatest();
@@ -334,3 +388,5 @@ if (fileWriteSuccess) {
 if (releaseData) {
   uploadReleaseAssets(releaseData);
 }
+
+sendNotification();
