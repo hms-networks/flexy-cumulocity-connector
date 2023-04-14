@@ -15,6 +15,8 @@ env:
   GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
   TARGET_BUCKET: ${{secrets.TARGET_BUCKET}}
   S3_BASE_URL: ${{secrets.S3_BASE_URL}}
+  SENDGRID_API_KEY : ${{secrets.SENDGRID_API_KEY}}
+  SENDGRID_TARGET_LIST: ${{vars.SENDGRID_TARGET_LIST}}
 
 jobs:
   upload:
