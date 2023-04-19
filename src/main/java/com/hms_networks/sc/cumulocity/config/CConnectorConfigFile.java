@@ -1,6 +1,7 @@
 package com.hms_networks.sc.cumulocity.config;
 
 import com.hms_networks.americas.sc.extensions.config.ConfigFile;
+import com.hms_networks.americas.sc.extensions.historicaldata.HistoricalDataQueueManager;
 import com.hms_networks.americas.sc.extensions.json.JSONException;
 import com.hms_networks.americas.sc.extensions.json.JSONObject;
 import com.hms_networks.americas.sc.extensions.logging.Logger;
@@ -69,6 +70,10 @@ public class CConnectorConfigFile extends ConfigFile {
   /** Key for accessing the 'QueueDataPollSizeMins' object in the configuration file. */
   private static final String CONFIG_FILE_QUEUE_DATA_POLL_SIZE_MINS_KEY = "QueueDataPollSizeMins";
 
+  /** Key for accessing the 'QueueDataPollMaxBehindTimeMins' object in the configuration file. */
+  private static final String CONFIG_FILE_QUEUE_DATA_POLL_MAX_BEHIND_TIME_MINS_KEY =
+      "QueueDataPollMaxBehindTimeMins";
+
   /** Key for accessing the 'QueueDataPollIntervalMillis' object in the configuration file. */
   private static final String CONFIG_FILE_QUEUE_DATA_POLL_INTERVAL_MILLIS_KEY =
       "QueueDataPollIntervalMillis";
@@ -82,6 +87,15 @@ public class CConnectorConfigFile extends ConfigFile {
    * data checked during each poll interval.
    */
   private static final long QUEUE_DATA_POLL_SIZE_MINS_DEFAULT = 1;
+
+  /**
+   * The default maximum time (in mins) which data polling may run behind. Changing this will modify
+   * the amount of time which data polling may run behind by. By default, this functionality is
+   * disabled. The value {@link HistoricalDataQueueManager#DISABLED_MAX_HIST_FIFO_GET_BEHIND_MINS}
+   * indicates that the functionality is disabled.
+   */
+  private static final long QUEUE_DATA_POLL_MAX_BEHIND_TIME_MINS_DEFAULT =
+      HistoricalDataQueueManager.DISABLED_MAX_HIST_FIFO_GET_BEHIND_MINS;
 
   /** The default interval (in milliseconds) to poll the historical data queue. */
   private static final long QUEUE_DATA_POLL_INTERVAL_MILLIS_DEFAULT = 10000;
@@ -141,6 +155,13 @@ public class CConnectorConfigFile extends ConfigFile {
    */
   private static final String CONNECTOR_QUEUE_DATA_POLL_SIZE_MINS_CONFIG_NAME =
       CONFIG_FILE_CONNECTOR_KEY + "/" + CONFIG_FILE_QUEUE_DATA_POLL_SIZE_MINS_KEY;
+
+  /**
+   * The configuration field name used for the connector maximum data polling run behind time (in
+   * minutes) setting when communicating with Cumulocity.
+   */
+  private static final String CONNECTOR_QUEUE_DATA_POLL_MAX_BEHIND_TIME_MINS_CONFIG_NAME =
+      CONFIG_FILE_CONNECTOR_KEY + "/" + CONFIG_FILE_QUEUE_DATA_POLL_MAX_BEHIND_TIME_MINS_KEY;
 
   /**
    * The configuration field name used for the connector queue diagnostic tags enable setting when
@@ -564,6 +585,39 @@ public class CConnectorConfigFile extends ConfigFile {
   }
 
   /**
+   * Get the queue maximum data polling run behind time in minutes setting from the configuration.
+   * The value of {@link
+   * com.hms_networks.americas.sc.extensions.historicaldata.HistoricalDataQueueManager#DISABLED_MAX_HIST_FIFO_GET_BEHIND_MINS}
+   * indicates that the functionality is disabled.
+   *
+   * @return queue maximum data polling run behind time in minutes
+   * @throws JSONException if unable to get queue maximum data polling run behind time in minutes
+   *     setting from configuration
+   */
+  public long getQueueDataPollMaxBehindTimeMinutes() throws JSONException {
+    long queueDataPollMaxBehindTimeMinutes;
+    if (configurationObject
+        .getJSONObject(CONFIG_FILE_CONNECTOR_KEY)
+        .has(CONFIG_FILE_QUEUE_DATA_POLL_MAX_BEHIND_TIME_MINS_KEY)) {
+      queueDataPollMaxBehindTimeMinutes =
+          configurationObject
+              .getJSONObject(CONFIG_FILE_CONNECTOR_KEY)
+              .getLong(CONFIG_FILE_QUEUE_DATA_POLL_MAX_BEHIND_TIME_MINS_KEY);
+    } else {
+      String defaultQueueDataPollMaxBehindTimeMinsStr =
+          String.valueOf(QUEUE_DATA_POLL_MAX_BEHIND_TIME_MINS_DEFAULT);
+      Logger.LOG_WARN(
+          "The queue maximum data polling run behind time setting was not set. "
+              + "Using default value of "
+              + defaultQueueDataPollMaxBehindTimeMinsStr
+              + " minutes.");
+      queueDataPollMaxBehindTimeMinutes = QUEUE_DATA_POLL_MAX_BEHIND_TIME_MINS_DEFAULT;
+    }
+
+    return queueDataPollMaxBehindTimeMinutes;
+  }
+
+  /**
    * Get the queue data poll interval in milliseconds from the configuration.
    *
    * @return queue data poll interval in milliseconds
@@ -679,6 +733,13 @@ public class CConnectorConfigFile extends ConfigFile {
             .getJSONObject(CONFIG_FILE_CONNECTOR_KEY)
             .put(
                 CONFIG_FILE_QUEUE_DATA_POLL_SIZE_MINS_KEY,
+                Long.parseLong(configFileEscapedStringLineValue));
+      } else if (configFileEscapedStringLineKey.equals(
+          CONNECTOR_QUEUE_DATA_POLL_MAX_BEHIND_TIME_MINS_CONFIG_NAME)) {
+        configurationObject
+            .getJSONObject(CONFIG_FILE_CONNECTOR_KEY)
+            .put(
+                CONFIG_FILE_QUEUE_DATA_POLL_MAX_BEHIND_TIME_MINS_KEY,
                 Long.parseLong(configFileEscapedStringLineValue));
       } else if (configFileEscapedStringLineKey.equals(
           CONNECTOR_QUEUE_ENABLE_DIAGNOSTIC_TAGS_CONFIG_NAME)) {
@@ -808,6 +869,19 @@ public class CConnectorConfigFile extends ConfigFile {
           configurationObject
               .getJSONObject(CONFIG_FILE_CONNECTOR_KEY)
               .getLong(CONFIG_FILE_QUEUE_DATA_POLL_SIZE_MINS_KEY));
+      configFileEscapedString.append("\n");
+    }
+
+    // Add Connector/QueueDataPollMaxBehindTimeMins
+    if (configurationObject
+        .getJSONObject(CONFIG_FILE_CONNECTOR_KEY)
+        .has(CONFIG_FILE_QUEUE_DATA_POLL_MAX_BEHIND_TIME_MINS_KEY)) {
+      configFileEscapedString.append(CONNECTOR_QUEUE_DATA_POLL_MAX_BEHIND_TIME_MINS_CONFIG_NAME);
+      configFileEscapedString.append("=");
+      configFileEscapedString.append(
+          configurationObject
+              .getJSONObject(CONFIG_FILE_CONNECTOR_KEY)
+              .getLong(CONFIG_FILE_QUEUE_DATA_POLL_MAX_BEHIND_TIME_MINS_KEY));
       configFileEscapedString.append("\n");
     }
 
@@ -1005,6 +1079,9 @@ public class CConnectorConfigFile extends ConfigFile {
     defaultConnectorConfigurationObject.put(CONFIG_FILE_UTF8_STRING_SUPPORT_KEY, true);
     defaultConnectorConfigurationObject.put(
         CONFIG_FILE_QUEUE_DATA_POLL_SIZE_MINS_KEY, QUEUE_DATA_POLL_SIZE_MINS_DEFAULT);
+    defaultConnectorConfigurationObject.put(
+        CONFIG_FILE_QUEUE_DATA_POLL_MAX_BEHIND_TIME_MINS_KEY,
+        QUEUE_DATA_POLL_MAX_BEHIND_TIME_MINS_DEFAULT);
     defaultConnectorConfigurationObject.put(
         CONFIG_FILE_QUEUE_STRING_HISTORY_KEY, QUEUE_DATA_STRING_HISTORY_ENABLED_DEFAULT);
     defaultConnectorConfigurationObject.put(
