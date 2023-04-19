@@ -5,7 +5,8 @@
       "QueueDataPollIntervalMillis": 10000,
       "QueueEnableDiagnosticTags": false,
       "QueueEnableStringHistory": false,
-      "QueueDataPollSizeMins": 1
+      "QueueDataPollSizeMins": 1,
+      "QueueDataPollMaxBehindTimeMins": -1
    },
    "Cumulocity": {
       "DeviceUsername": "<automatically filled>",

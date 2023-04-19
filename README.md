@@ -17,6 +17,7 @@ linking Ewon devices using a direct data path with a Flexy Java application.
         - [Queue Diagnostic Tags Enabled (QueueEnableDiagnosticTags)](#queue-diagnostic-tags-enabled-queueenablediagnostictags)
         - [Queue Enable String History (QueueEnableStringHistory)](#queue-enable-string-history-queueenablestringhistory)
         - [Queue Data Poll Size (QueueDataPollSizeMins)](#queue-data-poll-size-queuedatapollsizemins)
+        - [Queue Data Poll Max Behind Time (QueueDataPollMaxBehindTimeMins)](#queue-data-poll-max-behind-time-queuedatapollmaxbehindtimemins)
         - [Queue Data Poll Interval (QueueDataPollIntervalMillis)](#queue-data-poll-interval-queuedatapollintervalmillis)
     - [Cumulocity](#cumulocity)
         - [Host (Host)](#host-host)
@@ -112,6 +113,12 @@ time, especially in installations with large string tag counts.
 
 Parameter to configure the data poll size (in minutes) of each data queue poll. Changing this will
 modify the amount of data checked during each poll interval.
+
+#### Queue Data Poll Max Behind Time (QueueDataPollMaxBehindTimeMins)
+
+Parameter to configure the data poll maximum behind time (in minutes). Changing this will
+modify the maximum number of minutes which the historical queue data polling may be running behind
+by. A value of `-1` disables this functionality.
 
 #### Queue Data Poll Interval (QueueDataPollIntervalMillis)
 
