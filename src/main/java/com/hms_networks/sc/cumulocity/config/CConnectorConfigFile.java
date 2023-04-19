@@ -543,11 +543,11 @@ public class CConnectorConfigFile extends ConfigFile {
    * @throws JSONException if unable to get queue data string enabled setting from configuration
    */
   public long getQueueDataPollSizeMinutes() throws JSONException {
-    long queueDataStringEnabled;
+    long queueDataPollSizeMinutes;
     if (configurationObject
         .getJSONObject(CONFIG_FILE_CONNECTOR_KEY)
         .has(CONFIG_FILE_QUEUE_DATA_POLL_SIZE_MINS_KEY)) {
-      queueDataStringEnabled =
+      queueDataPollSizeMinutes =
           configurationObject
               .getJSONObject(CONFIG_FILE_CONNECTOR_KEY)
               .getLong(CONFIG_FILE_QUEUE_DATA_POLL_SIZE_MINS_KEY);
@@ -557,10 +557,10 @@ public class CConnectorConfigFile extends ConfigFile {
           "The queue data poll size setting was not set. Using default value of "
               + defaultPollSizeStr
               + " minutes.");
-      queueDataStringEnabled = QUEUE_DATA_POLL_SIZE_MINS_DEFAULT;
+      queueDataPollSizeMinutes = QUEUE_DATA_POLL_SIZE_MINS_DEFAULT;
     }
 
-    return queueDataStringEnabled;
+    return queueDataPollSizeMinutes;
   }
 
   /**
@@ -807,7 +807,7 @@ public class CConnectorConfigFile extends ConfigFile {
       configFileEscapedString.append(
           configurationObject
               .getJSONObject(CONFIG_FILE_CONNECTOR_KEY)
-              .getInt(CONFIG_FILE_QUEUE_DATA_POLL_SIZE_MINS_KEY));
+              .getLong(CONFIG_FILE_QUEUE_DATA_POLL_SIZE_MINS_KEY));
       configFileEscapedString.append("\n");
     }
 
