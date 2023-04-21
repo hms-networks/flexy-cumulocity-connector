@@ -1,5 +1,18 @@
 # Ewon Flexy Cumulocity Connector Changelog
 
+## Version 1.3.3
+### Features
+- Added support for remotely setting the bootstrap configuration using the REST API
+  - Support for overwriting an existing bootstrap configuration is also available via the REST API
+### Bug Fixes
+- N/A
+### Other
+- Made the custom certificate URL setting optional
+  - New installations will by default use the default Cumulocity Root CA certificate setting
+  - Existing installations will continue to use their existing Cumulocity Custom CA certificate URL setting
+    - The previous `CertificateUrl` setting will be moved to the new `CustomCertificateUrl` setting and `CustomCertificateUrlEnabled` will be set to `true`.
+  - Note: The default Cumulocity Root CA certificate setting, when `CustomCertificateUrlEnabled` is set to `false`, uses a locally cached copy of the default Cumulocity Cloud Root CA certificate.
+
 ## Version 1.3.2
 ### Features
 - Added support for queueing messages to be retried when MQTT connection is lost or not available
