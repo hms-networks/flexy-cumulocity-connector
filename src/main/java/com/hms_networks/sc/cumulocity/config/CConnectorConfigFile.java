@@ -285,6 +285,19 @@ public class CConnectorConfigFile extends ConfigFile {
   }
 
   /**
+   * Set the configured Cumulocity bootstrap tenant.
+   *
+   * @param bootstrapTenant Cumulocity bootstrap tenant
+   * @throws JSONException if unable to set Cumulocity bootstrap tenant in configuration
+   */
+  public void setCumulocityBootstrapTenant(String bootstrapTenant) throws JSONException {
+    configurationObject
+        .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
+        .put(CONFIG_FILE_BOOTSTRAP_TENANT_KEY, bootstrapTenant);
+    trySave();
+  }
+
+  /**
    * Get the configured Cumulocity device tenant.
    *
    * @return Cumulocity device tenant
@@ -319,6 +332,19 @@ public class CConnectorConfigFile extends ConfigFile {
     return configurationObject
         .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
         .getString(CONFIG_FILE_BOOTSTRAP_USERNAME_KEY);
+  }
+
+  /**
+   * Set the configured Cumulocity bootstrap username.
+   *
+   * @param bootstrapUsername Cumulocity bootstrap username
+   * @throws JSONException if unable to set Cumulocity bootstrap username in configuration
+   */
+  public void setCumulocityBootstrapUsername(String bootstrapUsername) throws JSONException {
+    configurationObject
+        .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
+        .put(CONFIG_FILE_BOOTSTRAP_USERNAME_KEY, bootstrapUsername);
+    trySave();
   }
 
   /**
@@ -359,6 +385,19 @@ public class CConnectorConfigFile extends ConfigFile {
   }
 
   /**
+   * Set the configured Cumulocity bootstrap password.
+   *
+   * @param bootstrapPassword Cumulocity bootstrap password
+   * @throws JSONException if unable to set Cumulocity bootstrap password in configuration
+   */
+  public void setCumulocityBootstrapPassword(String bootstrapPassword) throws JSONException {
+    configurationObject
+        .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
+        .put(CONFIG_FILE_BOOTSTRAP_PASSWORD_KEY, bootstrapPassword);
+    trySave();
+  }
+
+  /**
    * Get the configured Cumulocity device password.
    *
    * @return Cumulocity device password
@@ -393,6 +432,17 @@ public class CConnectorConfigFile extends ConfigFile {
     return configurationObject
         .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
         .getString(CONFIG_FILE_HOST_KEY);
+  }
+
+  /**
+   * Sets the configured Cumulocity host.
+   *
+   * @param host Cumulocity host
+   * @throws JSONException if unable to set Cumulocity host in configuration
+   */
+  public void setCumulocityHost(String host) throws JSONException {
+    configurationObject.getJSONObject(CONFIG_FILE_CUMULOCITY_KEY).put(CONFIG_FILE_HOST_KEY, host);
+    trySave();
   }
 
   /**
@@ -497,6 +547,17 @@ public class CConnectorConfigFile extends ConfigFile {
               + port);
     }
     return port;
+  }
+
+  /**
+   * Sets the configured Cumulocity port.
+   *
+   * @param port Cumulocity port
+   * @throws JSONException if unable to set Cumulocity port in configuration
+   */
+  public void setCumulocityPort(String port) throws JSONException {
+    configurationObject.getJSONObject(CONFIG_FILE_CUMULOCITY_KEY).put(CONFIG_FILE_PORT_KEY, port);
+    trySave();
   }
 
   /**
