@@ -194,6 +194,20 @@ public class CConnectorProvisionMqttMgr extends ConstrainedMqttManager {
   }
 
   /**
+   * Method for cancelling the device provisioning process. This method is called when the device
+   * provisioning process is to be cancelled. This method will stop the MQTT client and release any
+   * threads waiting for provisioning.
+   */
+  public synchronized void cancelProvisioning() {
+    // Stop MQTT client
+    stop();
+
+    // Release any threads waiting for provisioning
+    isProvisioned = true;
+    notifyAll();
+  }
+
+  /**
    * Method for waiting until device provisioning is complete. The calling thread is blocked until
    * released on completion of the device provisioning process.
    *
