@@ -104,6 +104,9 @@ public class CConnectorMain {
   /** Boolean flag to indicate if the connector is running. */
   private static boolean isRunning = true;
 
+  /** Boolean flag to indicate if the connector auto restart functionality is enabled. */
+  private static boolean isAppAutoRestartEnabled = false;
+
   /**
    * Serial number of the host Ewon device, populated during the initialization of the connector.
    */
@@ -176,6 +179,15 @@ public class CConnectorMain {
   }
 
   /**
+   * Gets a boolean indicating if the connector auto restart functionality is enabled.
+   *
+   * @return true if the connector auto restart functionality is enabled, false otherwise
+   */
+  public static boolean isAppAutoRestartEnabled() {
+    return isAppAutoRestartEnabled;
+  }
+
+  /**
    * Sets the {@link #restartAppAfterShutdown} flag to <code>true</code> to trigger a shutdown and
    * restart of the connector.
    */
@@ -242,7 +254,7 @@ public class CConnectorMain {
     RuntimeControl.configureAppWatchdog(APP_WATCHDOG_TIMEOUT_MIN);
 
     // Enable application auto restart
-    SCAppManagement.enableAppAutoRestart();
+    isAppAutoRestartEnabled = SCAppManagement.enableAppAutoRestart();
 
     // Start thread for default event manager
     boolean autorun = false;
