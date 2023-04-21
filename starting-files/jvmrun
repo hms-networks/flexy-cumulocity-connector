@@ -1,1 +1,1 @@
--heapsize 25M -classpath /usr/flexy-cumulocity-connector-1.3.2-full.jar -emain com.hms_networks.sc.cumulocity.CConnectorMain
+-heapsize 25M -classpath /usr/flexy-cumulocity-connector-1.3.3-full.jar -emain com.hms_networks.sc.cumulocity.CConnectorMain
