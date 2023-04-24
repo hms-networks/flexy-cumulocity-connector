@@ -345,22 +345,22 @@ the Ewon Flexy's web interface.
 1. Shutdown (shutdown)
     - Performs a shutdown of the connector.
     - `http://{EWON-HOST-ADDRESS}/rcgi.bin/jvmForm?formName=controlApi&shutdown=true`
-    - via M2Web: `https://m2web.talk2m.com/t2mapi/get/MyeWON/rcgi.bin/jvmForm?formName=controlApi&shutdown=true`
+    - via M2Web: `https://m2web.talk2m.com/t2mapi/get/{ewon-name}/rcgi.bin/jvmForm?formName=controlApi&shutdown=true`
 2. Restart (restart)
     - Performs a restart of the connector.
     - `http://{EWON-HOST-ADDRESS}/rcgi.bin/jvmForm?formName=controlApi&restart=true`
-    - via M2Web: `https://m2web.talk2m.com/t2mapi/get/MyeWON/rcgi.bin/jvmForm?formName=controlApi&restart=true`
+    - via M2Web: `https://m2web.talk2m.com/t2mapi/get/{ewon-name}/rcgi.bin/jvmForm?formName=controlApi&restart=true`
 
 #### Status Endpoints
 
 1. Get Config (getConfig)
     - Returns the configuration of the connector.
     - `http://{EWON-HOST-ADDRESS}/rcgi.bin/jvmForm?formName=statusApi&getConfig=true`
-    - via M2Web: `https://m2web.talk2m.com/t2mapi/get/MyeWON/rcgi.bin/jvmForm?formName=statusApi&getConfig=true`
+    - via M2Web: `https://m2web.talk2m.com/t2mapi/get/{ewon-name}/rcgi.bin/jvmForm?formName=statusApi&getConfig=true`
 2. Get Version (getVersion)
     - Returns the version number of the connector.
     - `http://{EWON-HOST-ADDRESS}/rcgi.bin/jvmForm?formName=statusApi&getVersion=true`
-    - via M2Web: `https://m2web.talk2m.com/t2mapi/get/MyeWON/rcgi.bin/jvmForm?formName=statusApi&getVersion=true`
+    - via M2Web: `https://m2web.talk2m.com/t2mapi/get/{ewon-name}/rcgi.bin/jvmForm?formName=statusApi&getVersion=true`
 
 #### Bootstrap/Provisioning Endpoints
 
