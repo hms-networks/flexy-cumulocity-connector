@@ -266,6 +266,11 @@ public class CConnectorMain {
     restartAppAfterShutdown = true;
     isRunning = false;
 
+    // Release the bootstrap configuration latch in case main thread is waiting on it
+    if (bootstrapConfigurationLatch != null) {
+      bootstrapConfigurationLatch.countDown();
+    }
+
     // Stop provisioning if it is in progress
     if (provisioningMqttMgr != null) {
       provisioningMqttMgr.cancelProvisioning();
@@ -281,6 +286,11 @@ public class CConnectorMain {
     restartDeviceAfterShutdown = true;
     isRunning = false;
 
+    // Release the bootstrap configuration latch in case main thread is waiting on it
+    if (bootstrapConfigurationLatch != null) {
+      bootstrapConfigurationLatch.countDown();
+    }
+
     // Stop provisioning if it is in progress
     if (provisioningMqttMgr != null) {
       provisioningMqttMgr.cancelProvisioning();
@@ -295,6 +305,11 @@ public class CConnectorMain {
     Logger.LOG_CRITICAL("The connector has been requested to shut down...");
     restartDeviceAfterShutdown = false;
     isRunning = false;
+
+    // Release the bootstrap configuration latch in case main thread is waiting on it
+    if (bootstrapConfigurationLatch != null) {
+      bootstrapConfigurationLatch.countDown();
+    }
 
     // Stop provisioning if it is in progress
     if (provisioningMqttMgr != null) {
@@ -483,27 +498,37 @@ public class CConnectorMain {
               "Awaiting remote API configuration of bootstrap before continuing...");
           bootstrapConfigurationLatch.await();
         }
-        startUpSuccess &= runProvisioningMqtt();
+
+        // Start provisioning MQTT manager (if shutdown/restart not already requested)
+        if (isRunning) {
+          startUpSuccess &= runProvisioningMqtt();
+        }
       }
     } catch (Exception e) {
       Logger.LOG_CRITICAL("Unable to check existing provisioning status of connector.");
       Logger.LOG_EXCEPTION(e);
     }
 
-    // Start main MQTT manager
-    startUpSuccess &= setUpMqtt();
-
-    // Create tag alarm manager
-    try {
-      alarmMgr = new CConnectorAlarmMgr();
-      Logger.LOG_CRITICAL("Created the tag alarm manager.");
-    } catch (Exception e) {
-      Logger.LOG_CRITICAL("Failed to create the tag alarm manager!");
-      Logger.LOG_EXCEPTION(e);
+    // Start main MQTT manager (if shutdown/restart not already requested)
+    if (isRunning) {
+      startUpSuccess &= setUpMqtt();
     }
 
-    // Configure the application watchdog
-    RuntimeControl.configureAppWatchdog(APP_WATCHDOG_TIMEOUT_MIN);
+    // Create tag alarm manager (if shutdown/restart not already requested)
+    if (isRunning) {
+      try {
+        alarmMgr = new CConnectorAlarmMgr();
+        Logger.LOG_CRITICAL("Created the tag alarm manager.");
+      } catch (Exception e) {
+        Logger.LOG_CRITICAL("Failed to create the tag alarm manager!");
+        Logger.LOG_EXCEPTION(e);
+      }
+    }
+
+    // Configure the application watchdog (if shutdown/restart not already requested)
+    if (isRunning) {
+      RuntimeControl.configureAppWatchdog(APP_WATCHDOG_TIMEOUT_MIN);
+    }
 
     if (startUpSuccess) {
       Logger.LOG_CRITICAL("Finished starting " + CONNECTOR_FRIENDLY_NAME + ".");
