@@ -1,5 +1,16 @@
 # Ewon Flexy Cumulocity Connector Changelog
 
+## Version 1.3.4
+### Features
+- N/A
+### Bug Fixes
+- Fixed a bug which could cause the application to trigger a restart when initialization or startup is paused or delayed
+- Fixed a bug which could cause the application to hang when a shutdown or restart was requested before initialization or startup was complete
+### Other
+- Improved connector restart HTTP API to show an error when the required connector auto-restart feature is not enabled
+- Improved support for shutting down or restarting when requested before initialization or startup is complete by cancelling additional tasks
+- Corrected documentation to include configuration file parameters for the improved certificate URL settings from v1.3.3.
+
 ## Version 1.3.3
 ### Features
 - Added support for remotely setting the bootstrap configuration using the REST API
