@@ -58,8 +58,19 @@ public class CConnectorWebApiListener extends ApplicationControlApiListener {
    * @return the response to the API request
    */
   public String onRestart(String value) {
-    CConnectorMain.shutdownAndRestartConnector();
-    return "{\"status\":\"ok\"}";
+    String response;
+
+    // Check if the application auto-restart is enabled
+    if (!CConnectorMain.isAppAutoRestartEnabled()) {
+      response =
+          "{\"status\":\"error\",\"error\":\"Application auto-restart is not enabled. "
+              + "Please check that the jvmrun file is properly uploaded.\"}";
+    } else {
+      CConnectorMain.shutdownAndRestartConnector();
+      response = "{\"status\":\"ok\"}";
+    }
+
+    return response;
   }
 
   /**
