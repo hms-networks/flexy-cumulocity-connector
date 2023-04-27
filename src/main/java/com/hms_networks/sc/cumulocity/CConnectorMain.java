@@ -337,9 +337,6 @@ public class CConnectorMain {
     }
     bootstrapConfigurationLatch = new SCCountdownLatch(bootstrapConfigurationLatchCount);
 
-    // Configure the application watchdog
-    RuntimeControl.configureAppWatchdog(APP_WATCHDOG_TIMEOUT_MIN);
-
     // Enable application auto restart
     isAppAutoRestartEnabled = SCAppManagement.enableAppAutoRestart();
 
@@ -504,6 +501,9 @@ public class CConnectorMain {
       Logger.LOG_CRITICAL("Failed to create the tag alarm manager!");
       Logger.LOG_EXCEPTION(e);
     }
+
+    // Configure the application watchdog
+    RuntimeControl.configureAppWatchdog(APP_WATCHDOG_TIMEOUT_MIN);
 
     if (startUpSuccess) {
       Logger.LOG_CRITICAL("Finished starting " + CONNECTOR_FRIENDLY_NAME + ".");
