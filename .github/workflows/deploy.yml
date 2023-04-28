@@ -5,8 +5,9 @@
 name: Release (Deploy to S3)
 
 on:
+  workflow_dispatch:
   release:
-    types: [released]
+    types: [published]
 
 env:
   AWS_SECRET_ACCESS_KEY : ${{secrets.AWS_SECRET_ACCESS_KEY}}
