@@ -18,6 +18,7 @@
       "DeviceTenant": "<automatically filled>",
       "SubscribeToErrors": false,
       "Port": "8883",
-      "CertificateUrl": "https://certs.godaddy.com/repository/gdroot-g2.crt"
+      "CustomCertificateUrl": "https://certs.godaddy.com/repository/gdroot-g2.crt",
+      "CustomCertificateUrlEnabled": false
    }
 }

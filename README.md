@@ -22,7 +22,8 @@ linking Ewon devices using a direct data path with a Flexy Java application.
     - [Cumulocity](#cumulocity)
         - [Host (Host)](#host-host)
         - [Port (Port)](#port-port)
-        - [Certificate URL (CertificateUrl)](#certificate-url-certificateurl)
+        - [Custom Certificate URL (CustomCertificateUrl)](#custom-certificate-url-customcertificateurl)
+        - [Custom Certificate URL Enabled (CustomCertificateUrlEnabled)](#custom-certificate-url-enabled-customcertificateurlenabled)
         - [Bootstrap Username (BootstrapUsername)](#bootstrap-username-bootstrapusername)
         - [Bootstrap Password (BootstrapPassword)](#bootstrap-password-bootstrappassword)
         - [Bootstrap Tenant (BootstrapTenant)](#bootstrap-tenant-bootstraptenant)
@@ -139,13 +140,21 @@ running the connector.
 
 Optional string parameter to specify the port of the Cumulocity server. Default: "8883"
 
-#### Certificate URL (CertificateUrl)
+#### Custom Certificate URL (CustomCertificateUrl)
 
-Optional string parameter to specify the URL of the Cumulocity server's certificate. 
+Optional string parameter to specify the custom certificate URL for the Cumulocity server's certificate. 
 Default: "https://certs.godaddy.com/repository/gdroot-g2.crt"
 
 This parameter is useful when connecting to Cumulocity Edge servers which use a self-signed
 certificate. 
+
+#### Custom Certificate URL Enabled (CustomCertificateUrlEnabled)
+
+Optional boolean parameter to enable the custom certificate URL for the Cumulocity server's certificate.
+Default: false
+
+This parameter is useful when connecting to Cumulocity Edge servers which use a self-signed
+certificate.
 
 #### Bootstrap Username (BootstrapUsername)
 
