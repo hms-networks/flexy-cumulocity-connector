@@ -2,6 +2,7 @@ package com.hms_networks.sc.cumulocity.api;
 
 import com.hms_networks.americas.sc.extensions.fileutils.FileAccessManager;
 import com.hms_networks.americas.sc.extensions.logging.Logger;
+import com.hms_networks.americas.sc.extensions.system.application.SCAppManagement;
 import com.hms_networks.americas.sc.extensions.system.http.SCHttpUtility;
 import com.hms_networks.sc.cumulocity.CConnectorMain;
 import java.io.File;
@@ -203,6 +204,12 @@ public class CConnectorApiCertificateMgr {
 
     // Download certificate if needed
     if (downloadCertificate) {
+      try {
+        SCAppManagement.waitForWanIp();
+      } catch (InterruptedException e) {
+        Logger.LOG_CRITICAL("Interrupted Exception thrown during wait for WAN IP!");
+        Logger.LOG_EXCEPTION(e);
+      }
       downloadCustomCaToFile(cumulocityCertificateUrl);
       Logger.LOG_INFO("Cumulocity Custom CA certificate downloaded to file system.");
     }
