@@ -134,6 +134,7 @@ public class CConnectorMain {
   public static String getConnectorFriendlyName() {
     return CONNECTOR_FRIENDLY_NAME;
   }
+
   /**
    * Gets the serial number of the host Ewon device which is populated during the initialization of
    * the connector.
