@@ -1,5 +1,13 @@
 # Ewon Flexy Cumulocity Connector Changelog
 
+## Version 1.3.5
+### Features
+- N/A
+### Bug Fixes
+- Fixed an issue where the connector would try to download a server certificate before the WAN was initialized. 
+### Other
+- Formatting change 
+
 ## Version 1.3.4
 ### Features
 - N/A
