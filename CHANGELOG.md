@@ -4,7 +4,7 @@
 ### Features
 - N/A
 ### Bug Fixes
-- Fixed an issue where the connector would try to download a server certificate before the WAN was initialized. 
+- Fixed an issue where the connector would try to download a server certificate before the WAN was initialized. This will resolve MQTT-related HTTPS errors on cellular connections. 
 ### Other
 - Formatting change 
 
