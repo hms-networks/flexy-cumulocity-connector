@@ -458,8 +458,9 @@ public class CConnectorMain {
       Logger.LOG_CRITICAL(
           "Configuring the queue diagnostic tags option..."
               + connectorConfig.getQueueDiagnosticTagsEnabled());
-      CConnectorDataMgr.configureQueueDiagnosticTags(
-          connectorConfig.getQueueDiagnosticTagsEnabled());
+      HistoricalDataQueueManager.setEnableDiagnosticTags(
+          connectorConfig.getQueueDiagnosticTagsEnabled(),
+          SCTimeUnit.MILLISECONDS.toSeconds(CConnectorDataMgr.QUEUE_DATA_POLL_BEHIND_MILLIS_WARN));
     } catch (Exception e) {
       Logger.LOG_CRITICAL("Failed to configure the queue diagnostic tags enabled option!");
       Logger.LOG_EXCEPTION(e);
