@@ -1,14 +1,10 @@
 package com.hms_networks.sc.cumulocity.data;
 
-import com.ewon.ewonitf.EWException;
-import com.ewon.ewonitf.TagControl;
 import com.hms_networks.americas.sc.extensions.datapoint.DataPoint;
 import com.hms_networks.americas.sc.extensions.datapoint.DataType;
 import com.hms_networks.americas.sc.extensions.historicaldata.HistoricalDataQueueManager;
 import com.hms_networks.americas.sc.extensions.logging.Logger;
 import com.hms_networks.americas.sc.extensions.string.StringUtils;
-import com.hms_networks.americas.sc.extensions.system.tags.SCTagUtils;
-import com.hms_networks.americas.sc.extensions.system.time.SCTimeUnit;
 import com.hms_networks.americas.sc.extensions.system.time.SCTimeUtils;
 import com.hms_networks.sc.cumulocity.CConnectorMain;
 import com.hms_networks.sc.cumulocity.api.CConnectorApiMessageBuilder;
@@ -51,80 +47,6 @@ public class CConnectorDataMgr {
   /** The maximum number of historical data queue poll failures before a reset is triggered. */
   public static final int QUEUE_DATA_POLL_FAILURE_RESET_THRESHOLD = 5;
 
-  /**
-   * The name of the diagnostic tag that is populated with the number of seconds that the queue is
-   * running behind.
-   */
-  public static final String QUEUE_DIAGNOSTIC_TAG_RUNNING_BEHIND_SECONDS_NAME =
-      "ConnectorQueueBehindSeconds";
-
-  /**
-   * The description of the diagnostic tag that is populated with the number of seconds that the
-   * queue is running behind.
-   */
-  public static final String QUEUE_DIAGNOSTIC_TAG_RUNNING_BEHIND_SECONDS_DESC =
-      "Diagnostic tag containing the amount of time, in seconds, that the connector data queue is"
-          + " running behind.";
-
-  /**
-   * The type of the diagnostic tag (integer) that is populated with the number of seconds that the
-   * queue is running behind.
-   */
-  public static final int QUEUE_DIAGNOSTIC_TAG_RUNNING_BEHIND_SECONDS_TYPE = 2;
-
-  /**
-   * The name of the diagnostic tag that is monitored for a request to forcibly reset the queue time
-   * tracker.
-   */
-  public static final String QUEUE_DIAGNOSTIC_TAG_FORCE_RESET_NAME = "ConnectorQueueForceReset";
-
-  /**
-   * The description of the diagnostic tag that is monitored for a request to forcibly reset the
-   * queue time tracker.
-   */
-  public static final String QUEUE_DIAGNOSTIC_TAG_FORCE_RESET_DESC =
-      "Diagnostic tag which can be used to request the connector to reset the queue time tracker.";
-
-  /**
-   * The type of the diagnostic tag (boolean) that is monitored for a request to forcibly reset the
-   * queue time tracker.
-   */
-  public static final int QUEUE_DIAGNOSTIC_TAG_FORCE_RESET_TYPE = 0;
-
-  /**
-   * The value used to represent true for the diagnostic tag that is monitored for a request to
-   * forcibly reset the queue time tracker.
-   */
-  public static final int QUEUE_DIAGNOSTIC_TAG_FORCE_RESET_TRUE_VALUE = 1;
-
-  /**
-   * The value used to represent false for the diagnostic tag that is monitored for a request to
-   * forcibly reset the queue time tracker.
-   */
-  public static final int QUEUE_DIAGNOSTIC_TAG_FORCE_RESET_FALSE_VALUE = 0;
-
-  /**
-   * The name of the diagnostic tag that is populated with the number of times that the queue has
-   * been polled for data.
-   */
-  public static final String QUEUE_DIAGNOSTIC_TAG_POLL_COUNT_NAME = "ConnectorQueuePollCount";
-
-  /**
-   * The description of the diagnostic tag that is populated with the number of times that the queue
-   * has been polled for data.
-   */
-  public static final String QUEUE_DIAGNOSTIC_TAG_POLL_COUNT_DESC =
-      "Diagnostic tag containing the number of times the queue has been polled for data.";
-
-  /**
-   * The type of the diagnostic tag (integer) that is populated with the number of times that the
-   * queue has been polled for data.
-   */
-  public static final int QUEUE_DIAGNOSTIC_TAG_POLL_COUNT_TYPE = 2;
-
-  /** The IO server used for queue diagnostic tag(s). */
-  public static final String QUEUE_DIAGNOSTIC_TAG_IO_SERVER = "MEM";
-
   /** The filler value used in place of blank strings when reporting data points to Cumulocity. */
   private static final String BLANK_STRING_FILLER_VALUE = "<BLANK TAG VALUE>";
 
@@ -139,27 +61,6 @@ public class CConnectorDataMgr {
 
   /** Long value used to track the last time the application checked for historical data update. */
   private static long lastUpdateTimestampMillis = 0;
-
-  /** Count of the number of times the application has polled the queue for data. */
-  private static long connectorQueuePollCount = 0;
-
-  /**
-   * Tag control object used for updating the value of the queue diagnostic tag for the amount of
-   * time running behind in seconds.
-   */
-  private static TagControl queueDiagnosticRunningBehindSecondsTag = null;
-
-  /**
-   * Tag control object used for getting the value of the queue diagnostic tag for forcing a reset
-   * of the time tracker.
-   */
-  private static TagControl queueDiagnosticForceResetTag = null;
-
-  /**
-   * Tag control object used for updating the value of the queue diagnostic tag for the queue poll
-   * count.
-   */
-  private static TagControl queueDiagnosticPollCountTag = null;
 
   /**
    * Splits a given tag name in to its expected components (child device, fragment, series).
@@ -254,42 +155,12 @@ public class CConnectorDataMgr {
           isMemoryCurrentlyLow = false;
         }
 
-        // Increment poll count, and reset to 0 if too large
-        connectorQueuePollCount++;
-        if (connectorQueuePollCount == Long.MAX_VALUE) {
-          connectorQueuePollCount = 0;
-        }
-        if (queueDiagnosticPollCountTag != null) {
-          try {
-            queueDiagnosticPollCountTag.setTagValueAsLong(connectorQueuePollCount);
-          } catch (EWException e) {
-            Logger.LOG_CRITICAL("Unable to set queue diagnostic poll count tag value!");
-            Logger.LOG_EXCEPTION(e);
-          }
-        }
-
         // Retrieve data from queue (if required)
         try {
-          // Check if a queue force reset has been requested
-          boolean forceReset = false;
-          if (queueDiagnosticForceResetTag != null) {
-            forceReset =
-                queueDiagnosticForceResetTag.getTagValueAsInt()
-                    == QUEUE_DIAGNOSTIC_TAG_FORCE_RESET_TRUE_VALUE;
-
-            if (forceReset) {
-              Logger.LOG_SERIOUS(
-                  "A force reset of the queue has been requested using the tag `"
-                      + QUEUE_DIAGNOSTIC_TAG_FORCE_RESET_NAME
-                      + "`. A new queue time tracker will be created at the current time!");
-            }
-          }
-
           // Read data points from queue
           final boolean startNewTimeTracker;
           if (HistoricalDataQueueManager.doesTimeTrackerExist()
-              && queuePollFailCount < QUEUE_DATA_POLL_FAILURE_RESET_THRESHOLD
-              && !forceReset) {
+              && queuePollFailCount < QUEUE_DATA_POLL_FAILURE_RESET_THRESHOLD) {
             startNewTimeTracker = false;
           } else {
             if (queuePollFailCount >= QUEUE_DATA_POLL_FAILURE_RESET_THRESHOLD) {
@@ -303,12 +174,6 @@ public class CConnectorDataMgr {
           }
           ArrayList datapointsReadFromQueue =
               HistoricalDataQueueManager.getFifoNextSpanDataAllGroups(startNewTimeTracker);
-
-          // Reset queue force reset tag value to false, if true
-          if (queueDiagnosticForceResetTag != null && forceReset) {
-            queueDiagnosticForceResetTag.setTagValueAsInt(
-                QUEUE_DIAGNOSTIC_TAG_FORCE_RESET_FALSE_VALUE);
-          }
 
           Logger.LOG_DEBUG(
               "Read " + datapointsReadFromQueue.size() + " data points from the historical log.");
@@ -324,16 +189,8 @@ public class CConnectorDataMgr {
                   "The historical data queue is running behind by "
                       + SCTimeUtils.getDayHourMinSecsForMillis(
                           (int) queueBehindMillis, "days", "hours", "minutes", "seconds"));
-            } else {
-              // Queue not running behind, reset to 0 for updating debug tag
-              queueBehindMillis = 0;
             }
 
-            // Update queue debug tag
-            if (queueDiagnosticRunningBehindSecondsTag != null) {
-              queueDiagnosticRunningBehindSecondsTag.setTagValueAsLong(
-                  SCTimeUnit.MILLISECONDS.toSeconds(queueBehindMillis));
-            }
           } catch (IOException e) {
             Logger.LOG_SERIOUS("Unable to detect if historical data queue is running behind.");
             Logger.LOG_EXCEPTION(e);
@@ -422,96 +279,5 @@ public class CConnectorDataMgr {
         }
       }
     }
-  }
-
-  /**
-   * Configures the queue diagnostic tags if the specified <code>queueDiagnosticTagsEnabled</code>
-   * boolean is true.
-   *
-   * @param queueDiagnosticTagsEnabled Boolean value indicating whether to enable the queue
-   *     diagnostic tags.
-   */
-  public static void configureQueueDiagnosticTags(boolean queueDiagnosticTagsEnabled) {
-    if (queueDiagnosticTagsEnabled) {
-      // Configure queue running behind diagnostic tag
-      try {
-        queueDiagnosticRunningBehindSecondsTag =
-            tryCreateDiagnosticTag(
-                QUEUE_DIAGNOSTIC_TAG_RUNNING_BEHIND_SECONDS_NAME,
-                QUEUE_DIAGNOSTIC_TAG_RUNNING_BEHIND_SECONDS_DESC,
-                QUEUE_DIAGNOSTIC_TAG_IO_SERVER,
-                QUEUE_DIAGNOSTIC_TAG_RUNNING_BEHIND_SECONDS_TYPE);
-      } catch (Exception e) {
-        Logger.LOG_WARN(
-            "Unable to create tag `"
-                + QUEUE_DIAGNOSTIC_TAG_RUNNING_BEHIND_SECONDS_NAME
-                + "`! To see the queue running behind time in seconds, please create a tag with"
-                + " the name `"
-                + QUEUE_DIAGNOSTIC_TAG_RUNNING_BEHIND_SECONDS_NAME
-                + "`.");
-        Logger.LOG_EXCEPTION(e);
-      }
-
-      // Configure queue reset tag
-      try {
-        queueDiagnosticForceResetTag =
-            tryCreateDiagnosticTag(
-                QUEUE_DIAGNOSTIC_TAG_FORCE_RESET_NAME,
-                QUEUE_DIAGNOSTIC_TAG_FORCE_RESET_DESC,
-                QUEUE_DIAGNOSTIC_TAG_IO_SERVER,
-                QUEUE_DIAGNOSTIC_TAG_FORCE_RESET_TYPE);
-      } catch (Exception e) {
-        Logger.LOG_WARN(
-            "Unable to create tag `"
-                + QUEUE_DIAGNOSTIC_TAG_FORCE_RESET_NAME
-                + "`! To request a force reset of the connector queue, please create a tag with"
-                + " the name `"
-                + QUEUE_DIAGNOSTIC_TAG_FORCE_RESET_NAME
-                + "`.");
-        Logger.LOG_EXCEPTION(e);
-      }
-
-      // Configure queue poll count tag
-      try {
-        queueDiagnosticPollCountTag =
-            tryCreateDiagnosticTag(
-                QUEUE_DIAGNOSTIC_TAG_POLL_COUNT_NAME,
-                QUEUE_DIAGNOSTIC_TAG_POLL_COUNT_DESC,
-                QUEUE_DIAGNOSTIC_TAG_IO_SERVER,
-                QUEUE_DIAGNOSTIC_TAG_POLL_COUNT_TYPE);
-      } catch (Exception e) {
-        Logger.LOG_WARN(
-            "Unable to create tag `"
-                + QUEUE_DIAGNOSTIC_TAG_POLL_COUNT_NAME
-                + "`! To see the queue poll count, please create a tag with"
-                + " the name `"
-                + QUEUE_DIAGNOSTIC_TAG_POLL_COUNT_NAME
-                + "`.");
-        Logger.LOG_EXCEPTION(e);
-      }
-    }
-  }
-
-  /**
-   * Attempts to create a diagnostic tag with the specified tag name, description, IO server, and
-   * type.
-   *
-   * @param tagName diagnostic tag name
-   * @param tagDesc diagnostic tag description
-   * @param tagIoServer diagnostic tag IO server
-   * @param tagType diagnostic tag type
-   * @return corresponding {@link TagControl} object for the diagnostic tag
-   */
-  public static TagControl tryCreateDiagnosticTag(
-      String tagName, String tagDesc, String tagIoServer, int tagType) throws Exception {
-    // Attempt to create tag control object (throws exception if tag missing)
-    TagControl tagControl;
-    try {
-      tagControl = new TagControl(tagName);
-    } catch (Exception e1) {
-      SCTagUtils.createTag(tagName, tagDesc, tagIoServer, tagType);
-      tagControl = new TagControl(tagName);
-    }
-    return tagControl;
   }
 }
