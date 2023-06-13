@@ -1,5 +1,13 @@
 # Ewon Flexy Cumulocity Connector Changelog
 
+## Version 1.3.6
+### Features
+- N/A
+### Bug Fixes
+- N/A
+### Other
+- Switch historical data queue diagnostic tags to use the new native implementation from the extensions library.
+
 ## Version 1.3.5
 ### Features
 - N/A
