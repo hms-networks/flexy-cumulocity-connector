@@ -9,8 +9,5 @@
         <module name="flexy-cumulocity-connector" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="flexy-cumulocity-connector" target="1.4" />
-    </bytecodeTargetLevel>
   </component>
 </project>

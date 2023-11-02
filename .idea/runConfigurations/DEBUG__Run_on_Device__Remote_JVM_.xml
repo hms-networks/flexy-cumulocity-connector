@@ -1,10 +1,9 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="DEBUG (Run on Device, Remote JVM)" type="Remote">
-    <module name="sc-maven-base-project" />
     <option name="USE_SOCKET_TRANSPORT" value="true" />
     <option name="SERVER_MODE" value="false" />
     <option name="SHMEM_ADDRESS" />
-    <option name="HOST" value="ah-flexy.116.com" />
+    <option name="HOST" value="10.0.0.53" />
     <option name="PORT" value="2800" />
     <option name="AUTO_RESTART" value="false" />
     <RunnerSettings RunnerId="Debug">
