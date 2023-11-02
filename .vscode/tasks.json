@@ -4,7 +4,7 @@
         {
             "label": "INSTALL (Upload to Device)",
             "type": "shell",
-            "command": "mvn install -f pom.xml -Dmaven.javadoc.skip=true",
+            "command": "mvn install -f pom.xml `-Dmaven.javadoc.skip=true",
             "group": "build"
         },
         {
@@ -16,31 +16,31 @@
         {
             "label": "DEPLOY (Run on Device, No Debug)",
             "type": "shell",
-            "command": "mvn deploy -f pom.xml -P noDebug -Dmaven.javadoc.skip=true",
+            "command": "mvn deploy -f pom.xml -P noDebug `-Dmaven.javadoc.skip=true",
             "group": "build"
         },
         {
             "label": "DEPLOY (Run on Device, Debug)",
             "type": "shell",
-            "command": "mvn deploy -f pom.xml -P debug -Dmaven.javadoc.skip=true",
+            "command": "mvn deploy -f pom.xml -P debug `-Dmaven.javadoc.skip=true",
             "group": "build"
         },
         {
             "label": "VERIFY (Verify Project)",
             "type": "shell",
-            "command": "mvn verify -f pom.xml -Dmaven.javadoc.skip=true",
+            "command": "mvn verify -f pom.xml `-Dmaven.javadoc.skip=true",
             "group": "build"
         },
         {
             "label": "CLEAN (Remove Build Output)",
             "type": "shell",
-            "command": "mvn clean -f pom.xml -Dmaven.javadoc.skip=true",
+            "command": "mvn clean -f pom.xml `-Dmaven.javadoc.skip=true",
             "group": "build"
         },
         {
             "label": "UPDATE (Get Latest Dependencies)",
             "type": "shell",
-            "command": "mvn clean -U -f pom.xml -Dmaven.javadoc.skip=true",
+            "command": "mvn clean -U -f pom.xml `-Dmaven.javadoc.skip=true",
             "group": "build"
         }
     ]
