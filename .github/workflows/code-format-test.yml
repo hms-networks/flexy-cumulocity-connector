@@ -1,10 +1,9 @@
 # HMS Networks Solution Center
 # Code Format Test Action for Maven-based Ewon ETK Projects
-# Version: 2.0
+# Version: 2.1
 #
 # This action is configured to automatically run when a push
-# is made or pull request is merged to the `main` or `master`
-# branch.
+# is made or pull request is merged to the `main` branch.
 
 name: Code Format Test
 
@@ -12,11 +11,9 @@ on:
   pull_request:
     branches:
       - main
-      - master
   push:
     branches:
       - main
-      - master
 
 jobs:
   formatting:
