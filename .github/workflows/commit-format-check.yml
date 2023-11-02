@@ -1,9 +1,9 @@
 # HMS Networks Solution Center
 # Commit Format Action for Maven-based Ewon ETK Projects
-# Version: 2.0
+# Version: 2.2
 #
 # This action is configured to automatically run when a pull
-# request is made to the `main` or `master` branch.
+# request is made to the `main` branch.
 
 name: Commit Format Check
 
@@ -11,12 +11,12 @@ on:
   pull_request:
     branches:
       - main
-      - master
 
 jobs:
   check-commit-message:
     name: Check Commit Message
     runs-on: ubuntu-latest
+    if: ${{ github.actor != 'dependabot[bot]' }}
     steps:
       - name: Check Title Line Length
         uses: gsactions/commit-message-checker@v2

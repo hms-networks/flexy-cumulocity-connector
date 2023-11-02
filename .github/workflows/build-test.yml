@@ -1,22 +1,19 @@
 # HMS Networks Solution Center
-# Compile Test Action for Maven-based Ewon ETK Projects
-# Version: 2.0
+# Build Test Action for Maven-based Ewon ETK Projects
+# Version: 2.1
 #
 # This action is configured to automatically run when a push
-# is made or pull request is merged to the `main` or `master`
-# branch.
+# is made or pull request is merged to the `main` branch.
 
-name: Compile Test
+name: Build Test
 
 on:
   pull_request:
     branches:
       - main
-      - master
   push:
     branches:
       - main
-      - master
 
 jobs:
   build:
@@ -40,5 +37,5 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Compile Java Files With Maven
-        run: mvn compile -f pom.xml
+      - name: Package Java Files With Maven
+        run: mvn package -f pom.xml
