@@ -130,6 +130,8 @@ public class CConnectorMain {
 
   /**
    * Gets the friendly name for the connector application in the format: %Title%, version %Version%.
+   *
+   * @return friendly name for the connector application
    */
   public static String getConnectorFriendlyName() {
     return CONNECTOR_FRIENDLY_NAME;
@@ -318,7 +320,11 @@ public class CConnectorMain {
     }
   }
 
-  /** Method for performing connector application initialization steps. */
+  /**
+   * Method for performing connector application initialization steps.
+   *
+   * @return {@code true} if initialization was successful, {@code false} otherwise
+   */
   private static boolean initialize() {
     Logger.LOG_CRITICAL("Initializing " + CONNECTOR_FRIENDLY_NAME + "...");
     boolean initializeSuccess = true;
@@ -484,7 +490,11 @@ public class CConnectorMain {
     return initializeSuccess;
   }
 
-  /** Method for performing connector application start up steps. */
+  /**
+   * Method for performing connector application start up steps.
+   *
+   * @return {@code true} if start up was successful, {@code false} otherwise
+   */
   private static boolean startUp() {
     Logger.LOG_CRITICAL("Starting " + CONNECTOR_FRIENDLY_NAME + "...");
     boolean startUpSuccess = true;
