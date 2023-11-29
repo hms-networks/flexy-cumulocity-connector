@@ -1,5 +1,18 @@
 # Ewon Flexy Cumulocity Connector Changelog
 
+## Version 1.4.0
+### Features
+- Added support for historical data queue aggregation (disabled by default)
+  - Added CConnectorJsonDataPayload.java to support aggregation payload construction
+  - Added MQTT manager support for retrying and sending JSON data payloads
+### Bug Fixes
+- Removed unused @throws declaration in CConnectorApiMessageReader.java
+- Fixed Javadocs in the main class and MQTT manager classes
+### Other
+- Added standalone tag parsing utility class to facilitate cleaner code
+- Updated com.hms_networks.americas.sc:extensions library to version 1.15.8
+- Updated IDE files
+
 ## Version 1.3.6
 ### Features
 - N/A
