@@ -37,8 +37,8 @@ linking Ewon devices using a direct data path with a Flexy Java application.
                 - [String Tag History](#string-tag-history)
 - [Runtime](#runtime)
     - [Child Device Support](#child-device-support)
-      - [Child Device Tag Name Syntax](#child-device-tag-name-syntax)
-      - [Child Device Tag Name Examples](#child-device-tag-name-examples)
+        - [Child Device Tag Name Syntax](#child-device-tag-name-syntax)
+        - [Child Device Tag Name Examples](#child-device-tag-name-examples)
     - [Connector Halt Tag](#connector-halt-tag)
     - [Commands from Cumulocity](#commands-from-cumulocity)
     - [REST API](#rest-api)
@@ -142,15 +142,17 @@ Optional string parameter to specify the port of the Cumulocity server. Default:
 
 #### Custom Certificate URL (CustomCertificateUrl)
 
-Optional string parameter to specify the custom certificate URL for the Cumulocity server's certificate. 
+Optional string parameter to specify the custom certificate URL for the Cumulocity server's
+certificate.
 Default: "https://certs.godaddy.com/repository/gdroot-g2.crt"
 
 This parameter is useful when connecting to Cumulocity Edge servers which use a self-signed
-certificate. 
+certificate.
 
 #### Custom Certificate URL Enabled (CustomCertificateUrlEnabled)
 
-Optional boolean parameter to enable the custom certificate URL for the Cumulocity server's certificate.
+Optional boolean parameter to enable the custom certificate URL for the Cumulocity server's
+certificate.
 Default: false
 
 This parameter is useful when connecting to Cumulocity Edge servers which use a self-signed
@@ -282,8 +284,8 @@ The following syntax can be used to create child devices:
 
 #### Child Device Tag Name Examples
 
-Using the syntax described in the [Child Device Tag Name Syntax](#child-device-tag-name-syntax) section,
-the following examples are valid:
+Using the syntax described in the [Child Device Tag Name Syntax](#child-device-tag-name-syntax)
+section, the following examples are valid:
 
 - "One"<br>
   a. Child Device: (none)<br>
@@ -383,9 +385,11 @@ the Ewon Flexy's web interface.
         - `tenant`: The boostrap tenant name of the Cumulocity server.
         - `username`: The boostrap username of the Cumulocity server.
         - `password`: The boostrap password of the Cumulocity server.
-   
+
 2. Overwrite Bootstrap Authentication (overwriteBootstrapAuth)
-    - Sets the bootstrap authentication configuration of the connector, overwriting any existing configuration. If an existing configuration is overwritten, the connector will be restarted to apply the new configuration.
+    - Sets the bootstrap authentication configuration of the connector, overwriting any existing
+      configuration. If an existing configuration is overwritten, the connector will be restarted to
+      apply the new configuration.
     - `http://{EWON-HOST-ADDRESS}/rcgi.bin/jvmForm?formName=overwriteBootstrapAuth&host={host}&port={port}&tenant={tenant}&username={username}&password={password}`
     - via M2Web: `https://m2web.talk2m.com/t2mapi/get/{ewon-name}/rcgi.bin/jvmForm?formName=overwriteBootstrapAuth&host={host}&port={port}&tenant={tenant}&username={username}&password={password}`
     - Parameters:
@@ -437,15 +441,15 @@ log level 2 (serious) and log level 1 (critical). All positive log levels print 
 realtime logs, and negative log levels output for text files in the /usr directory of Ewon Flexy.
 Log text files are named logN.txt, where N is an integer.
 
-| LogLevel         | Description                                                                      |
-| :--------------: | :------------------------------------------------------------------------------- |
-| 6, -6 (Trace)    | Exception stack traces                                                           |
-| 5, -5 (Debug)    | Low level information about the state of the application                         |
-| 4, -4 (Info)     | Application state information                                                    |
+|     LogLevel     | Description                                                                      |
+|:----------------:|:---------------------------------------------------------------------------------|
+|  6, -6 (Trace)   | Exception stack traces                                                           |
+|  5, -5 (Debug)   | Low level information about the state of the application                         |
+|   4, -4 (Info)   | Application state information                                                    |
 | 3, -3 (Warning)  | Issues encountered in the application that are not serious                       |
 | 2, -2 (Serious)  | Errors that are serious but recoverable                                          |
 | 1, -1 (Critical) | Critical application log messages (Startup, Initialization, Unrecoverable Error) |
-| 0 (None)         | Logging is disabled                                                              |
+|     0 (None)     | Logging is disabled                                                              |
 
 #### Logging Performance
 
