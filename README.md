@@ -127,6 +127,27 @@ by. A value of `-1` disables this functionality.
 Parameter to configure the data poll interval (in milliseconds) to poll the historical data queue.
 Changing this will modify the amount of time between each check (poll) for data.
 
+#### Queue Data Aggregation Period in Seconds (QueueDataAggregationPeriodSecs)
+
+Parameter to enable and configure the data aggregation period (in seconds) for the historical data
+queue. To disable queue data aggregation, set this parameter to `-1`. Changing this will modify the
+amount of time between each aggregation of data points in the queue.
+
+#### Queue Data Aggregation Method (QueueDataAggregationMethod)
+
+Parameter to configure the data aggregation method for the historical data queue. This parameter is
+used to determine how multiple data points in a single aggregation period are aggregated into a
+single data point. The following aggregation methods are supported:
+
+- 0: Last Recorded Value (Newest)
+- 1: First Recorded Value (Oldest)
+- 2: Minimum Recorded Value (Lowest)
+- 3: Maximum Recorded Value (Highest)
+- 4: Average Recorded Value (Average)
+
+_Note: The aggregation method is only used when queue data aggregation is enabled, as described
+above in the `QueueDataAggregationPeriodSecs` parameter description._
+
 ### Cumulocity
 
 This section contains configuration fields which are used to configure the connection to Cumulocity.
