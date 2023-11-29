@@ -6,7 +6,9 @@
       "QueueEnableDiagnosticTags": false,
       "QueueEnableStringHistory": false,
       "QueueDataPollSizeMins": 1,
-      "QueueDataPollMaxBehindTimeMins": -1
+      "QueueDataPollMaxBehindTimeMins": -1,
+      "QueueDataAggregationPeriodSecs": -1,
+      "QueueDataAggregationMethod": 0
    },
    "Cumulocity": {
       "DeviceUsername": "<automatically filled>",

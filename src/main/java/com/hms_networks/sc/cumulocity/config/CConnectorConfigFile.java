@@ -6,6 +6,7 @@ import com.hms_networks.americas.sc.extensions.json.JSONException;
 import com.hms_networks.americas.sc.extensions.json.JSONObject;
 import com.hms_networks.americas.sc.extensions.logging.Logger;
 import com.hms_networks.americas.sc.extensions.string.StringUtils;
+import com.hms_networks.sc.cumulocity.data.CConnectorAggregationMethod;
 import java.util.List;
 
 /**
@@ -84,6 +85,14 @@ public class CConnectorConfigFile extends ConfigFile {
   private static final String CONFIG_FILE_QUEUE_DATA_POLL_MAX_BEHIND_TIME_MINS_KEY =
       "QueueDataPollMaxBehindTimeMins";
 
+  /** Key for accessing the 'QueueDataAggregationPeriodSecs' object in the configuration file. */
+  public static final String CONFIG_FILE_QUEUE_DATA_AGGREGATION_PERIOD_SECS_KEY =
+      "QueueDataAggregationPeriodSecs";
+
+  /** Key for accessing the 'QueueDataAggregationMethod' object in the configuration file. */
+  public static final String CONFIG_FILE_QUEUE_DATA_AGGREGATION_METHOD_KEY =
+      "QueueDataAggregationMethod";
+
   /** Key for accessing the 'QueueDataPollIntervalMillis' object in the configuration file. */
   private static final String CONFIG_FILE_QUEUE_DATA_POLL_INTERVAL_MILLIS_KEY =
       "QueueDataPollIntervalMillis";
@@ -109,6 +118,22 @@ public class CConnectorConfigFile extends ConfigFile {
 
   /** The default interval (in milliseconds) to poll the historical data queue. */
   private static final long QUEUE_DATA_POLL_INTERVAL_MILLIS_DEFAULT = 10000;
+
+  /** The data aggregation period value which indicates that data aggregation is disabled. */
+  public static final long QUEUE_DATA_AGGREGATION_PERIOD_SECS_DISABLED = -1;
+
+  /**
+   * The default aggregation period (in seconds) for data points processed from the historical data
+   * queue. The value in {@link #QUEUE_DATA_AGGREGATION_PERIOD_SECS_DISABLED} indicates that data
+   * aggregation is disabled.
+   */
+  public static final long CONFIG_FILE_QUEUE_DATA_AGGREGATION_PERIOD_SECS_DEFAULT =
+      QUEUE_DATA_AGGREGATION_PERIOD_SECS_DISABLED;
+
+  /** The default aggregation method for data points processed from the historical data queue. */
+  public static final CConnectorAggregationMethod
+      CONFIG_FILE_QUEUE_DATA_AGGREGATION_METHOD_DEFAULT =
+          CConnectorAggregationMethod.LAST_RECORDED_DATA;
 
   /** The default value for the subscribe to errors setting. */
   private static final boolean SUBSCRIBE_TO_ERRORS_DEFAULT = false;
@@ -175,6 +200,20 @@ public class CConnectorConfigFile extends ConfigFile {
    */
   private static final String CONNECTOR_QUEUE_DATA_POLL_MAX_BEHIND_TIME_MINS_CONFIG_NAME =
       CONFIG_FILE_CONNECTOR_KEY + "/" + CONFIG_FILE_QUEUE_DATA_POLL_MAX_BEHIND_TIME_MINS_KEY;
+
+  /**
+   * The configuration field name used for the connector queue data aggregation period (in seconds)
+   * setting when communicating with Cumulocity.
+   */
+  private static final String CONNECTOR_QUEUE_DATA_AGGREGATION_PERIOD_SECS_CONFIG_NAME =
+      CONFIG_FILE_CONNECTOR_KEY + "/" + CONFIG_FILE_QUEUE_DATA_AGGREGATION_PERIOD_SECS_KEY;
+
+  /**
+   * The configuration field name used for the connector queue data aggregation method setting when
+   * communicating with Cumulocity.
+   */
+  private static final String CONNECTOR_QUEUE_DATA_AGGREGATION_METHOD_CONFIG_NAME =
+      CONFIG_FILE_CONNECTOR_KEY + "/" + CONFIG_FILE_QUEUE_DATA_AGGREGATION_METHOD_KEY;
 
   /**
    * The configuration field name used for the connector queue diagnostic tags enable setting when
@@ -878,6 +917,83 @@ public class CConnectorConfigFile extends ConfigFile {
   }
 
   /**
+   * Get the historical data queue aggregation period (in seconds) from the configuration.
+   *
+   * @return queue data queue aggregation period (in seconds)
+   */
+  public long getQueueDataAggregationPeriodSecs() {
+    long queueDataAggregationPeriodSecs;
+    try {
+      if (configurationObject
+          .getJSONObject(CONFIG_FILE_CONNECTOR_KEY)
+          .has(CONFIG_FILE_QUEUE_DATA_AGGREGATION_PERIOD_SECS_KEY)) {
+        queueDataAggregationPeriodSecs =
+            configurationObject
+                .getJSONObject(CONFIG_FILE_CONNECTOR_KEY)
+                .getLong(CONFIG_FILE_QUEUE_DATA_AGGREGATION_PERIOD_SECS_KEY);
+      } else {
+        // Use default and add to configuration file
+        queueDataAggregationPeriodSecs = CONFIG_FILE_QUEUE_DATA_AGGREGATION_PERIOD_SECS_DEFAULT;
+        configurationObject
+            .getJSONObject(CONFIG_FILE_CONNECTOR_KEY)
+            .put(
+                CONFIG_FILE_QUEUE_DATA_AGGREGATION_PERIOD_SECS_KEY,
+                CONFIG_FILE_QUEUE_DATA_AGGREGATION_PERIOD_SECS_DEFAULT);
+        trySave();
+      }
+    } catch (JSONException e) {
+      queueDataAggregationPeriodSecs = CONFIG_FILE_QUEUE_DATA_AGGREGATION_PERIOD_SECS_DEFAULT;
+      Logger.LOG_WARN(
+          "The queue data aggregation period setting could not be read from the configuration"
+              + " file. Using default value of "
+              + CONFIG_FILE_QUEUE_DATA_AGGREGATION_PERIOD_SECS_DEFAULT
+              + ".",
+          e);
+    }
+
+    return queueDataAggregationPeriodSecs;
+  }
+
+  /**
+   * Get the historical data queue aggregation method from the configuration.
+   *
+   * @return queue data queue aggregation method
+   */
+  public CConnectorAggregationMethod getQueueDataAggregationMethod() {
+    CConnectorAggregationMethod queueDataAggregationMethod;
+    try {
+      if (configurationObject
+          .getJSONObject(CONFIG_FILE_CONNECTOR_KEY)
+          .has(CONFIG_FILE_QUEUE_DATA_AGGREGATION_METHOD_KEY)) {
+        queueDataAggregationMethod =
+            CConnectorAggregationMethod.fromValue(
+                configurationObject
+                    .getJSONObject(CONFIG_FILE_CONNECTOR_KEY)
+                    .getInt(CONFIG_FILE_QUEUE_DATA_AGGREGATION_METHOD_KEY));
+      } else {
+        // Use default and add to configuration file
+        queueDataAggregationMethod = CONFIG_FILE_QUEUE_DATA_AGGREGATION_METHOD_DEFAULT;
+        configurationObject
+            .getJSONObject(CONFIG_FILE_CONNECTOR_KEY)
+            .put(
+                CONFIG_FILE_QUEUE_DATA_AGGREGATION_METHOD_KEY,
+                CONFIG_FILE_QUEUE_DATA_AGGREGATION_METHOD_DEFAULT.getValue());
+        trySave();
+      }
+    } catch (JSONException e) {
+      queueDataAggregationMethod = CONFIG_FILE_QUEUE_DATA_AGGREGATION_METHOD_DEFAULT;
+      Logger.LOG_WARN(
+          "The queue data aggregation method setting could not be read from the configuration"
+              + " file. Using default value of "
+              + CONFIG_FILE_QUEUE_DATA_AGGREGATION_METHOD_DEFAULT.getValue()
+              + ".",
+          e);
+    }
+
+    return queueDataAggregationMethod;
+  }
+
+  /**
    * Saves the configuration to the file system and catches any exceptions generated while saving.
    */
   void trySave() {
@@ -1010,6 +1126,20 @@ public class CConnectorConfigFile extends ConfigFile {
             .put(
                 CONFIG_FILE_SUBSCRIBE_TO_ERRORS_KEY,
                 configFileEscapedStringLineValue.equals("true"));
+      } else if (configFileEscapedStringLineKey.equals(
+          CONNECTOR_QUEUE_DATA_AGGREGATION_PERIOD_SECS_CONFIG_NAME)) {
+        configurationObject
+            .getJSONObject(CONFIG_FILE_CONNECTOR_KEY)
+            .put(
+                CONFIG_FILE_QUEUE_DATA_AGGREGATION_PERIOD_SECS_KEY,
+                Long.parseLong(configFileEscapedStringLineValue));
+      } else if (configFileEscapedStringLineKey.equals(
+          CONNECTOR_QUEUE_DATA_AGGREGATION_METHOD_CONFIG_NAME)) {
+        configurationObject
+            .getJSONObject(CONFIG_FILE_CONNECTOR_KEY)
+            .put(
+                CONFIG_FILE_QUEUE_DATA_AGGREGATION_METHOD_KEY,
+                Integer.parseInt(configFileEscapedStringLineValue));
       }
     }
     trySave();
@@ -1105,6 +1235,32 @@ public class CConnectorConfigFile extends ConfigFile {
           configurationObject
               .getJSONObject(CONFIG_FILE_CONNECTOR_KEY)
               .getBoolean(CONFIG_FILE_ENABLE_QUEUE_DIAGNOSTIC_TAGS_KEY));
+      configFileEscapedString.append("\n");
+    }
+
+    // Add Connector/QueueDataAggregationPeriodSecs
+    if (configurationObject
+        .getJSONObject(CONFIG_FILE_CONNECTOR_KEY)
+        .has(CONFIG_FILE_QUEUE_DATA_AGGREGATION_PERIOD_SECS_KEY)) {
+      configFileEscapedString.append(CONNECTOR_QUEUE_DATA_AGGREGATION_PERIOD_SECS_CONFIG_NAME);
+      configFileEscapedString.append("=");
+      configFileEscapedString.append(
+          configurationObject
+              .getJSONObject(CONFIG_FILE_CONNECTOR_KEY)
+              .getLong(CONFIG_FILE_QUEUE_DATA_AGGREGATION_PERIOD_SECS_KEY));
+      configFileEscapedString.append("\n");
+    }
+
+    // Add Connector/QueueDataAggregationMethod
+    if (configurationObject
+        .getJSONObject(CONFIG_FILE_CONNECTOR_KEY)
+        .has(CONFIG_FILE_QUEUE_DATA_AGGREGATION_METHOD_KEY)) {
+      configFileEscapedString.append(CONNECTOR_QUEUE_DATA_AGGREGATION_METHOD_CONFIG_NAME);
+      configFileEscapedString.append("=");
+      configFileEscapedString.append(
+          configurationObject
+              .getJSONObject(CONFIG_FILE_CONNECTOR_KEY)
+              .getInt(CONFIG_FILE_QUEUE_DATA_AGGREGATION_METHOD_KEY));
       configFileEscapedString.append("\n");
     }
 
@@ -1309,6 +1465,12 @@ public class CConnectorConfigFile extends ConfigFile {
         CONFIG_FILE_QUEUE_STRING_HISTORY_KEY, QUEUE_DATA_STRING_HISTORY_ENABLED_DEFAULT);
     defaultConnectorConfigurationObject.put(
         CONFIG_FILE_QUEUE_DATA_POLL_INTERVAL_MILLIS_KEY, QUEUE_DATA_POLL_INTERVAL_MILLIS_DEFAULT);
+    defaultConnectorConfigurationObject.put(
+        CONFIG_FILE_QUEUE_DATA_AGGREGATION_PERIOD_SECS_KEY,
+        CONFIG_FILE_QUEUE_DATA_AGGREGATION_PERIOD_SECS_DEFAULT);
+    defaultConnectorConfigurationObject.put(
+        CONFIG_FILE_QUEUE_DATA_AGGREGATION_METHOD_KEY,
+        CONFIG_FILE_QUEUE_DATA_AGGREGATION_METHOD_DEFAULT.getValue());
     defaultConnectorConfigurationObject.put(
         CONFIG_FILE_ENABLE_QUEUE_DIAGNOSTIC_TAGS_KEY, ENABLE_QUEUE_DIAGNOSTIC_TAGS_DEFAULT);
 
