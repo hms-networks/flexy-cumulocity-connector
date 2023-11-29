@@ -950,6 +950,8 @@ public class CConnectorApiMessageReader {
    * @param remoteFileUrl The URL of the remote file to download the firmware file from.
    * @return A string indicating the reason for download failure, otherwise, null if successful.
    * @throws EWException if the download fails, see the Ewon event logs.
+   * @throws JSONException if the device configuration information cannot be parsed or retrieved
+   *     from the configuration file.
    */
   private static String downloadFirmwareFile(String remoteFileUrl)
       throws EWException, JSONException {
