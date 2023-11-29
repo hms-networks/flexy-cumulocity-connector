@@ -173,7 +173,11 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
           retryPayload.incrementRetryCount();
           String childDevice = (String) retryPayload.getChildDevice();
           String payloadString = (String) retryPayload.getMessagePayload();
-          sendMessageWithChildDeviceRouting(payloadString, childDevice);
+          if (retryPayload.isJsonMessage()) {
+            sendJsonMeasurementMessageWithChildDeviceRouting(payloadString, childDevice);
+          } else {
+            sendMessageWithChildDeviceRouting(payloadString, childDevice);
+          }
           pendingRetryMessages.pop();
           Logger.LOG_DEBUG(
               "Successfully sent payload to Cumulocity after "
@@ -377,9 +381,13 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
    *
    * @param messagePayload the message payload to send
    * @param childDevice the child device to route the message to (if not null)
+   * @param isJsonMessage boolean indicating whether the specified message payload is in JSON format
    */
-  public void addMessageToRetryPending(String messagePayload, String childDevice) {
-    pendingRetryMessages.push(new CConnectorRetryMessage(messagePayload, childDevice));
+  public void addMessageToRetryPending(
+      String messagePayload, String childDevice, boolean isJsonMessage) {
+    CConnectorRetryMessage cConnectorRetryMessage =
+        new CConnectorRetryMessage(messagePayload, childDevice, isJsonMessage);
+    pendingRetryMessages.push(cConnectorRetryMessage);
   }
 
   /**

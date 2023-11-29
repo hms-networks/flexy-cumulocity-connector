@@ -145,7 +145,8 @@ public class CConnectorAlarmMgr extends AlarmMonitor {
                 + alarmedTagValue
                 + "]");
         Logger.LOG_EXCEPTION(e);
-        mqttMgr.addMessageToRetryPending(alarmMessage, childDevice);
+        final boolean isJsonMessage = false;
+        mqttMgr.addMessageToRetryPending(alarmMessage, childDevice, isJsonMessage);
       }
     } else {
       Logger.LOG_SERIOUS(
