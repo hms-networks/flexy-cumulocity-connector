@@ -51,6 +51,10 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
   /** The MQTT topic for publishing messages to Cumulocity via MQTT. */
   private static final String CUMULOCITY_MQTT_TOPIC_SUS = "s/us";
 
+  /** The MQTT topic for publishing JSON measurement messages to Cumulocity via MQTT. */
+  private static final String CUMULOCITY_MQTT_TOPIC_MEASUREMENT_JSON =
+      "measurement/measurements/create";
+
   /** The MQTT topic for receiving messages from Cumulocity via MQTT. */
   private static final String CUMULOCITY_MQTT_TOPIC_SDS = "s/ds";
 
@@ -391,6 +395,58 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
   }
 
   /**
+   * Sends the specified JSON measurement message to Cumulocity with the proper topic for routing to
+   * a child device, if not null. If the child device has not been registered using the {@link
+   * CConnectorApiMessageBuilder#childDeviceCreation_101(String, String)} static template, it will
+   * be registered. Registered child devices are added to a list to ensure that they are not
+   * registered more than once per session.
+   *
+   * @param jsonPayload the JSON message payload to send
+   * @param childDevice the child device to route the message to (if not null)
+   * @throws EWException if an Ewon exception occurs, check the Ewon event log for more details
+   * @throws UnsupportedEncodingException if the character encoding is not supported
+   */
+  public void sendJsonMeasurementMessageWithChildDeviceRouting(
+      String jsonPayload, String childDevice) throws EWException, UnsupportedEncodingException {
+    // Register child device if not already registered
+    verifyChildDeviceRegistration(childDevice);
+
+    // Send message to Cumulocity
+    mqttPublish(CUMULOCITY_MQTT_TOPIC_MEASUREMENT_JSON, jsonPayload, MQTT_QOS_LEVEL, MQTT_RETAIN);
+    Logger.LOG_DEBUG(
+        "Sent message to Cumulocity on topic ["
+            + CUMULOCITY_MQTT_TOPIC_MEASUREMENT_JSON
+            + "]: "
+            + jsonPayload);
+  }
+
+  /**
+   * Verifies that the specified child device has been registered with Cumulocity. If the child
+   * device has not been registered, it will be registered using the {@link
+   * CConnectorApiMessageBuilder#childDeviceCreation_101(String, String)} static template.
+   * Registered child devices are added to a list to ensure that they are not registered more than
+   * once per session.
+   *
+   * @param childDevice the child device to verify registration for
+   * @throws EWException if an Ewon exception occurs, check the Ewon event log for more details
+   * @throws UnsupportedEncodingException if the character encoding is not supported
+   */
+  public void verifyChildDeviceRegistration(String childDevice)
+      throws EWException, UnsupportedEncodingException {
+    // Register child device if not already registered
+    String childDeviceCumulocityId = getMqttId() + "_" + childDevice;
+    if (childDevice != null && !registeredChildDevices.contains(childDevice)) {
+      // Register child device
+      String childDeviceRegistrationPayload =
+          CConnectorApiMessageBuilder.childDeviceCreation_101(childDeviceCumulocityId, childDevice);
+      mqttPublish(
+          CUMULOCITY_MQTT_TOPIC_SUS, childDeviceRegistrationPayload, MQTT_QOS_LEVEL, MQTT_RETAIN);
+      registeredChildDevices.add(childDevice);
+      Logger.LOG_INFO("Registered child device " + childDevice + " with Cumulocity.");
+    }
+  }
+
+  /**
    * Sends the specified message to Cumulocity with the proper topic for routing to a child device,
    * if not null. If the child device has not been registered using the {@link
    * CConnectorApiMessageBuilder#childDeviceCreation_101(String, String)} static template, it will
@@ -405,18 +461,10 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
   public void sendMessageWithChildDeviceRouting(String messagePayload, String childDevice)
       throws EWException, UnsupportedEncodingException {
     // Register child device if not already registered
-    String childDeviceCumulocityId = getMqttId() + "_" + childDevice;
-    if (childDevice != null && !registeredChildDevices.contains(childDevice)) {
-      // Register child device
-      String childDeviceRegistrationPayload =
-          CConnectorApiMessageBuilder.childDeviceCreation_101(childDeviceCumulocityId, childDevice);
-      mqttPublish(
-          CUMULOCITY_MQTT_TOPIC_SUS, childDeviceRegistrationPayload, MQTT_QOS_LEVEL, MQTT_RETAIN);
-      registeredChildDevices.add(childDevice);
-      Logger.LOG_INFO("Registered child device " + childDevice + " with Cumulocity.");
-    }
+    verifyChildDeviceRegistration(childDevice);
 
     // Build topic name to publish method (append child device, if not null)
+    String childDeviceCumulocityId = getMqttId() + "_" + childDevice;
     String messageTopic = CUMULOCITY_MQTT_TOPIC_SUS;
     if (childDevice != null) {
       messageTopic += "/" + childDeviceCumulocityId;
