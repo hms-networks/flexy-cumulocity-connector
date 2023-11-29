@@ -18,7 +18,6 @@ import com.hms_networks.sc.cumulocity.CConnectorMain;
 import com.hms_networks.sc.cumulocity.data.CConnectorTagName;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.List;
 
 /**
@@ -953,7 +952,7 @@ public class CConnectorApiMessageReader {
    * @throws EWException if the download fails, see the Ewon event logs.
    */
   private static String downloadFirmwareFile(String remoteFileUrl)
-      throws EWException, MalformedURLException, JSONException {
+      throws EWException, JSONException {
     // Disable application auto-restart otherwise firmware update gets interrupted.
     SCAppManagement.disableAppAutoRestart();
 
