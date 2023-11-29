@@ -71,6 +71,10 @@ public class CConnectorProvisionMqttMgr extends ConstrainedMqttManager {
    * @param mqttId The ID of the MQTT client.
    * @param mqttHost The host of the MQTT broker.
    * @param enableUtf8 Boolean indicating if UTF-8 support is enabled.
+   * @param port The port of the MQTT broker.
+   * @param rootCaFilePath The path to the root CA file for the MQTT broker.
+   * @param mqttUsername The username for the MQTT broker.
+   * @param mqttPassword The password for the MQTT broker.
    * @throws Exception if unable to create the MQTT client.
    */
   public CConnectorProvisionMqttMgr(
