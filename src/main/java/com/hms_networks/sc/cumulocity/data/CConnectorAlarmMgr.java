@@ -90,12 +90,12 @@ public class CConnectorAlarmMgr extends AlarmMonitor {
             + ")");
 
     // Get and split tag name of data point
-    String[] alarmedSplitTagName = CConnectorDataMgr.getSplitTagName(alarmedTagName);
+    CConnectorTagName alarmedTagNameObject = new CConnectorTagName(alarmedTagName);
 
     // Get data point information
-    String childDevice = alarmedSplitTagName[0];
-    String fragment = StringUtils.replace(alarmedSplitTagName[1], " ", "_");
-    String series = StringUtils.replace(alarmedSplitTagName[2], " ", "_");
+    String childDevice = alarmedTagNameObject.getChildDevice();
+    String fragment = StringUtils.replace(alarmedTagNameObject.getFragment(), " ", "_");
+    String series = StringUtils.replace(alarmedTagNameObject.getSeries(), " ", "_");
     String cumulocityAlarmType = fragment + "_" + series;
 
     // Pick alarm type (critical, major, etc.) from alarm hint (default to major if no type in hint)

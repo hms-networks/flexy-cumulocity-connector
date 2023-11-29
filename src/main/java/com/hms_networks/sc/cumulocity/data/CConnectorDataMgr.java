@@ -4,7 +4,7 @@ import com.hms_networks.americas.sc.extensions.datapoint.DataPoint;
 import com.hms_networks.americas.sc.extensions.datapoint.DataType;
 import com.hms_networks.americas.sc.extensions.historicaldata.HistoricalDataQueueManager;
 import com.hms_networks.americas.sc.extensions.logging.Logger;
-import com.hms_networks.americas.sc.extensions.string.StringUtils;
+import com.hms_networks.americas.sc.extensions.system.time.SCTimeSpan;
 import com.hms_networks.americas.sc.extensions.system.time.SCTimeUtils;
 import com.hms_networks.sc.cumulocity.CConnectorMain;
 import com.hms_networks.sc.cumulocity.api.CConnectorApiMessageBuilder;
@@ -22,15 +22,6 @@ import java.util.Map;
  * @author HMS Networks, MU Americas Solution Center
  */
 public class CConnectorDataMgr {
-
-  /** The size of the array with expected tag name components. */
-  private static final int SPLIT_TAG_NAME_ARRAY_SIZE = 3;
-
-  /** The delimiter used to split the tag name into components. */
-  public static final String SPLIT_TAG_NAME_DELIMITER = "/";
-
-  /** The default Cumulocity data series name if one is not included in the tag name. */
-  private static final String DEFAULT_SERIES_VALUE = "0";
 
   /**
    * The default interval (in milliseconds) to poll the historical data queue in the event it cannot
@@ -61,47 +52,6 @@ public class CConnectorDataMgr {
 
   /** Long value used to track the last time the application checked for historical data update. */
   private static long lastUpdateTimestampMillis = 0;
-
-  /**
-   * Splits a given tag name in to its expected components (child device, fragment, series).
-   *
-   * @param tagName tag name to split into expected components
-   * @return tag name components (child device, fragment, series)
-   */
-  public static String[] getSplitTagName(String tagName) {
-    // Split the tag name into its component parts
-    List tagNameComponents = StringUtils.split(tagName, SPLIT_TAG_NAME_DELIMITER);
-
-    // Build the split tag name array
-    String[] splitTagName = new String[SPLIT_TAG_NAME_ARRAY_SIZE];
-    switch (tagNameComponents.size()) {
-      case 1:
-        splitTagName[0] = null;
-        splitTagName[1] = (String) tagNameComponents.get(0);
-        splitTagName[2] = DEFAULT_SERIES_VALUE;
-        break;
-      case 2:
-        splitTagName[0] = null;
-        splitTagName[1] = (String) tagNameComponents.get(0);
-        splitTagName[2] = (String) tagNameComponents.get(1);
-        break;
-      case 3:
-        splitTagName[0] = (String) tagNameComponents.get(0);
-        splitTagName[1] = (String) tagNameComponents.get(1);
-        splitTagName[2] = (String) tagNameComponents.get(2);
-        break;
-      default:
-        // Get last three components of the tag name (truncate additional leading components)
-        final int firstComponentIndex = tagNameComponents.size() - 3;
-        final int secondComponentIndex = tagNameComponents.size() - 2;
-        final int thirdComponentIndex = tagNameComponents.size() - 1;
-        splitTagName[0] = (String) tagNameComponents.get(firstComponentIndex);
-        splitTagName[1] = (String) tagNameComponents.get(secondComponentIndex);
-        splitTagName[2] = (String) tagNameComponents.get(thirdComponentIndex);
-        break;
-    }
-    return splitTagName;
-  }
 
   /**
    * Checks for historical data in the queue and sends any data points to Cumulocity.
@@ -228,13 +178,9 @@ public class CConnectorDataMgr {
         DataPoint datapoint = (DataPoint) datapointsReadFromQueue.get(i);
 
         // Get and split tag name of data point
-        String datapointTagName = datapoint.getTagName();
-        String[] datapointSplitTagName = getSplitTagName(datapointTagName);
+        CConnectorTagName datapointTagName = new CConnectorTagName(datapoint.getTagName());
 
         // Get data point information
-        String childDevice = datapointSplitTagName[0];
-        String fragment = "\"" + datapointSplitTagName[1] + "\"";
-        String series = datapointSplitTagName[2];
         String value = datapoint.getValueString();
         String unit = datapoint.getTagUnit();
         String time = SCTimeUtils.getIso8601FormattedTimestampForDataPoint(datapoint);
@@ -245,20 +191,27 @@ public class CConnectorDataMgr {
           // Handle strings as a basic event (use filler value if tag value is blank)
           String guardedValue = value.trim().length() > 2 ? value : BLANK_STRING_FILLER_VALUE;
           payloadString =
-              CConnectorApiMessageBuilder.createBasicEvent_400(fragment, guardedValue, time);
+              CConnectorApiMessageBuilder.createBasicEvent_400(
+                  datapointTagName.getFragmentQuoted(), guardedValue, time);
         } else {
           // Handle non-strings as a measurement
           payloadString =
               CConnectorApiMessageBuilder.createCustomMeasurement_200(
-                  fragment, series, value, unit, time);
+                  datapointTagName.getFragmentQuoted(),
+                  datapointTagName.getSeries(),
+                  value,
+                  unit,
+                  time);
         }
 
         // Add to child device message map
-        if (childDeviceMessageMap.containsKey(childDevice)) {
-          String existingMessage = (String) childDeviceMessageMap.get(childDevice);
-          childDeviceMessageMap.put(childDevice, existingMessage + "\n" + payloadString);
+        if (childDeviceMessageMap.containsKey(datapointTagName.getChildDevice())) {
+          String existingMessage =
+              (String) childDeviceMessageMap.get(datapointTagName.getChildDevice());
+          childDeviceMessageMap.put(
+              datapointTagName.getChildDevice(), existingMessage + "\n" + payloadString);
         } else {
-          childDeviceMessageMap.put(childDevice, payloadString);
+          childDeviceMessageMap.put(datapointTagName.getChildDevice(), payloadString);
         }
 
         // Update last update time stamp
