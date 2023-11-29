@@ -15,7 +15,7 @@ import com.hms_networks.americas.sc.extensions.taginfo.TagInfoManager;
 import com.hms_networks.americas.sc.extensions.taginfo.TagType;
 import com.hms_networks.americas.sc.extensions.util.Base64;
 import com.hms_networks.sc.cumulocity.CConnectorMain;
-import com.hms_networks.sc.cumulocity.data.CConnectorDataMgr;
+import com.hms_networks.sc.cumulocity.data.CConnectorTagName;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -455,7 +455,7 @@ public class CConnectorApiMessageReader {
           if (command.startsWith("setf")) {
             tagName =
                 (String) commandParts.get(1)
-                    + CConnectorDataMgr.SPLIT_TAG_NAME_DELIMITER
+                    + CConnectorTagName.SPLIT_TAG_NAME_DELIMITER
                     + (String) commandParts.get(2);
             tagValue = (String) commandParts.get(3);
           } else {
@@ -465,7 +465,7 @@ public class CConnectorApiMessageReader {
 
           // Append child device name if present/applicable
           if (childDeviceName != null) {
-            tagName = childDeviceName + CConnectorDataMgr.SPLIT_TAG_NAME_DELIMITER + tagName;
+            tagName = childDeviceName + CConnectorTagName.SPLIT_TAG_NAME_DELIMITER + tagName;
           }
         } catch (IndexOutOfBoundsException e) {
           tagName = null;
