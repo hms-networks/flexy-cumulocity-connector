@@ -204,9 +204,10 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
           if (retryPayload.getRetryCount() >= PENDING_RETRY_MESSAGE_MAX_RETRY_COUNT) {
             Logger.LOG_CRITICAL(
                 "The maximum number of retries has been exceeded for the following message: "
-                    + retryPayload.getMessagePayload());
+                    + retryPayload.getMessagePayload()
+                    + "\n"
+                    + "The message has been discarded.");
             pendingRetryMessages.pop();
-            Logger.LOG_CRITICAL("The message has been discarded.");
           }
         }
       }
