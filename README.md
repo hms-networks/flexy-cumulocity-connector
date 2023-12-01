@@ -35,6 +35,11 @@ linking Ewon devices using a direct data path with a Flexy Java application.
         - [Tag Eligibility](#tag-eligibility)
             - [Tag Data Types](#tag-data-types)
                 - [String Tag History](#string-tag-history)
+    - [Data Aggregation](#data-aggregation)
+        - [Data Aggregation Configuration Parameters](#data-aggregation-configuration-parameters)
+        - [Data Aggregation Modes](#data-aggregation-modes)
+        - [Data Aggregation Timestamps](#data-aggregation-timestamps)
+        - [Data Aggregation Payload Format](#data-aggregation-payload-format)
 - [Runtime](#runtime)
     - [Child Device Support](#child-device-support)
         - [Child Device Tag Name Syntax](#child-device-tag-name-syntax)
@@ -268,6 +273,47 @@ Storage > Memory Settings*.
 
 Note: *This setting should be configured prior to installing the application, as a complete format
 of the Ewon is necessary to apply this setting.*
+
+### Data Aggregation
+
+The Ewon Flexy Cumulocity Connector supports data aggregation for the historical data queue.
+Data aggregation is used to reduce the number of data points sent to Cumulocity by aggregating
+multiple data points into a single data point.
+Currently, data aggregation is only supported for numerical data types (integer, boolean, floating
+point, and DWORD).
+String data types are not yet supported for data aggregation.
+
+#### Data Aggregation Configuration Parameters
+
+Data aggregation is configured using the following configuration file parameters:
+
+- [Queue Data Aggregation Period in Seconds (QueueDataAggregationPeriodSecs)](#queue-data-aggregation-period-in-seconds-queuedataaggregationperiodsecs)
+- [Queue Data Aggregation Method (QueueDataAggregationMethod)](#queue-data-aggregation-method-queuedataaggregationmethod)
+
+#### Data Aggregation Modes
+
+The following methods are supported for data aggregation (as described for configuration file
+parameters linked above):
+
+- Last Recorded Value (Newest)
+- First Recorded Value (Oldest)
+- Minimum Recorded Value (Lowest)
+- Maximum Recorded Value (Highest)
+- Average Recorded Value (Average)
+
+#### Data Aggregation Timestamps
+
+The aggregation period of each data point is determined by the rounding of the timestamp to the
+nearest aggregation period.
+For example, if the aggregation period is 60 seconds, and a data point is received at 12:00:00.500,
+it will be grouped with the 12:00:00.000 aggregation period.
+If the aggregation period is 60 seconds, and a data point is received at 12:00:46.000, it will be
+grouped with the 12:01:00.000 aggregation period.
+
+#### Data Aggregation Payload Format
+
+The payload used for data aggregation follows the Cumulocity JSON via MQTT specification, outlined
+at [https://cumulocity.com/guides/reference/smartrest-two/#create-a-measurement-data-point](https://cumulocity.com/guides/reference/smartrest-two/#create-a-measurement-data-point).
 
 ## Runtime
 
