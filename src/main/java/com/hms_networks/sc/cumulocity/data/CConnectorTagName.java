@@ -146,31 +146,40 @@ public class CConnectorTagName {
     List tagNameComponents = StringUtils.split(tagName, SPLIT_TAG_NAME_DELIMITER);
 
     // Build the split tag name array
+    final int sizeOnlyFragment = 1;
+    final int sizeFragmentAndSeries = 2;
+    final int sizeFragmentSeriesAndChildDevice = 3;
+    final int indexChildDevice = 0;
+    final int indexFragment = 1;
+    final int indexSeries = 2;
+    int firstComponentIndex = 0;
+    int secondComponentIndex = 1;
+    int thirdComponentIndex = 2;
     String[] splitTagName = new String[SPLIT_TAG_NAME_ARRAY_SIZE];
     switch (tagNameComponents.size()) {
-      case 1:
-        splitTagName[0] = null;
-        splitTagName[1] = (String) tagNameComponents.get(0);
-        splitTagName[2] = DEFAULT_SERIES_VALUE;
+      case sizeOnlyFragment:
+        splitTagName[indexChildDevice] = null;
+        splitTagName[indexFragment] = (String) tagNameComponents.get(firstComponentIndex);
+        splitTagName[indexSeries] = DEFAULT_SERIES_VALUE;
         break;
-      case 2:
-        splitTagName[0] = null;
-        splitTagName[1] = (String) tagNameComponents.get(0);
-        splitTagName[2] = (String) tagNameComponents.get(1);
+      case sizeFragmentAndSeries:
+        splitTagName[indexChildDevice] = null;
+        splitTagName[indexFragment] = (String) tagNameComponents.get(firstComponentIndex);
+        splitTagName[indexSeries] = (String) tagNameComponents.get(secondComponentIndex);
         break;
-      case 3:
-        splitTagName[0] = (String) tagNameComponents.get(0);
-        splitTagName[1] = (String) tagNameComponents.get(1);
-        splitTagName[2] = (String) tagNameComponents.get(2);
+      case sizeFragmentSeriesAndChildDevice:
+        splitTagName[indexChildDevice] = (String) tagNameComponents.get(firstComponentIndex);
+        splitTagName[indexFragment] = (String) tagNameComponents.get(secondComponentIndex);
+        splitTagName[indexSeries] = (String) tagNameComponents.get(thirdComponentIndex);
         break;
       default:
         // Get last three components of the tag name (truncate additional leading components)
-        final int firstComponentIndex = tagNameComponents.size() - 3;
-        final int secondComponentIndex = tagNameComponents.size() - 2;
-        final int thirdComponentIndex = tagNameComponents.size() - 1;
-        splitTagName[0] = (String) tagNameComponents.get(firstComponentIndex);
-        splitTagName[1] = (String) tagNameComponents.get(secondComponentIndex);
-        splitTagName[2] = (String) tagNameComponents.get(thirdComponentIndex);
+        firstComponentIndex = tagNameComponents.size() - 3;
+        secondComponentIndex = tagNameComponents.size() - 2;
+        thirdComponentIndex = tagNameComponents.size() - 1;
+        splitTagName[indexChildDevice] = (String) tagNameComponents.get(firstComponentIndex);
+        splitTagName[indexFragment] = (String) tagNameComponents.get(secondComponentIndex);
+        splitTagName[indexSeries] = (String) tagNameComponents.get(thirdComponentIndex);
         break;
     }
     return splitTagName;
