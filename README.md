@@ -30,6 +30,8 @@ linking Ewon devices using a direct data path with a Flexy Java application.
         - [Device Username (DeviceUsername)](#device-username-deviceusername)
         - [Device Password (DevicePassword)](#device-password-devicepassword)
         - [Device Tenant (DeviceTenant)](#device-tenant-devicetenant)
+        - [Data Processing Mode (DataProcessingMode)](#data-processing-mode-dataprocessingmode)
+        - [Parent Device Aggregated Payload Type (ParentDeviceAggregatedPayloadType)](#parent-device-aggregated-payload-type-parentdeviceaggregatedpayloadtype)
 - [Telemetry](#telemetry)
     - [Data Source](#data-source)
         - [Tag Eligibility](#tag-eligibility)
@@ -217,6 +219,29 @@ password used to authenticate with Cumulocity.
 
 This configuration field is filled automatically by the connector application, and is the device
 tenant used to authenticate with Cumulocity.
+
+#### Data Processing Mode (DataProcessingMode)
+
+Parameter to configure the data processing mode.
+This determines how data is processed by Cumulocity.
+The following data processing modes are supported:
+
+s: Persistent (Default)
+t: Transient
+q: Quiescent
+c: CEP
+
+More information about these data processing modes can be found in
+the [Cumulocity documentation](https://cumulocity.com/guides/concepts/realtime/#implementation).
+
+This field is optional, and if not specified, the default value of `s` will be used.
+
+#### Parent Device Aggregated Payload Type (ParentDeviceAggregatedPayloadType)
+
+Parameter to configure the parent (main/non-child) device aggregated payload type.
+This determines the value for the `type` field in aggregated payloads for the parent device.
+
+This field is optional, and if not specified, the default value of `None` will be used.
 
 ## Telemetry
 

@@ -7,6 +7,7 @@ import com.hms_networks.americas.sc.extensions.json.JSONObject;
 import com.hms_networks.americas.sc.extensions.logging.Logger;
 import com.hms_networks.americas.sc.extensions.string.StringUtils;
 import com.hms_networks.sc.cumulocity.data.CConnectorAggregationMethod;
+import com.hms_networks.sc.cumulocity.data.CConnectorDataProcessingMode;
 import java.util.List;
 
 /**
@@ -68,6 +69,13 @@ public class CConnectorConfigFile extends ConfigFile {
 
   /** Key for accessing the 'SubscribeToErrors' object in the configuration file. */
   private static final String CONFIG_FILE_SUBSCRIBE_TO_ERRORS_KEY = "SubscribeToErrors";
+
+  /** Key for accessing the 'DataProcessingMode' object in the configuration file. */
+  private static final String CONFIG_FILE_DATA_PROCESSING_MODE_KEY = "DataProcessingMode";
+
+  /** Key for accessing the 'ParentDeviceAggregatedPayloadType' object in the configuration file. */
+  private static final String CONFIG_FILE_PARENT_DEVICE_AGGREGATED_PAYLOAD_TYPE_KEY =
+      "ParentDeviceAggregatedPayloadType";
 
   /** Key for accessing the 'LogLevel' object in the configuration file. */
   private static final String CONFIG_FILE_LOG_LEVEL_KEY = "LogLevel";
@@ -138,9 +146,16 @@ public class CConnectorConfigFile extends ConfigFile {
   /** The default value for the subscribe to errors setting. */
   private static final boolean SUBSCRIBE_TO_ERRORS_DEFAULT = false;
 
+  /** The default value for the data processing mode setting. */
+  private static final CConnectorDataProcessingMode DATA_PROCESSING_MODE_DEFAULT =
+      CConnectorDataProcessingMode.PERSISTENT;
+
   /** The default value for the custom certificate URL setting. */
   private static final String CUSTOM_CERTIFICATE_URL_DEFAULT =
       "https://certs.godaddy.com/repository/gdroot-g2.crt";
+
+  /** The default value for the parent device's aggregated data 'type' setting. */
+  private static final String PARENT_DEVICE_AGGREGATED_PAYLOAD_TYPE_DEFAULT = "None";
 
   /** The default value for the custom certificate URL enabled setting. */
   private static final boolean CUSTOM_CERTIFICATE_URL_ENABLED_DEFAULT = false;
@@ -305,6 +320,20 @@ public class CConnectorConfigFile extends ConfigFile {
    */
   private static final String CUMULOCITY_SUBSCRIBE_TO_ERRORS_CONFIG_NAME =
       CONFIG_FILE_CUMULOCITY_KEY + "/" + CONFIG_FILE_SUBSCRIBE_TO_ERRORS_KEY;
+
+  /**
+   * The configuration field name used for the Cumulocity processing mode setting when communicating
+   * with Cumulocity.
+   */
+  private static final String CUMULOCITY_DATA_PROCESSING_MODE_CONFIG_NAME =
+      CONFIG_FILE_CUMULOCITY_KEY + "/" + CONFIG_FILE_DATA_PROCESSING_MODE_KEY;
+
+  /**
+   * The configuration field name used for the 'type' value in aggregated data payloads associated
+   * with the parent device when communicating with Cumulocity.
+   */
+  private static final String CUMULOCITY_PARENT_DEVICE_AGGREGATED_PAYLOAD_TYPE_CONFIG_NAME =
+      CONFIG_FILE_CUMULOCITY_KEY + "/" + CONFIG_FILE_PARENT_DEVICE_AGGREGATED_PAYLOAD_TYPE_KEY;
 
   /**
    * Returns a boolean indicating if device provisioning is required.
@@ -698,6 +727,73 @@ public class CConnectorConfigFile extends ConfigFile {
               + subscribeToErrors);
     }
     return subscribeToErrors;
+  }
+
+  /**
+   * Gets the Cumulocity data processing mode setting.
+   *
+   * @return Cumulocity data processing mode setting
+   */
+  public CConnectorDataProcessingMode getCumulocityDataProcessingMode() {
+    CConnectorDataProcessingMode dataProcessingMode = DATA_PROCESSING_MODE_DEFAULT;
+    try {
+      if (configurationObject
+          .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
+          .has(CONFIG_FILE_DATA_PROCESSING_MODE_KEY)) {
+        dataProcessingMode =
+            CConnectorDataProcessingMode.fromValue(
+                configurationObject
+                    .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
+                    .getString(CONFIG_FILE_DATA_PROCESSING_MODE_KEY));
+      } else {
+        final String logKey = CUMULOCITY_DATA_PROCESSING_MODE_CONFIG_NAME;
+        final String logMessage =
+            CONFIG_FILE_DATA_PROCESSING_MODE_KEY
+                + " not found in configuration file. Using default: "
+                + dataProcessingMode;
+        Logger.LOG_DEBUG_ONCE(logKey, logMessage);
+      }
+    } catch (JSONException e) {
+      Logger.LOG_DEBUG(
+          "An error occurred while accessing the "
+              + CONFIG_FILE_DATA_PROCESSING_MODE_KEY
+              + " field in the configuration file. Using default: "
+              + dataProcessingMode);
+    }
+    return dataProcessingMode;
+  }
+
+  /**
+   * Gets the Cumulocity parent device aggregated payload type setting.
+   *
+   * @return Cumulocity parent device aggregated payload type setting
+   */
+  public String getCumulocityParentDeviceAggregatedPayloadType() {
+    String parentDeviceAggregatedPayloadType = PARENT_DEVICE_AGGREGATED_PAYLOAD_TYPE_DEFAULT;
+    try {
+      if (configurationObject
+          .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
+          .has(CONFIG_FILE_PARENT_DEVICE_AGGREGATED_PAYLOAD_TYPE_KEY)) {
+        parentDeviceAggregatedPayloadType =
+            configurationObject
+                .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
+                .getString(CONFIG_FILE_PARENT_DEVICE_AGGREGATED_PAYLOAD_TYPE_KEY);
+      } else {
+        final String logKey = CUMULOCITY_PARENT_DEVICE_AGGREGATED_PAYLOAD_TYPE_CONFIG_NAME;
+        final String logMessage =
+            CONFIG_FILE_PARENT_DEVICE_AGGREGATED_PAYLOAD_TYPE_KEY
+                + " not found in configuration file. Using default: "
+                + parentDeviceAggregatedPayloadType;
+        Logger.LOG_DEBUG_ONCE(logKey, logMessage);
+      }
+    } catch (JSONException e) {
+      Logger.LOG_DEBUG(
+          "An error occurred while accessing the "
+              + CONFIG_FILE_PARENT_DEVICE_AGGREGATED_PAYLOAD_TYPE_KEY
+              + " field in the configuration file. Using default: "
+              + parentDeviceAggregatedPayloadType);
+    }
+    return parentDeviceAggregatedPayloadType;
   }
 
   /**
@@ -1127,6 +1223,18 @@ public class CConnectorConfigFile extends ConfigFile {
                 CONFIG_FILE_SUBSCRIBE_TO_ERRORS_KEY,
                 configFileEscapedStringLineValue.equals("true"));
       } else if (configFileEscapedStringLineKey.equals(
+          CUMULOCITY_DATA_PROCESSING_MODE_CONFIG_NAME)) {
+        configurationObject
+            .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
+            .put(CONFIG_FILE_DATA_PROCESSING_MODE_KEY, configFileEscapedStringLineValue);
+      } else if (configFileEscapedStringLineKey.equals(
+          CUMULOCITY_PARENT_DEVICE_AGGREGATED_PAYLOAD_TYPE_CONFIG_NAME)) {
+        configurationObject
+            .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
+            .put(
+                CONFIG_FILE_PARENT_DEVICE_AGGREGATED_PAYLOAD_TYPE_KEY,
+                configFileEscapedStringLineValue);
+      } else if (configFileEscapedStringLineKey.equals(
           CONNECTOR_QUEUE_DATA_AGGREGATION_PERIOD_SECS_CONFIG_NAME)) {
         configurationObject
             .getJSONObject(CONFIG_FILE_CONNECTOR_KEY)
@@ -1424,6 +1532,32 @@ public class CConnectorConfigFile extends ConfigFile {
       configFileEscapedString.append("\n");
     }
 
+    // Add Cumulocity/DataProcessingMode
+    if (configurationObject
+        .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
+        .has(CONFIG_FILE_DATA_PROCESSING_MODE_KEY)) {
+      configFileEscapedString.append(CUMULOCITY_DATA_PROCESSING_MODE_CONFIG_NAME);
+      configFileEscapedString.append("=");
+      configFileEscapedString.append(
+          configurationObject
+              .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
+              .getString(CONFIG_FILE_DATA_PROCESSING_MODE_KEY));
+      configFileEscapedString.append("\n");
+    }
+
+    // Add Cumulocity/parentDeviceAggregatedPayloadType
+    if (configurationObject
+        .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
+        .has(CONFIG_FILE_PARENT_DEVICE_AGGREGATED_PAYLOAD_TYPE_KEY)) {
+      configFileEscapedString.append(CUMULOCITY_PARENT_DEVICE_AGGREGATED_PAYLOAD_TYPE_CONFIG_NAME);
+      configFileEscapedString.append("=");
+      configFileEscapedString.append(
+          configurationObject
+              .getJSONObject(CONFIG_FILE_CUMULOCITY_KEY)
+              .getString(CONFIG_FILE_PARENT_DEVICE_AGGREGATED_PAYLOAD_TYPE_KEY));
+      configFileEscapedString.append("\n");
+    }
+
     return configFileEscapedString.toString();
   }
 
@@ -1493,6 +1627,11 @@ public class CConnectorConfigFile extends ConfigFile {
     defaultCumulocityConfigurationObject.put(CONFIG_FILE_PORT_KEY, PORT_DEFAULT);
     defaultCumulocityConfigurationObject.put(
         CONFIG_FILE_SUBSCRIBE_TO_ERRORS_KEY, SUBSCRIBE_TO_ERRORS_DEFAULT);
+    defaultCumulocityConfigurationObject.put(
+        CONFIG_FILE_DATA_PROCESSING_MODE_KEY, DATA_PROCESSING_MODE_DEFAULT.getValue());
+    defaultCumulocityConfigurationObject.put(
+        CONFIG_FILE_PARENT_DEVICE_AGGREGATED_PAYLOAD_TYPE_KEY,
+        PARENT_DEVICE_AGGREGATED_PAYLOAD_TYPE_DEFAULT);
 
     // Add default Cumulocity object and Connector object to a root object and return
     JSONObject defaultConfigObject = new JSONObject();
