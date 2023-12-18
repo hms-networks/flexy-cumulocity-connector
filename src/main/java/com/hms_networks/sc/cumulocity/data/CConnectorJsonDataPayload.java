@@ -5,6 +5,7 @@ import com.hms_networks.americas.sc.extensions.json.JSONObject;
 import com.hms_networks.americas.sc.extensions.system.time.SCTimeUtils;
 import com.hms_networks.americas.sc.extensions.util.RawNumberValueUtils;
 import com.hms_networks.sc.cumulocity.CConnectorMain;
+import com.hms_networks.sc.cumulocity.config.CConnectorConfigFile;
 import java.util.*;
 
 /**
@@ -73,14 +74,6 @@ public class CConnectorJsonDataPayload {
   private static final String EXTERNAL_SOURCE_TYPE_C8Y_SERIAL = "c8y_Serial";
 
   /**
-   * Constant for the {@link #type} field value used to indicate that the data payload is not
-   * associated with a child device.
-   *
-   * @since 1.0.0
-   */
-  private static final String TYPE_NONE = "None";
-
-  /**
    * The {@link Date} object representing the timestamp of the data payload. This is the timestamp
    * associated with the data in the payload (usually aggregated).
    *
@@ -100,8 +93,9 @@ public class CConnectorJsonDataPayload {
   private final JSONObject externalSource;
 
   /**
-   * The {@link String} object representing the type of the data payload. This usually is either
-   * {@link #TYPE_NONE} or the name of the child device the data is associated with.
+   * The {@link String} object representing the type of the data payload. This usually is the name
+   * of the child device the data is associated with, or the configured parent device aggregation
+   * payload type if the data is not associated with a child device or {@code null} is specified.
    *
    * @since 1.0.0
    */
@@ -257,19 +251,23 @@ public class CConnectorJsonDataPayload {
    * @param time the {@link Date} object representing the timestamp of the data payload. This is the
    *     timestamp associated with the aggregated data in the payload.
    * @param type the {@link String} object representing the type of the data payload. This usually
-   *     is the name of the child device the data is associated with, or {@link #TYPE_NONE} if the
-   *     data is not associated with a child device. If {@code null} is specified, {@link
-   *     #TYPE_NONE} is used.
+   *     is the name of the child device the data is associated with, or the configured parent
+   *     device aggregation payload type if the data is not associated with a child device or {@code
+   *     null} is specified.
    * @throws JSONException if unable to populate the external source information object when the
    *     specified {@code type} value is non-null
+   * @see CConnectorMain#getConnectorConfig()
+   * @see CConnectorConfigFile#getCumulocityParentDeviceAggregatedPayloadType()
    * @since 1.0.0
    */
   public CConnectorJsonDataPayload(Date time, String type) throws JSONException {
+    String parentDeviceAggregatedPayloadType =
+        CConnectorMain.getConnectorConfig().getCumulocityParentDeviceAggregatedPayloadType();
     this.time = time;
-    this.type = type != null ? type : TYPE_NONE;
+    this.type = type != null ? type : parentDeviceAggregatedPayloadType;
 
     // Populate external source field if the type is not null/none, otherwise set to null
-    if (!this.type.equals(TYPE_NONE)) {
+    if (!this.type.equals(parentDeviceAggregatedPayloadType)) {
       externalSource = new JSONObject();
       // External source ID is main/host device ID, underscore, then the type/child device name
       final String externalSourceId = CConnectorMain.getMqttMgr().getMqttId() + "_" + type;
@@ -292,8 +290,10 @@ public class CConnectorJsonDataPayload {
   }
 
   /**
-   * Gets the {@link String} object representing the type of the data payload. This usually is
-   * either {@link #TYPE_NONE} or the name of the child device the data is associated with.
+   * Gets the {@link String} object representing the type of the data payload. This usually is the
+   * name of the child device the data is associated with, or the configured parent device
+   * aggregation payload type if the data is not associated with a child device or {@code null} is
+   * specified.
    *
    * @return the {@link String} object representing the type of the data payload
    * @since 1.0.0
