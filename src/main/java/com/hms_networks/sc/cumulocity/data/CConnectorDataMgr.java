@@ -5,6 +5,7 @@ import com.hms_networks.americas.sc.extensions.datapoint.DataPointString;
 import com.hms_networks.americas.sc.extensions.datapoint.DataType;
 import com.hms_networks.americas.sc.extensions.historicaldata.HistoricalDataQueueManager;
 import com.hms_networks.americas.sc.extensions.logging.Logger;
+import com.hms_networks.americas.sc.extensions.mqtt.MqttStatusCode;
 import com.hms_networks.americas.sc.extensions.system.time.SCTimeSpan;
 import com.hms_networks.americas.sc.extensions.system.time.SCTimeUtils;
 import com.hms_networks.sc.cumulocity.CConnectorMain;
@@ -98,6 +99,9 @@ public class CConnectorDataMgr {
       } else if (mqttMgr == null) {
         Logger.LOG_WARN(
             "The MQTT manager is not available to send historical data. Skipping data poll!");
+      } else if (mqttMgr.getLastKnownMqttStatusCode() != MqttStatusCode.CONNECTED) {
+        Logger.LOG_WARN(
+            "The MQTT manager is not connected or has an unknown status. Skipping data poll!");
       } else {
         // There is enough memory to run, reset memory state variable.
         if (isMemoryCurrentlyLow) {
