@@ -40,6 +40,7 @@ linking Ewon devices using a direct data path with a Flexy Java application.
     - [Data Aggregation](#data-aggregation)
         - [Data Aggregation Configuration Parameters](#data-aggregation-configuration-parameters)
         - [Data Aggregation Modes](#data-aggregation-modes)
+            - [Calculations for Boolean Data Types](#calculations-for-boolean-data-types)
         - [Data Aggregation Timestamps](#data-aggregation-timestamps)
         - [Data Aggregation Payload Format](#data-aggregation-payload-format)
 - [Runtime](#runtime)
@@ -325,6 +326,20 @@ parameters linked above):
 - Minimum Recorded Value (Lowest)
 - Maximum Recorded Value (Highest)
 - Average Recorded Value (Average)
+
+##### Calculations for Boolean Data Types
+
+Certain calculations for boolean data types are handled differently than other data types.
+The following calculations are used for boolean data types:
+
+- Minimum Recorded Value (Lowest)
+    - If any value is false, the minimum value is false.
+- Maximum Recorded Value (Highest)
+    - If any value is true, the maximum value is true.
+- Average Recorded Value (Average)
+    - If there are more true values than false values, the average will be true.
+    - If there are more false values than true values, or an equal number of true and false values,
+      the average will be false.
 
 #### Data Aggregation Timestamps
 
