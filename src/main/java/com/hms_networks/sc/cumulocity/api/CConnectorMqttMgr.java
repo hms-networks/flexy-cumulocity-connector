@@ -28,7 +28,6 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
   /** The array of supported operations to be sent to Cumulocity. */
   public static final String[] CONNECTOR_SUPPORTED_OPERATIONS = {
     CConnectorApiMessageReader.CUMULOCITY_FIRMWARE_OPERATION_ID,
-    CConnectorApiMessageReader.CUMULOCITY_SOFTWARE_OPERATION_ID,
     CConnectorApiMessageReader.CUMULOCITY_CONFIGURATION_OPERATION_ID,
     CConnectorApiMessageReader.CUMULOCITY_RUN_COMMAND_OPERATION_ID,
     CConnectorApiMessageReader.CUMULOCITY_RESTART_OPERATION_ID
