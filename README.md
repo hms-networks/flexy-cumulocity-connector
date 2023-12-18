@@ -48,6 +48,7 @@ linking Ewon devices using a direct data path with a Flexy Java application.
         - [Child Device Tag Name Syntax](#child-device-tag-name-syntax)
         - [Child Device Tag Name Examples](#child-device-tag-name-examples)
     - [Connector Halt Tag](#connector-halt-tag)
+    - [Supported Cumulocity Operations](#supported-cumulocity-operations)
     - [Commands from Cumulocity](#commands-from-cumulocity)
     - [REST API](#rest-api)
         - [Control Endpoints](#control-endpoints)
@@ -418,6 +419,25 @@ Flexy is running. The application will cyclically poll the “CumulocityConnecto
 shut down the application when the value is set to one (1). This reduces the CPU load of the Flexy
 and allows for maintenance to be completed on the unit. The application can only be stopped in the
 telemetry portion of the application and shut down during initialization is not permitted.
+
+### Supported Cumulocity Operations
+
+The Ewon Flexy Cumulocity Connector application supports the following Cumulocity
+operations:
+
+- `c8y_Firmware`
+    - This operation is used to update the firmware of the Ewon Flexy.
+- `c8y_Configuration`
+    - This operation is used to update the configuration of the Ewon Flexy.
+- `c8y_Command`
+    - This operation is used to send commands to the Ewon Flexy, as described in
+      the [Commands from Cumulocity](#commands-from-cumulocity) section below.
+- `c8y_Restart`
+    - This operation is used to restart the Ewon Flexy.
+
+Detailed information about these operations, and others supported by the Cumulocity platform, can be
+found in the Cumulocity documentation
+at [https://cumulocity.com/guides/reference/device-management-library/#c8y_supportedoperations-fragments](https://cumulocity.com/guides/reference/device-management-library/#c8y_supportedoperations-fragments).
 
 ### Commands from Cumulocity
 
