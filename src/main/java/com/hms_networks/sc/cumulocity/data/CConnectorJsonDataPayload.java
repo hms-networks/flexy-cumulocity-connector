@@ -178,8 +178,8 @@ public class CConnectorJsonDataPayload {
        * @since 1.0.0
        */
       public Series(Object value, String unit, Date originalTime) throws IllegalArgumentException {
-        if (!(value instanceof Number)) {
-          throw new IllegalArgumentException("Value must be a number.");
+        if (!(value instanceof Boolean) && !(value instanceof Number)) {
+          throw new IllegalArgumentException("Value must be a number or boolean.");
         }
         this.value = value;
         this.unit = unit;
@@ -421,19 +421,41 @@ public class CConnectorJsonDataPayload {
         Object[] seriesValues = new Object[seriesList.size()];
         int seriesValuesIndex = 0;
 
+        // Check for boolean value
+        boolean booleanValueDetected = selectedSeries.getValue() instanceof Boolean;
+
         // Loop through seriesList and find min/max/first/last/avg
         while (seriesListIterator.hasNext()) {
           Fragment.Series seriesListItem = (Fragment.Series) seriesListIterator.next();
           Object currentSeriesValue = seriesListItem.getValue();
+          booleanValueDetected = booleanValueDetected || currentSeriesValue instanceof Boolean;
 
-          // Check min
+          // Check min (boolean)
           if (queueDataAggregationMethod == CConnectorAggregationMethod.MIN_RECORDED_DATA
+              && booleanValueDetected
+              && selectedSeries.getValue().equals(Boolean.TRUE)
+              && currentSeriesValue.equals(Boolean.FALSE)) {
+            selectedSeries = seriesListItem;
+            break; // Break because min boolean value found. No need to check other values.
+          }
+          // Check max (boolean)
+          else if (queueDataAggregationMethod == CConnectorAggregationMethod.MAX_RECORDED_DATA
+              && booleanValueDetected
+              && selectedSeries.getValue().equals(Boolean.FALSE)
+              && currentSeriesValue.equals(Boolean.TRUE)) {
+            selectedSeries = seriesListItem;
+            break; // Break because max boolean value found. No need to check other values.
+          }
+          // Check min (non-boolean)
+          if (queueDataAggregationMethod == CConnectorAggregationMethod.MIN_RECORDED_DATA
+              && !booleanValueDetected
               && RawNumberValueUtils.getValueMin(selectedSeries.getValue(), currentSeriesValue)
                   .equals(currentSeriesValue)) {
             selectedSeries = seriesListItem;
           }
-          // Check max
+          // Check max (non-boolean)
           else if (queueDataAggregationMethod == CConnectorAggregationMethod.MAX_RECORDED_DATA
+              && !booleanValueDetected
               && RawNumberValueUtils.getValueMax(selectedSeries.getValue(), currentSeriesValue)
                   .equals(currentSeriesValue)) {
             selectedSeries = seriesListItem;
@@ -448,7 +470,22 @@ public class CConnectorJsonDataPayload {
               && seriesListItem.getOriginalTime().after(selectedSeries.getOriginalTime())) {
             selectedSeries = seriesListItem;
           }
-          // Check average
+          // Check average (boolean)
+          else if (queueDataAggregationMethod == CConnectorAggregationMethod.AVERAGE_RECORDED_DATA
+              && booleanValueDetected) {
+            // Add value to array
+            seriesValues[seriesValuesIndex++] = seriesListItem.getValue();
+
+            // Check if last item in list
+            if (!seriesListIterator.hasNext()) {
+              // Calculate average
+              Object valueAvg = getBooleanValueAvg(seriesValues);
+              selectedSeries =
+                  new Fragment.Series(
+                      valueAvg, selectedSeries.getUnit(), selectedSeries.getOriginalTime());
+            }
+          }
+          // Check average (non-boolean)
           else if (queueDataAggregationMethod
               == CConnectorAggregationMethod.AVERAGE_RECORDED_DATA) {
             // Add value to array
