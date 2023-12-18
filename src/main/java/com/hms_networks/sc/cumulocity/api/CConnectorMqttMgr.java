@@ -95,6 +95,20 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
   private final Stack pendingRetryMessages = new Stack();
 
   /**
+   * Integer used to track the last known value of the MQTT status code. This value is updated when
+   * the {@link #onStatus(int)} method is called and in each execution of {@link
+   * #runOnMqttLoop(int)}.
+   *
+   * <p>API Note: This is not a replacement for the {@link #getStatus()} method value, and should
+   * not be used as such. This value is used to allow the application to provide its own logic for
+   * MQTT status codes. The value will typically reflect the same last known MQTT status code as
+   * reported by the {@link #getStatus()} method. In circumstances where the connector has
+   * determined that the network connection has been lost and not yet detected by the MQTT client,
+   * this value will be updated to reflect the more accurate status code.
+   */
+  private int lastKnownMqttStatusCode = MqttStatusCode.UNKNOWN;
+
+  /**
    * Constructor for the MQTT manager with the given MQTT ID, host, and boolean indicating if UTF-8
    * support is enabled.
    *
@@ -169,6 +183,9 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
    * @param currentMqttStatus the current MQTT status integer
    */
   public void runOnMqttLoop(int currentMqttStatus) {
+    // Update last known MQTT status value
+    lastKnownMqttStatusCode = currentMqttStatus;
+
     // Retry pending payloads if connected to MQTT
     if (currentMqttStatus == MqttStatusCode.CONNECTED) {
       if (!pendingRetryMessages.empty()) {
@@ -225,6 +242,7 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
    */
   public void onStatus(int status) {
     Logger.LOG_CRITICAL("MQTT client status changed to " + status);
+    lastKnownMqttStatusCode = status;
   }
 
   /** Method for processing a successful MQTT connection. */
@@ -478,5 +496,22 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
     mqttPublish(messageTopic, messagePayload, MQTT_QOS_LEVEL, MQTT_RETAIN);
     Logger.LOG_DEBUG(
         "Sent message to Cumulocity on topic [" + messageTopic + "]: " + messagePayload);
+  }
+
+  /**
+   * Gets the last known value of the MQTT status code. This value is updated when the {@link
+   * #onStatus(int)} method is called and in each execution of {@link #runOnMqttLoop(int)}. In
+   * circumstances where the connector has determined that the network connection has been lost and
+   * not yet detected by the MQTT client, this value will be updated to reflect the more accurate
+   * status code.
+   *
+   * <p>API Note: This is not a replacement for the {@link #getStatus()} method value, and should
+   * not be used as such. This value is used to allow the application to provide its own logic for
+   * MQTT status codes.
+   *
+   * @return the last known value of the MQTT status code
+   */
+  public int getLastKnownMqttStatusCode() {
+    return lastKnownMqttStatusCode;
   }
 }
