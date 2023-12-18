@@ -13,7 +13,7 @@ import java.util.*;
  * aggregation method.
  *
  * @since 1.4.0
- * @version 1.0.0
+ * @version 1.0.1
  * @author HMS Networks, MU Americas Solution Center
  */
 public class CConnectorJsonDataPayload {
@@ -482,6 +482,32 @@ public class CConnectorJsonDataPayload {
 
     // Return resulting JSONObject
     return jsonObject;
+  }
+
+  /**
+   * Gets the boolean value average from the specified array of values.
+   *
+   * <p>If the number of true values is greater than the number of false values, {@link
+   * Boolean#TRUE} is returned. Otherwise, {@link Boolean#FALSE} is returned.
+   *
+   * @param seriesValues the array of values to get the average from
+   * @return the boolean value average
+   * @since 1.0.1
+   */
+  private static synchronized Object getBooleanValueAvg(Object[] seriesValues) {
+    // Count true and false values
+    int trueCount = 0;
+    int falseCount = 0;
+    for (int i = 0; i < seriesValues.length; i++) {
+      if (Boolean.TRUE.equals(seriesValues[i])) {
+        trueCount++;
+      } else if (Boolean.FALSE.equals(seriesValues[i])) {
+        falseCount++;
+      }
+    }
+
+    // Return average (true if true count is greater than false count, false otherwise)
+    return trueCount > falseCount ? Boolean.TRUE : Boolean.FALSE;
   }
 
   /**
