@@ -209,11 +209,8 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
           retryPayload.incrementRetryCount();
           String childDevice = (String) retryPayload.getChildDevice();
           String payloadString = (String) retryPayload.getMessagePayload();
-          if (retryPayload.getMessageType() == CConnectorMessageType.JSON_DATA) {
-            sendJsonMeasurementMessageWithChildDeviceRouting(payloadString, childDevice);
-          } else {
-            sendMessageWithChildDeviceRouting(payloadString, childDevice);
-          }
+          sendMessageWithChildDeviceRouting(
+              payloadString, childDevice, retryPayload.getMessageType());
           pendingRetryMessages.pop();
           Logger.LOG_DEBUG(
               "Successfully sent payload to Cumulocity after "
@@ -429,32 +426,6 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
   }
 
   /**
-   * Sends the specified JSON measurement message to Cumulocity with the proper topic for routing to
-   * a child device, if not null. If the child device has not been registered using the {@link
-   * CConnectorApiMessageBuilder#childDeviceCreation_101(String, String)} static template, it will
-   * be registered. Registered child devices are added to a list to ensure that they are not
-   * registered more than once per session.
-   *
-   * @param jsonPayload the JSON message payload to send
-   * @param childDevice the child device to route the message to (if not null)
-   * @throws EWException if an Ewon exception occurs, check the Ewon event log for more details
-   * @throws UnsupportedEncodingException if the character encoding is not supported
-   */
-  public void sendJsonMeasurementMessageWithChildDeviceRouting(
-      String jsonPayload, String childDevice) throws EWException, UnsupportedEncodingException {
-    // Register child device if not already registered
-    verifyChildDeviceRegistration(childDevice);
-
-    // Send message to Cumulocity
-    mqttPublish(CUMULOCITY_MQTT_TOPIC_MEASUREMENT_JSON, jsonPayload, MQTT_QOS_LEVEL, MQTT_RETAIN);
-    Logger.LOG_DEBUG(
-        "Sent message to Cumulocity on topic ["
-            + CUMULOCITY_MQTT_TOPIC_MEASUREMENT_JSON
-            + "]: "
-            + jsonPayload);
-  }
-
-  /**
    * Verifies that the specified child device has been registered with Cumulocity. If the child
    * device has not been registered, it will be registered using the {@link
    * CConnectorApiMessageBuilder#childDeviceCreation_101(String, String)} static template.
@@ -489,19 +460,40 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
    *
    * @param messagePayload the message payload to send
    * @param childDevice the child device to route the message to (if not null)
+   * @param messageType the value indicating the type of the message
    * @throws EWException if an Ewon exception occurs, check the Ewon event log for more details
    * @throws UnsupportedEncodingException if the character encoding is not supported
    */
-  public void sendMessageWithChildDeviceRouting(String messagePayload, String childDevice)
+  public void sendMessageWithChildDeviceRouting(
+      String messagePayload, String childDevice, CConnectorMessageType messageType)
       throws EWException, UnsupportedEncodingException {
     // Register child device if not already registered
     verifyChildDeviceRegistration(childDevice);
 
-    // Build topic name to publish method (append child device, if not null)
+    // Get child device Cumulocity ID
     String childDeviceCumulocityId = getMqttId() + "_" + childDevice;
-    String messageTopic = CUMULOCITY_MQTT_TOPIC_SUS;
-    if (childDevice != null) {
-      messageTopic += "/" + childDeviceCumulocityId;
+
+    // Get data processing mode
+    CConnectorDataProcessingMode dataProcessingMode =
+        CConnectorMain.getConnectorConfig().getCumulocityDataProcessingMode();
+
+    // Determine message type and build topic name
+    String messageTopic;
+    if (messageType == CConnectorMessageType.DATA) {
+      final String messageTopicBase =
+          dataProcessingMode.getValue() + "/" + CUMULOCITY_MQTT_UPSTREAM;
+      messageTopic =
+          childDevice == null ? messageTopicBase : messageTopicBase + "/" + childDeviceCumulocityId;
+    } else if (messageType == CConnectorMessageType.JSON_DATA) {
+      messageTopic =
+          dataProcessingMode == CConnectorDataProcessingMode.PERSISTENT
+              ? CUMULOCITY_MQTT_TOPIC_MEASUREMENT_JSON
+              : dataProcessingMode.getValue() + "/" + CUMULOCITY_MQTT_TOPIC_MEASUREMENT_JSON;
+    } else {
+      messageTopic =
+          childDevice == null
+              ? CUMULOCITY_MQTT_TOPIC_SUS
+              : CUMULOCITY_MQTT_TOPIC_SUS + "/" + childDeviceCumulocityId;
     }
 
     // Send message to Cumulocity
