@@ -1,5 +1,21 @@
 # Ewon Flexy Cumulocity Connector Changelog
 
+## Version 1.4.1-pre1
+### Features
+- Added support for globally setting the Cumulocity data processing mode for tag data
+- Added support for changing the 'type' value in aggregated data payloads for the parent (
+  main/non-child) device
+### Bug Fixes
+- Fixed an issue where erroneous calculations on boolean tag values could prevent data aggregation
+  from working properly
+- Fixed missing entry in README.md documentation table of contents
+### Other
+- Updated com.hms_networks.americas.sc:extensions library to version 1.15.9
+- Improved MQTT client status code tracking to facilitate better connection failure detection
+    - Data polling is skipped when the MQTT client does not report a successful/healthy connection
+- Removed c8y_Software from supported Cumulocity operations as it is not supported
+- Documented the supported Cumulocity operations in the README.md file
+
 ## Version 1.4.0
 ### Features
 - Added support for historical data queue aggregation (disabled by default)
