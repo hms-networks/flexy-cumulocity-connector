@@ -11,6 +11,7 @@ import com.hms_networks.americas.sc.extensions.string.StringUtils;
 import com.hms_networks.sc.cumulocity.CConnectorMain;
 import com.hms_networks.sc.cumulocity.api.CConnectorApiMessageBuilder.InstalledSoftware;
 import com.hms_networks.sc.cumulocity.data.CConnectorAlarmMgr;
+import com.hms_networks.sc.cumulocity.data.CConnectorMessageType;
 import com.hms_networks.sc.cumulocity.data.CConnectorRetryMessage;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -197,7 +198,7 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
           retryPayload.incrementRetryCount();
           String childDevice = (String) retryPayload.getChildDevice();
           String payloadString = (String) retryPayload.getMessagePayload();
-          if (retryPayload.isJsonMessage()) {
+          if (retryPayload.getMessageType() == CConnectorMessageType.JSON_DATA) {
             sendJsonMeasurementMessageWithChildDeviceRouting(payloadString, childDevice);
           } else {
             sendMessageWithChildDeviceRouting(payloadString, childDevice);
@@ -407,12 +408,12 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
    *
    * @param messagePayload the message payload to send
    * @param childDevice the child device to route the message to (if not null)
-   * @param isJsonMessage boolean indicating whether the specified message payload is in JSON format
+   * @param messageType the value indicating the type of the message
    */
   public void addMessageToRetryPending(
-      String messagePayload, String childDevice, boolean isJsonMessage) {
+      String messagePayload, String childDevice, CConnectorMessageType messageType) {
     CConnectorRetryMessage cConnectorRetryMessage =
-        new CConnectorRetryMessage(messagePayload, childDevice, isJsonMessage);
+        new CConnectorRetryMessage(messagePayload, childDevice, messageType);
     pendingRetryMessages.push(cConnectorRetryMessage);
   }
 
