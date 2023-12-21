@@ -136,7 +136,8 @@ public class CConnectorAlarmMgr extends AlarmMonitor {
     CConnectorMqttMgr mqttMgr = CConnectorMain.getMqttMgr();
     if (mqttMgr != null) {
       try {
-        mqttMgr.sendMessageWithChildDeviceRouting(alarmMessage, childDevice);
+        mqttMgr.sendMessageWithChildDeviceRouting(
+            alarmMessage, childDevice, CConnectorMessageType.OTHER);
       } catch (Exception e) {
         Logger.LOG_SERIOUS(
             "An alarm was unable to be sent to Cumulocity because of an exception: ["

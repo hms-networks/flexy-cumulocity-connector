@@ -317,7 +317,8 @@ public class CConnectorDataMgr {
               (CConnectorJsonDataPayload) payloadListIterator.next();
           String payloadString = payload.getJsonString();
           try {
-            mqttMgr.sendJsonMeasurementMessageWithChildDeviceRouting(payloadString, childDevice);
+            mqttMgr.sendMessageWithChildDeviceRouting(
+                payloadString, childDevice, CConnectorMessageType.JSON_DATA);
           } catch (Exception e) {
             Logger.LOG_CRITICAL("Unable to send payload to MQTT broker.");
             Logger.LOG_EXCEPTION(e);
@@ -399,7 +400,8 @@ public class CConnectorDataMgr {
         String childDevice = (String) childDeviceMessageMapKeysArray[x];
         String payloadString = (String) childDeviceMessageMap.get(childDevice);
         try {
-          mqttMgr.sendMessageWithChildDeviceRouting(payloadString, childDevice);
+          mqttMgr.sendMessageWithChildDeviceRouting(
+              payloadString, childDevice, CConnectorMessageType.DATA);
         } catch (Exception e) {
           Logger.LOG_CRITICAL("Unable to send data point to MQTT broker.");
           Logger.LOG_EXCEPTION(e);
