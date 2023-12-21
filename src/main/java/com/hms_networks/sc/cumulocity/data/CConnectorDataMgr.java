@@ -321,8 +321,8 @@ public class CConnectorDataMgr {
           } catch (Exception e) {
             Logger.LOG_CRITICAL("Unable to send payload to MQTT broker.");
             Logger.LOG_EXCEPTION(e);
-            final boolean isJsonMessage = true;
-            mqttMgr.addMessageToRetryPending(payloadString, childDevice, isJsonMessage);
+            mqttMgr.addMessageToRetryPending(
+                payloadString, childDevice, CConnectorMessageType.JSON_DATA);
           }
         }
       }
@@ -403,8 +403,7 @@ public class CConnectorDataMgr {
         } catch (Exception e) {
           Logger.LOG_CRITICAL("Unable to send data point to MQTT broker.");
           Logger.LOG_EXCEPTION(e);
-          final boolean isJsonMessage = false;
-          mqttMgr.addMessageToRetryPending(payloadString, childDevice, isJsonMessage);
+          mqttMgr.addMessageToRetryPending(payloadString, childDevice, CConnectorMessageType.DATA);
         }
       }
     }

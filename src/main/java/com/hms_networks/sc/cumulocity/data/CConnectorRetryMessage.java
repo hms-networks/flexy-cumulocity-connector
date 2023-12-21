@@ -16,8 +16,8 @@ public class CConnectorRetryMessage {
   /** The child device name for the message, if applicable. */
   private final String childDevice;
 
-  /** The boolean value indicating whether the message payload is in JSON format. */
-  private final boolean isJsonMessage;
+  /** The value indicating the type of the message. */
+  private final CConnectorMessageType messageType;
 
   /**
    * The number of times the message has been retried. This value is incremented each time the
@@ -31,12 +31,13 @@ public class CConnectorRetryMessage {
    *
    * @param messagePayload the {@link String} message payload content
    * @param childDevice the child device to route the message to (if not null)
-   * @param isJsonMessage boolean indicating whether the specified message payload is in JSON format
+   * @param messageType the value indicating the type of the message
    */
-  public CConnectorRetryMessage(String messagePayload, String childDevice, boolean isJsonMessage) {
+  public CConnectorRetryMessage(
+      String messagePayload, String childDevice, CConnectorMessageType messageType) {
     this.messagePayload = messagePayload;
     this.childDevice = childDevice;
-    this.isJsonMessage = isJsonMessage;
+    this.messageType = messageType;
     this.retryCount = 0;
   }
 
@@ -59,12 +60,12 @@ public class CConnectorRetryMessage {
   }
 
   /**
-   * Gets the boolean value indicating whether the message payload is in JSON format.
+   * Gets the value indicating the type of the message.
    *
-   * @return boolean indicating whether the message payload is in JSON format
+   * @return the value indicating the type of the message
    */
-  public boolean isJsonMessage() {
-    return isJsonMessage;
+  public CConnectorMessageType getMessageType() {
+    return messageType;
   }
 
   /**
