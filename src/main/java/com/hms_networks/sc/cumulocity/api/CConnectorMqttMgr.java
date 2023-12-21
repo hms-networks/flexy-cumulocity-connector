@@ -11,6 +11,7 @@ import com.hms_networks.americas.sc.extensions.string.StringUtils;
 import com.hms_networks.sc.cumulocity.CConnectorMain;
 import com.hms_networks.sc.cumulocity.api.CConnectorApiMessageBuilder.InstalledSoftware;
 import com.hms_networks.sc.cumulocity.data.CConnectorAlarmMgr;
+import com.hms_networks.sc.cumulocity.data.CConnectorDataProcessingMode;
 import com.hms_networks.sc.cumulocity.data.CConnectorMessageType;
 import com.hms_networks.sc.cumulocity.data.CConnectorRetryMessage;
 import java.io.UnsupportedEncodingException;
@@ -48,8 +49,18 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
   /** TLS version for MQTT connections. Azure IoT Hub connections use TLS v1.2. */
   public static final String MQTT_TLS_VERSION = "tlsv1.2";
 
-  /** The MQTT topic for publishing messages to Cumulocity via MQTT. */
-  private static final String CUMULOCITY_MQTT_TOPIC_SUS = "s/us";
+  /** The value which is used in the MQTT topic to indicate upstream messaging to Cumulocity. */
+  private static final String CUMULOCITY_MQTT_UPSTREAM = "us";
+
+  /**
+   * The MQTT topic for publishing messages to Cumulocity via MQTT using the persistent data
+   * processing mode.
+   *
+   * <p>The persistent data processing mode is used for a number of messages in addition to data
+   * points, including sending alarms, events, and operations.
+   */
+  private static final String CUMULOCITY_MQTT_TOPIC_SUS =
+      CConnectorDataProcessingMode.PERSISTENT.getValue() + "/" + CUMULOCITY_MQTT_UPSTREAM;
 
   /** The MQTT topic for publishing JSON measurement messages to Cumulocity via MQTT. */
   private static final String CUMULOCITY_MQTT_TOPIC_MEASUREMENT_JSON =
