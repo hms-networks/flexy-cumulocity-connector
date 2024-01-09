@@ -261,12 +261,6 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
     // Finish operations which required reboot
     CConnectorApiMessageReader.finalizeRebootOperations(this);
 
-    // Send connector, hardware, and software information to Cumulocity
-    sendInformationToCumulocity();
-
-    // Send configuration to Cumulocity
-    sendConfigurationFileToCumulocity();
-
     // Request pending operations (500)
     try {
       mqttPublish(
@@ -278,6 +272,12 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
       Logger.LOG_CRITICAL("Unable to request pending operations (Template 500) on MQTT connect!");
       Logger.LOG_EXCEPTION(e);
     }
+
+    // Send connector, hardware, and software information to Cumulocity
+    sendInformationToCumulocity();
+
+    // Send configuration to Cumulocity
+    sendConfigurationFileToCumulocity();
   }
 
   /** Sends basic information about the connector, hardware, and other software to Cumulocity. */
