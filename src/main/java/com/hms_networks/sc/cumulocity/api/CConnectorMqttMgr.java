@@ -9,7 +9,6 @@ import com.hms_networks.americas.sc.extensions.mqtt.ConstrainedMqttManager;
 import com.hms_networks.americas.sc.extensions.mqtt.MqttStatusCode;
 import com.hms_networks.americas.sc.extensions.string.StringUtils;
 import com.hms_networks.sc.cumulocity.CConnectorMain;
-import com.hms_networks.sc.cumulocity.api.CConnectorApiMessageBuilder.InstalledSoftware;
 import com.hms_networks.sc.cumulocity.data.CConnectorAlarmMgr;
 import com.hms_networks.sc.cumulocity.data.CConnectorDataProcessingMode;
 import com.hms_networks.sc.cumulocity.data.CConnectorMessageType;
@@ -273,14 +272,14 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
       Logger.LOG_EXCEPTION(e);
     }
 
-    // Send connector, hardware, and software information to Cumulocity
+    // Send connector and hardware information to Cumulocity
     sendInformationToCumulocity();
 
     // Send configuration to Cumulocity
     sendConfigurationFileToCumulocity();
   }
 
-  /** Sends basic information about the connector, hardware, and other software to Cumulocity. */
+  /** Sends basic information about the connector and hardware to Cumulocity. */
   public void sendInformationToCumulocity() {
     // Get connector information for adding software/agent information
     String connectorName =
@@ -347,22 +346,6 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
           MQTT_RETAIN);
     } catch (Exception e) {
       Logger.LOG_CRITICAL("Unable to send firmware information to Cumulocity!");
-      Logger.LOG_EXCEPTION(e);
-    }
-
-    // Send basic software information
-    try {
-      // Create installed software array and add connector information as entry
-      InstalledSoftware[] installedSoftware = new InstalledSoftware[1];
-      installedSoftware[0] =
-          new InstalledSoftware(connectorName, connectorVersion, connectorDownloadUrl);
-      mqttPublish(
-          CUMULOCITY_MQTT_TOPIC_SUS,
-          CConnectorApiMessageBuilder.setSoftwareList_116(installedSoftware),
-          MQTT_QOS_LEVEL,
-          MQTT_RETAIN);
-    } catch (Exception e) {
-      Logger.LOG_CRITICAL("Unable to send software information to Cumulocity!");
       Logger.LOG_EXCEPTION(e);
     }
   }
