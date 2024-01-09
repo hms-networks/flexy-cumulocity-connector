@@ -288,6 +288,8 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
         "\"" + CConnectorMqttMgr.class.getPackage().getImplementationVersion() + "\"";
     String connectorDownloadUrl = "\"" + CONNECTOR_DOWNLOAD_URL + "\"";
 
+    Logger.LOG_INFO("Sending connector and hardware information to Cumulocity.");
+
     // Send agent information
     try {
       String agentInfoPayload =
@@ -295,6 +297,7 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
               connectorName, connectorVersion, connectorDownloadUrl);
       String agentInfoTopic = CUMULOCITY_MQTT_TOPIC_AGENT_INFO_PREFIX + getMqttId();
       mqttPublish(agentInfoTopic, agentInfoPayload, MQTT_QOS_LEVEL, MQTT_RETAIN);
+      Logger.LOG_DEBUG("Sent agent information to Cumulocity successfully.");
     } catch (Exception e) {
       Logger.LOG_CRITICAL("Unable to send agent information to Cumulocity!");
       Logger.LOG_EXCEPTION(e);
@@ -307,6 +310,7 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
           CConnectorApiMessageBuilder.setSupportedOperations_114(CONNECTOR_SUPPORTED_OPERATIONS),
           MQTT_QOS_LEVEL,
           MQTT_RETAIN);
+      Logger.LOG_DEBUG("Sent supported operation information to Cumulocity successfully.");
     } catch (Exception e) {
       Logger.LOG_CRITICAL("Unable to send supported operation information to Cumulocity!");
       Logger.LOG_EXCEPTION(e);
@@ -323,6 +327,7 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
           CConnectorApiMessageBuilder.configureHardware_110(serialNumber, modelNumber, revision),
           MQTT_QOS_LEVEL,
           MQTT_RETAIN);
+      Logger.LOG_DEBUG("Sent hardware information to Cumulocity successfully.");
     } catch (Exception e) {
       Logger.LOG_CRITICAL("Unable to send hardware information to Cumulocity!");
       Logger.LOG_EXCEPTION(e);
@@ -344,6 +349,7 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
               firmwareName, firmwareVersion, firmwareDownloadUrl),
           MQTT_QOS_LEVEL,
           MQTT_RETAIN);
+      Logger.LOG_DEBUG("Sent firmware information to Cumulocity successfully.");
     } catch (Exception e) {
       Logger.LOG_CRITICAL("Unable to send firmware information to Cumulocity!");
       Logger.LOG_EXCEPTION(e);
