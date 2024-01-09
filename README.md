@@ -27,6 +27,7 @@ linking Ewon devices using a direct data path with a Flexy Java application.
         - [Bootstrap Username (BootstrapUsername)](#bootstrap-username-bootstrapusername)
         - [Bootstrap Password (BootstrapPassword)](#bootstrap-password-bootstrappassword)
         - [Bootstrap Tenant (BootstrapTenant)](#bootstrap-tenant-bootstraptenant)
+        - [Subscribe to Errors (SubscribeToErrors)](#subscribe-to-errors-subscribetoerrors)
         - [Device Username (DeviceUsername)](#device-username-deviceusername)
         - [Device Password (DevicePassword)](#device-password-devicepassword)
         - [Device Tenant (DeviceTenant)](#device-tenant-devicetenant)
