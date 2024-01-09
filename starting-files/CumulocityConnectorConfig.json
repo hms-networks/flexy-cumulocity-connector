@@ -21,6 +21,8 @@
       "SubscribeToErrors": false,
       "Port": "8883",
       "CustomCertificateUrl": "https://certs.godaddy.com/repository/gdroot-g2.crt",
-      "CustomCertificateUrlEnabled": false
+      "CustomCertificateUrlEnabled": false,
+      "DataProcessingMode": "s",
+      "ParentDeviceAggregatedPayloadType": "None"
    }
 }
