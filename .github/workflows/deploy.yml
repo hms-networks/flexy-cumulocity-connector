@@ -6,7 +6,10 @@ name: Release (Deploy to S3)
 
 on:
   workflow_dispatch:
-  release:
+  workflow_run:
+    workflows: [ "Release (Build Outputs)" ]
+    types:
+      - completed
 
 env:
   AWS_SECRET_ACCESS_KEY : ${{secrets.AWS_SECRET_ACCESS_KEY}}
