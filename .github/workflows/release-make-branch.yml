@@ -1,6 +1,7 @@
-# HMS Networks Solution Center
+# HMS Networks; Americas
 # Make Branch Action for Maven-based Ewon ETK Project Releases
-# Version: 2.0
+# Version: 3.0.0
+# Date: February 8, 2024
 #
 # This action is configured to automatically run when a release
 # tag is created in the following syntax: `v*`.
@@ -16,7 +17,7 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
-  build:
+  make-branch:
     name: Create Release Branch
     runs-on: ubuntu-latest
     steps:
