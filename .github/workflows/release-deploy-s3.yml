@@ -1,0 +1,42 @@
+# HMS Networks; Americas
+# Artifact S3 Deploy Action for Maven-based Ewon ETK Project Releases
+# Version: 3.0.0
+# Date: February 8, 2024
+#
+# This action is configured to automatically run when requested, or
+# upon the completion of the release-build-outputs.yml action.
+
+name: Release (Deploy to S3)
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: [ "Release (Build Outputs)" ]
+    types:
+      - completed
+
+env:
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  TARGET_BUCKET: ${{ secrets.TARGET_BUCKET }}
+  S3_BASE_URL: ${{ secrets.S3_BASE_URL }}
+  SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+  SENDGRID_TARGET_LIST: ${{ vars.SENDGRID_TARGET_LIST }}
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Project
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts
+          cache: yarn
+
+      - name: Run S3 Deploy Application and Send Notification
+        run: yarn && yarn run upload
+        working-directory: "deploy"
