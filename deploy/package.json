@@ -7,9 +7,9 @@
   "author": "HMS Solution Center",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.287.0",
+    "@sendgrid/mail": "^8.1.1",
     "node-libcurl": "^3.0.0",
-    "octokit": "^3.1.2",
-    "@sendgrid/mail": "^7.7.0"
+    "octokit": "^3.1.2"
   },
   "scripts": {
     "upload": "node index.js"
