@@ -1,0 +1,59 @@
+# HMS Networks; Americas
+# Feature/Enhancement Request Template for Maven-based Ewon ETK Projects
+# Version: 3.0.0
+# Date: February 8, 2024
+#
+# This template provides an option when creating a new issue to report a
+# feature or enhancement request using a structured format.
+
+name: Feature or Enhancement Request
+description: Create a request for a new feature or enhancement in the project.
+title: "[FEATURE] <title>"
+labels: [ 'enhancement' ]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please provide a clear and concise description of the feature or enhancement you are requesting.
+  - type: checkboxes
+    attributes:
+      label: 'Is this feature or enhancement request related to a problem?'
+      description: 'Please provide a clear and concise description of what the problem is. Ex. I am always frustrated when [...]'
+      options:
+        - label: 'Yes'
+          required: true
+  - type: textarea
+    id: feature-enhancement-description
+    attributes:
+      label: 'Feature/Enhancement Description'
+      description: 'A clear and concise description of what the feature or enhancement is.'
+      placeholder: 'e.g. I would like to see [...]'
+    validations:
+      required: true
+  - type: textarea
+    id: feature-enhancement-alternatives
+    attributes:
+      label: 'Feature/Enhancement Alternatives'
+      description: 'A clear and concise description of any alternative solutions or features you have considered.'
+      placeholder: 'e.g. I have considered [...]'
+  - type: textarea
+    id: additional-information
+    attributes:
+      label: 'Additional Information'
+      description: 'Please provide any additional information that may be helpful.'
+      placeholder: 'e.g. The feature or enhancement may also help with [...]'
+  - type: checkboxes
+    id: code-of-conduct
+    attributes:
+      label: 'Code of Conduct'
+      description: 'By submitting this feature/enhancement request, you agree to abide by our [Code of Conduct](CODE_OF_CONDUCT.md).'
+      options:
+        - label: 'I agree to abide by the Code of Conduct.'
+          required: true
+  - type: markdown
+    attributes:
+      value: |
+        <h5>Privacy Notice</h5>
+        This form creates a GitHub issue in the repository for this project, which may be publicly accessible or shared with third parties.
+        Please do not include any sensitive information, including device backup files.
+        Sensitive information should be provided to HMS Networks Support when requested.

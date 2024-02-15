@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: HMS Networks Support
+    url: https://support.hms-networks.com/hc/en-us
+    about: Please contact our support team for assistance.
+  - name: HMS Networks Cybersecurity
+    url: https://www.hms-networks.com/cybersecurity
+    about: Please report security vulnerabilities here.

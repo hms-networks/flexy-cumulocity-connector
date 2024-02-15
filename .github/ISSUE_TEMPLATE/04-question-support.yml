@@ -1,0 +1,39 @@
+# HMS Networks Application Engineering
+# Question/Support Request Template for Maven-based Ewon ETK Projects
+# Version: 3.0.0
+# Date: February 8, 2024
+#
+# This template provides an option when creating a new issue to report a
+# question or support request using a structured format.
+
+name: Question or Support Request
+description: Create a request for a question or support in the project.
+title: "[QUESTION] <title>"
+labels: [ 'question' ]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please provide a clear and concise description of your question or support request.
+  - type: textarea
+    id: question-support-description
+    attributes:
+      label: 'Description'
+      description: 'A clear and concise description of the question or support request.'
+      placeholder: 'e.g. I would like to know [...]'
+    validations:
+      required: true
+  - type: textarea
+    id: additional-information
+    attributes:
+      label: 'Additional Information'
+      description: 'Please provide any additional information that may be helpful.'
+      placeholder: 'e.g. The feature or enhancement may also help with [...]'
+  - type: checkboxes
+    id: code-of-conduct
+    attributes:
+      label: 'Code of Conduct'
+      description: 'By submitting this question/support request, you agree to abide by our [Code of Conduct](CODE_OF_CONDUCT.md).'
+      options:
+        - label: 'I agree to abide by the Code of Conduct.'
+          required: true
