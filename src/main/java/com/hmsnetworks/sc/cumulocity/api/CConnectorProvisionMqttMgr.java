@@ -1,11 +1,11 @@
-package com.hms_networks.sc.cumulocity.api;
+package com.hmsnetworks.sc.cumulocity.api;
 
 import com.ewon.ewonitf.MqttMessage;
 import com.hms_networks.americas.sc.extensions.json.JSONException;
 import com.hms_networks.americas.sc.extensions.logging.Logger;
 import com.hms_networks.americas.sc.extensions.mqtt.ConstrainedMqttManager;
 import com.hms_networks.americas.sc.extensions.string.StringUtils;
-import com.hms_networks.sc.cumulocity.CConnectorMain;
+import com.hmsnetworks.sc.cumulocity.CConnectorMain;
 import java.util.List;
 
 /**

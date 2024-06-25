@@ -1,4 +1,4 @@
-package com.hms_networks.sc.cumulocity.data;
+package com.hmsnetworks.sc.cumulocity.data;
 
 import com.hms_networks.americas.sc.extensions.string.StringUtils;
 import java.util.List;

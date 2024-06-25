@@ -1,4 +1,4 @@
-package com.hms_networks.sc.cumulocity.data;
+package com.hmsnetworks.sc.cumulocity.data;
 
 import com.hms_networks.americas.sc.extensions.alarms.AlarmMonitor;
 import com.hms_networks.americas.sc.extensions.logging.Logger;
@@ -6,9 +6,9 @@ import com.hms_networks.americas.sc.extensions.string.StringUtils;
 import com.hms_networks.americas.sc.extensions.taginfo.TagInfo;
 import com.hms_networks.americas.sc.extensions.taginfo.TagInfoManager;
 import com.hms_networks.americas.sc.extensions.taginfo.TagType;
-import com.hms_networks.sc.cumulocity.CConnectorMain;
-import com.hms_networks.sc.cumulocity.api.CConnectorApiMessageBuilder;
-import com.hms_networks.sc.cumulocity.api.CConnectorMqttMgr;
+import com.hmsnetworks.sc.cumulocity.CConnectorMain;
+import com.hmsnetworks.sc.cumulocity.api.CConnectorApiMessageBuilder;
+import com.hmsnetworks.sc.cumulocity.api.CConnectorMqttMgr;
 
 /**
  * Class for managing alarms on Ewon tags with alarm monitoring enabled.

@@ -1,4 +1,4 @@
-package com.hms_networks.sc.cumulocity;
+package com.hmsnetworks.sc.cumulocity;
 
 import com.ewon.ewonitf.DefaultEventHandler;
 import com.ewon.ewonitf.EWException;
@@ -18,13 +18,13 @@ import com.hms_networks.americas.sc.extensions.system.tags.SCTagUtils;
 import com.hms_networks.americas.sc.extensions.system.threading.SCCountdownLatch;
 import com.hms_networks.americas.sc.extensions.system.time.SCTimeUnit;
 import com.hms_networks.americas.sc.extensions.system.time.SCTimeUtils;
-import com.hms_networks.sc.cumulocity.api.CConnectorApiCertificateMgr;
-import com.hms_networks.sc.cumulocity.api.CConnectorMqttMgr;
-import com.hms_networks.sc.cumulocity.api.CConnectorProvisionMqttMgr;
-import com.hms_networks.sc.cumulocity.api.CConnectorWebApiListener;
-import com.hms_networks.sc.cumulocity.config.CConnectorConfigFile;
-import com.hms_networks.sc.cumulocity.data.CConnectorAlarmMgr;
-import com.hms_networks.sc.cumulocity.data.CConnectorDataMgr;
+import com.hmsnetworks.sc.cumulocity.api.CConnectorApiCertificateMgr;
+import com.hmsnetworks.sc.cumulocity.api.CConnectorMqttMgr;
+import com.hmsnetworks.sc.cumulocity.api.CConnectorProvisionMqttMgr;
+import com.hmsnetworks.sc.cumulocity.api.CConnectorWebApiListener;
+import com.hmsnetworks.sc.cumulocity.config.CConnectorConfigFile;
+import com.hmsnetworks.sc.cumulocity.data.CConnectorAlarmMgr;
+import com.hmsnetworks.sc.cumulocity.data.CConnectorDataMgr;
 import java.util.Date;
 
 /**

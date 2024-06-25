@@ -1,4 +1,4 @@
-package com.hms_networks.sc.cumulocity.data;
+package com.hmsnetworks.sc.cumulocity.data;
 
 import com.hms_networks.americas.sc.extensions.datapoint.DataPoint;
 import com.hms_networks.americas.sc.extensions.datapoint.DataPointString;
@@ -8,10 +8,10 @@ import com.hms_networks.americas.sc.extensions.logging.Logger;
 import com.hms_networks.americas.sc.extensions.mqtt.MqttStatusCode;
 import com.hms_networks.americas.sc.extensions.system.time.SCTimeSpan;
 import com.hms_networks.americas.sc.extensions.system.time.SCTimeUtils;
-import com.hms_networks.sc.cumulocity.CConnectorMain;
-import com.hms_networks.sc.cumulocity.api.CConnectorApiMessageBuilder;
-import com.hms_networks.sc.cumulocity.api.CConnectorMqttMgr;
-import com.hms_networks.sc.cumulocity.config.CConnectorConfigFile;
+import com.hmsnetworks.sc.cumulocity.CConnectorMain;
+import com.hmsnetworks.sc.cumulocity.api.CConnectorApiMessageBuilder;
+import com.hmsnetworks.sc.cumulocity.api.CConnectorMqttMgr;
+import com.hmsnetworks.sc.cumulocity.config.CConnectorConfigFile;
 import java.io.IOException;
 import java.util.*;
 

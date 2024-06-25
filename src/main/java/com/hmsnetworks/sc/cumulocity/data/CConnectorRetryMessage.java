@@ -1,4 +1,4 @@
-package com.hms_networks.sc.cumulocity.data;
+package com.hmsnetworks.sc.cumulocity.data;
 
 /**
  * Utility class for storing the content and retry count for an MQTT message to Cumulocity. This

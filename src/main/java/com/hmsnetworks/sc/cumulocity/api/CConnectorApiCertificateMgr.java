@@ -1,10 +1,10 @@
-package com.hms_networks.sc.cumulocity.api;
+package com.hmsnetworks.sc.cumulocity.api;
 
 import com.hms_networks.americas.sc.extensions.fileutils.FileAccessManager;
 import com.hms_networks.americas.sc.extensions.logging.Logger;
 import com.hms_networks.americas.sc.extensions.system.application.SCAppManagement;
 import com.hms_networks.americas.sc.extensions.system.http.SCHttpUtility;
-import com.hms_networks.sc.cumulocity.CConnectorMain;
+import com.hmsnetworks.sc.cumulocity.CConnectorMain;
 import java.io.File;
 
 /**

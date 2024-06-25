@@ -1,4 +1,4 @@
-package com.hms_networks.sc.cumulocity.api;
+package com.hmsnetworks.sc.cumulocity.api;
 
 import com.ewon.ewonitf.EWException;
 import com.ewon.ewonitf.RuntimeControl;
@@ -14,8 +14,8 @@ import com.hms_networks.americas.sc.extensions.taginfo.TagInfo;
 import com.hms_networks.americas.sc.extensions.taginfo.TagInfoManager;
 import com.hms_networks.americas.sc.extensions.taginfo.TagType;
 import com.hms_networks.americas.sc.extensions.util.Base64;
-import com.hms_networks.sc.cumulocity.CConnectorMain;
-import com.hms_networks.sc.cumulocity.data.CConnectorTagName;
+import com.hmsnetworks.sc.cumulocity.CConnectorMain;
+import com.hmsnetworks.sc.cumulocity.data.CConnectorTagName;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;

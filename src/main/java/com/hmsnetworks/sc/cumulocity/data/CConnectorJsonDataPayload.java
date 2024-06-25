@@ -1,11 +1,11 @@
-package com.hms_networks.sc.cumulocity.data;
+package com.hmsnetworks.sc.cumulocity.data;
 
 import com.hms_networks.americas.sc.extensions.json.JSONException;
 import com.hms_networks.americas.sc.extensions.json.JSONObject;
 import com.hms_networks.americas.sc.extensions.system.time.SCTimeUtils;
 import com.hms_networks.americas.sc.extensions.util.RawNumberValueUtils;
-import com.hms_networks.sc.cumulocity.CConnectorMain;
-import com.hms_networks.sc.cumulocity.config.CConnectorConfigFile;
+import com.hmsnetworks.sc.cumulocity.CConnectorMain;
+import com.hmsnetworks.sc.cumulocity.config.CConnectorConfigFile;
 import java.util.*;
 
 /**

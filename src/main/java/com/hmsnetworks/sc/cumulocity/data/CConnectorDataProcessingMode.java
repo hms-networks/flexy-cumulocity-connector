@@ -1,4 +1,4 @@
-package com.hms_networks.sc.cumulocity.data;
+package com.hmsnetworks.sc.cumulocity.data;
 
 /**
  * An enum-like class for Java 1.4 compatibility that provides constants for the Cumulocity data

@@ -1,4 +1,4 @@
-package com.hms_networks.sc.cumulocity.api;
+package com.hmsnetworks.sc.cumulocity.api;
 
 import com.ewon.ewonitf.DefaultEventHandler;
 import com.ewon.ewonitf.EWException;
@@ -8,11 +8,11 @@ import com.hms_networks.americas.sc.extensions.logging.Logger;
 import com.hms_networks.americas.sc.extensions.mqtt.ConstrainedMqttManager;
 import com.hms_networks.americas.sc.extensions.mqtt.MqttStatusCode;
 import com.hms_networks.americas.sc.extensions.string.StringUtils;
-import com.hms_networks.sc.cumulocity.CConnectorMain;
-import com.hms_networks.sc.cumulocity.data.CConnectorAlarmMgr;
-import com.hms_networks.sc.cumulocity.data.CConnectorDataProcessingMode;
-import com.hms_networks.sc.cumulocity.data.CConnectorMessageType;
-import com.hms_networks.sc.cumulocity.data.CConnectorRetryMessage;
+import com.hmsnetworks.sc.cumulocity.CConnectorMain;
+import com.hmsnetworks.sc.cumulocity.data.CConnectorAlarmMgr;
+import com.hmsnetworks.sc.cumulocity.data.CConnectorDataProcessingMode;
+import com.hmsnetworks.sc.cumulocity.data.CConnectorMessageType;
+import com.hmsnetworks.sc.cumulocity.data.CConnectorRetryMessage;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;

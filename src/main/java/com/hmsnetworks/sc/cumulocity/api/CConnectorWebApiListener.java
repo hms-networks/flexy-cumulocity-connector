@@ -1,8 +1,8 @@
-package com.hms_networks.sc.cumulocity.api;
+package com.hmsnetworks.sc.cumulocity.api;
 
 import com.hms_networks.americas.sc.extensions.api.ApplicationControlApiListener;
 import com.hms_networks.americas.sc.extensions.string.StringUtils;
-import com.hms_networks.sc.cumulocity.CConnectorMain;
+import com.hmsnetworks.sc.cumulocity.CConnectorMain;
 
 /**
  * The listener class for receiving HTTP application control API requests for the connector's status

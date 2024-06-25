@@ -1,4 +1,4 @@
-package com.hms_networks.sc.cumulocity.config;
+package com.hmsnetworks.sc.cumulocity.config;
 
 import com.hms_networks.americas.sc.extensions.config.ConfigFile;
 import com.hms_networks.americas.sc.extensions.historicaldata.HistoricalDataQueueManager;
@@ -6,8 +6,8 @@ import com.hms_networks.americas.sc.extensions.json.JSONException;
 import com.hms_networks.americas.sc.extensions.json.JSONObject;
 import com.hms_networks.americas.sc.extensions.logging.Logger;
 import com.hms_networks.americas.sc.extensions.string.StringUtils;
-import com.hms_networks.sc.cumulocity.data.CConnectorAggregationMethod;
-import com.hms_networks.sc.cumulocity.data.CConnectorDataProcessingMode;
+import com.hmsnetworks.sc.cumulocity.data.CConnectorAggregationMethod;
+import com.hmsnetworks.sc.cumulocity.data.CConnectorDataProcessingMode;
 import java.util.List;
 
 /**

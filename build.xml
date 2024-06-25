@@ -13,7 +13,7 @@ configured for use locally with Ant.
 	<property name="ProjectName" value="flexy-cumulocity-connector"/>
 	
 	<!-- The main class to run (where the main function is) -->
-	<property name="MainClass" value="com.hms_networks.sc.cumulocity.CConnectorMain"/>
+	<property name="MainClass" value="com.hmsnetworks.sc.cumulocity.CConnectorMain"/>
 	
 	<!-- The JAVA heapsize -->
 	<property name="HeapSize" value="5M"/>

@@ -17,7 +17,7 @@
   <!-- PROJECT PROPERTIES -->
   <properties>
     <!-- Project Main Class -->
-    <project.main.class>com.hms_networks.sc.cumulocity.CConnectorMain</project.main.class>
+    <project.main.class>com.hmsnetworks.sc.cumulocity.CConnectorMain</project.main.class>
     <!-- Project Memory Heap Size -->
     <project.heap.size>25M</project.heap.size>
 
