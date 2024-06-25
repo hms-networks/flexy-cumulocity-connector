@@ -42,6 +42,12 @@ public class CConnectorAlarmMgr extends AlarmMonitor {
    */
   private static final String WARNING_ALARM_HINT_PREFIX = "Warning:";
 
+  /** The Ewon alarm status used to indicate the 'end' of an alarm condition. */
+  private static final String ALARM_STATUS_END = "END";
+
+  /** The Ewon alarm status used to indicate the 'return to normal' of an alarm condition. */
+  private static final String ALARM_STATUS_RTN = "RTN";
+
   /**
    * Method for handling alarm status changes on Ewon tags with alarm monitoring enabled.
    *
@@ -100,7 +106,7 @@ public class CConnectorAlarmMgr extends AlarmMonitor {
 
     // Pick alarm type (critical, major, etc.) from alarm hint (default to major if no type in hint)
     String alarmMessage;
-    if (alarmStatus.equals("END") || alarmStatus.equals("NONE")) {
+    if (alarmStatus.equals(ALARM_STATUS_END) || alarmStatus.equals(ALARM_STATUS_RTN)) {
       alarmMessage = CConnectorApiMessageBuilder.clearExistingAlarm_306(cumulocityAlarmType);
     } else if (unmodifiedAlarmHint.startsWith(CRITICAL_ALARM_HINT_PREFIX)) {
       String alarmHintWithoutPrefix =
