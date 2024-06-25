@@ -1,0 +1,119 @@
+---
+id: maven-lifecycles
+title: Maven Lifecycles
+sidebar_label: Maven Lifecycles
+---
+
+### Clean Lifecycle
+
+During the `clean` lifecycle, previous build output and artifacts will be cleaned up, and the entire
+build output directory deleted. This lifecycle is not automatically invoked and must be manually
+run.
+
+:::info Clean Lifecycle
+
+The `clean` lifecycle can be run with the `CLEAN (Remove Build Output)` launch configuration in
+your IDE, or with the following command:
+
+```shell
+mvn clean -f pom.xml
+```
+
+:::
+
+### Test Lifecycle
+
+During the `test` lifecycle, any JUnit test classes in the `src/test/java` class will be run by
+Maven. This lifecycle is automatically invoked by
+the [package](#package-lifecycle), [install](#install-lifecycle), and [deploy](#deploy-lifecycle)
+lifecycles.
+
+In the event of a test failure, the lifecycle will fail. Detailed failure or successful test
+information can be found in the `target/surefire-reports` folder.
+
+More information about the Maven Surefure Plugin, which is used for the JUnit testing, can be found
+at [https://maven.apache.org/surefire/maven-surefire-plugin/](https://maven.apache.org/surefire/maven-surefire-plugin/).
+
+:::info Test Lifecycle
+
+The `test` lifecycle can be run with the `TEST (Run JUnit)` launch configuration in your IDE, or
+with the following command:
+
+```
+mvn test -f pom.xml`
+```
+
+:::
+
+### Package Lifecycle
+
+During the 'package' lifecycle, the application source code and resources will be compiled and
+packaged in to a JAR file with the name '{artifactId}-{version}-full.jar'. This lifecycle is
+automatically invoked by the [install](#install-lifecycle)
+and [deploy](#deploy-lifecycle) lifecycles.
+
+:::info Package Lifecycle
+
+The Maven package lifecycle can be run with the `PACKAGE (Create JAR)` launch configuration in your
+IDE, or with the
+following command:
+
+```
+mvn package -f pom.xml`
+```
+
+:::
+
+### Install Lifecycle
+
+During the `install` lifecycle, the packaged application will be uploaded to the Ewon device using
+the 'ewon.address,' 'ewon.username,' and 'ewon.password' properties. This lifecycle is automatically
+invoked by the [deploy](#deploy-lifecycle) lifecycle, and automatically
+invokes [package lifecycle](#package-lifecycle).
+
+:::info Install Lifecycle
+
+The Maven install lifecycle can be run with the `INSTALL (Upload to Device)` launch configuration in
+your IDE, or with the following command:
+
+```
+mvn install -f pom.xml
+```
+
+:::
+
+### Deploy Lifecycle
+
+During the `deploy` lifecycle, the packaged and uploaded application will be run on the Ewon Flexy
+device. This lifecycle automatically invokes the [install](#install-lifecycle)
+and [package](#package-lifecycle) lifecycles.
+
+The `deploy` lifecycle uses multiple Maven profiles, and can be invoked in different ways.
+
+:::info Deploy Lifecycle (No Debugging)
+
+The Maven deploy lifecycle can be run without debugging enabled using
+the `DEPLOY (Run on Device, No Debug)` launch
+configuration in your IDE, or with the following command:
+
+```
+mvn deploy -f pom.xml -P noDebug
+```
+
+:::
+
+:::info Deploy Lifecycle (With Debugging)
+
+The Maven deploy lifecycle can be run with debugging enabled using
+the `DEPLOY (Run on Device, Debug)` launch configuration in your IDE.
+
+The Maven deploy lifecycle with debugging enabled can also be run by command line, but a remote JVM
+debugging connection must be manually created using the values from the 'ewon.address' and '
+project.build.debug.port' properties. The following command will run the deploy lifecycle with
+debugging enabled:
+
+```
+mvn deploy -f pom.xml -P debug
+```
+
+:::

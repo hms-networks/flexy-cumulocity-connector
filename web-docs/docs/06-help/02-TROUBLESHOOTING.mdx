@@ -1,0 +1,77 @@
+---
+id: troubleshooting
+title: Troubleshooting
+sidebar_label: Troubleshooting
+---
+
+import ScDocusaurusConfig from "@site/ScDocusaurusConfig.js";
+
+## Disclaimer
+
+<>The information provided in this section is intended to assist with troubleshooting common issues
+that may be encountered when using the {ScDocusaurusConfig.title}. This information is provided
+as-is, and is not intended to be a comprehensive troubleshooting guide.</><br/><br/>
+
+If you are unable to resolve an issue using the information provided in this section, please
+visit the [Support](03-SUPPORT.mdx) page for additional support options.
+
+## 1. IDE Auto-Import Errors
+
+### Symptom
+
+<>When using an IDE that supports auto-import functionality, such as IntelliJ IDEA, you may
+encounter errors during the auto-import process for the {ScDocusaurusConfig.title}. These errors
+may display as messages and/or project source files may be hidden in the IDE.</><br/>
+
+### Cause
+
+In most cases, these errors are likely caused by an issue with the project configuration files,
+such as the `pom.xml` file.
+
+### Solution
+
+To resolve these errors, try the following:
+
+1. Double-check that the project configuration files are valid and all required steps were completed
+   during setup.
+2. If the project configuration files are valid, try restarting the IDE and re-importing the
+   project.
+    1. Some IDEs may include an option to "Invalidate Caches and Restart" when restarting.
+       If this option is available, try using it before re-importing the project. Note: This option
+       may be found in the "File" menu.
+3. If the errors persist, try reverting to a previously known good commit, or resetting local
+   changes.
+
+## 2. Javadoc Errors During Build After Updating the POM File
+
+### Symptom
+
+<>When building the {ScDocusaurusConfig.title}, you may encounter build errors related to the
+generation of Javadocs. These errors may prevent the build from completing successfully.</><br/>
+
+### Cause
+
+A recently added or updated dependency in the `pom.xml` file may include invalid Javadocs, or the
+Javadocs may not be available.
+
+### Solution
+
+Dependencies that introduce Javadoc errors may be excluded from the Javadoc generation process by
+modifying the `pom.xml` file.
+
+To exclude a dependency from the Javadoc generation process, add a
+corresponding `<dependencySourceExclude></dependencySourceExclude>` to
+the `org.apache.maven.plugins:maven-javadoc-plugin` `<plugin></plugin>` section of your `pom.xml`.
+
+:::info
+
+For example, to exclude the Javadoc documentation for the `commons-lang:commons-lang` dependency,
+add the following to
+the `org.apache.maven.plugins:maven-javadoc-plugin` `<plugin></plugin>` section of your `pom.xml`:
+
+```xml
+
+<dependencySourceExclude>commons-lang:commons-lang:*</dependencySourceExclude>
+```
+
+:::

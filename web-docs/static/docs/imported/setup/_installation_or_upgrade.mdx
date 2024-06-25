@@ -1,0 +1,25 @@
+import GreenCheckMark from '@site/static/img/imported/graphics/green-check-icon-cc0v1.webp';
+import ScDocusaurusConfig from "@site/ScDocusaurusConfig.js";
+
+#### Step 1
+
+Open an FTP connection to the target Ewon device.
+
+#### Step 2
+
+Navigate to the /usr folder on the Ewon device's file system.
+
+#### Step 3
+
+Upload the downloaded connector files to the /usr folder.
+
+- <><code>{ScDocusaurusConfig.applicationJarFileName}</code> where X.Y.Z are the connector version numbers</><br/>
+- `jvmrun`
+- <><code>{ScDocusaurusConfig.configFileName}</code></><br/>
+
+#### Step 4
+
+Once the files have been uploaded, you may close the FTP connection and proceed to
+the next section.
+
+<img src={GreenCheckMark} alt="Green check mark" width="100"/>

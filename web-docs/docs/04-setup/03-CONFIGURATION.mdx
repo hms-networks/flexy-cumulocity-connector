@@ -1,0 +1,23 @@
+---
+id: configuration
+title: Configuration
+sidebar_label: Configuration
+---
+
+import ConfigurationPartial from '@site/static/docs/imported/setup/_configuration.mdx';
+import ConfigurationFieldsPartial from '@site/docs/_partial/_configuration_fields.mdx';
+import CodeBlock from '@theme/CodeBlock';
+import DefaultConfigJson from '!!raw-loader!../../../starting-files/CumulocityConnectorConfig.json';
+
+<ConfigurationPartial />
+
+##### II. Configuration File Fields
+
+<ConfigurationFieldsPartial/>
+
+##### III. Default Configuration File
+
+If no configuration file is detected, a default configuration file will be generated to match what
+is shown below:
+
+<CodeBlock>{DefaultConfigJson}</CodeBlock>

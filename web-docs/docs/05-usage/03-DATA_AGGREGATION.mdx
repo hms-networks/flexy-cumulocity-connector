@@ -1,0 +1,59 @@
+---
+id: data-aggregation
+title: Data Aggregation
+sidebar_label: Data Aggregation
+---
+
+The Ewon Flexy Cumulocity Connector supports data aggregation for the historical data queue.
+Data aggregation is used to reduce the number of data points sent to Cumulocity by aggregating
+multiple data points into a single data point.
+Currently, data aggregation is only supported for numerical data types (integer, boolean, floating
+point, and DWORD).
+String data types are not yet supported for data aggregation.
+
+## Data Aggregation Configuration Parameters
+
+Data aggregation is configured using the following configuration file parameters:
+
+TODO: FIX THESE LINKS
+- [Queue Data Aggregation Period in Seconds (QueueDataAggregationPeriodSecs)](#queue-data-aggregation-period-in-seconds-queuedataaggregationperiodsecs)
+- [Queue Data Aggregation Method (QueueDataAggregationMethod)](#queue-data-aggregation-method-queuedataaggregationmethod)
+
+## Data Aggregation Modes
+
+The following methods are supported for data aggregation (as described for configuration file
+parameters linked above):
+
+- Last Recorded Value (Newest)
+- First Recorded Value (Oldest)
+- Minimum Recorded Value (Lowest)
+- Maximum Recorded Value (Highest)
+- Average Recorded Value (Average)
+
+### Calculations for Boolean Data Types
+
+Certain calculations for boolean data types are handled differently than other data types.
+The following calculations are used for boolean data types:
+
+- Minimum Recorded Value (Lowest)
+    - If any value is false, the minimum value is false.
+- Maximum Recorded Value (Highest)
+    - If any value is true, the maximum value is true.
+- Average Recorded Value (Average)
+    - If there are more true values than false values, or an equal number of true and false values,
+      the average will be true.
+    - If there are more false values than true values, the average will be false.
+
+## Data Aggregation Timestamps
+
+The aggregation period of each data point is determined by the rounding of the timestamp to the
+nearest aggregation period.
+For example, if the aggregation period is 60 seconds, and a data point is received at 12:00:00.500,
+it will be grouped with the 12:00:00.000 aggregation period.
+If the aggregation period is 60 seconds, and a data point is received at 12:00:46.000, it will be
+grouped with the 12:01:00.000 aggregation period.
+
+## Data Aggregation Payload Format
+
+The payload used for data aggregation follows the Cumulocity JSON via MQTT specification, outlined
+at [https://cumulocity.com/guides/reference/smartrest-two/#create-a-measurement-data-point](https://cumulocity.com/guides/reference/smartrest-two/#create-a-measurement-data-point).

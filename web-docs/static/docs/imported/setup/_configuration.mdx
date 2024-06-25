@@ -1,0 +1,148 @@
+import CodeBlock from '@theme/CodeBlock';
+import ScDocusaurusConfig from "@site/ScDocusaurusConfig.js";
+import Popover from '@site/src/components/imported/popover.js';
+import GreenCheckMark from '@site/static/img/imported/graphics/green-check-icon-cc0v1.webp';
+import EwonAddTag from '@site/static/img/imported/ewon/setup/add-tag.gif';
+import EwonModifyTag from '@site/static/img/imported/ewon/setup/modify-tag.gif';
+import EwonWebPageHome from '@site/static/img/imported/ewon/pages/ewon-web-page-home.webp';
+import EwonTagConfigPageHistLogging from '@site/static/img/imported/ewon/pages/ewon-tag-config-page-hist-logging.webp';
+
+
+#### Ewon Configuration
+
+When setting up an Ewon, follow all standard Ewon Flexy documentation and installation
+guides.
+Documentation, installation guides, and more for the Ewon Flexy can be found
+at [https://websupport.ewon.biz/support](https://websupport.ewon.biz/support).
+
+<>In addition to the standard Ewon Flexy documentation, follow these additional steps to prepare the
+Ewon for use with the {ScDocusaurusConfig.title}.</><br/>
+
+##### I. Setup Historical Logging for Tags
+
+:::note Animations
+<Popover label="View steps for new tags">
+<img src={EwonAddTag} alt="Ewon add tag" width="750"/>
+</Popover>
+
+<Popover label="View steps for existing tags">
+<img src={EwonModifyTag} alt="Ewon modify tag" width="750"/>
+</Popover>
+:::
+
+###### Step 1
+
+Open the Ewon web page.
+
+<img src={EwonWebPageHome} alt="Ewon web page home" width="750"/>
+
+###### Step 2
+
+Navigate to the `Values` page (On the left-hand menu, click `Tags` > `Values`).
+
+###### Step 3
+
+Change the `MODE` to `Setup`.
+
+###### Step 4
+
+For each tag that requires logged data, double-click the tag to open the `Tag configuration` menu.
+
+###### Step 4a
+
+Scroll down to the `Historical Logging` section and check the `Historical Logging Enabled` checkbox.
+
+###### Step 4b
+
+In the same `Historical Logging` section, enable either deadband or interval logging.
+
+:::info Deadband Logging
+
+The Logging Deadband field triggers logging when the tag's value changes by a particular amount.
+For example, a logging deadband of 2 means that a tag will be logged when the value changes by 2 or
+more.
+A negative value in the logging deadband field disables logging on value change.
+
+:::
+:::info Interval Logging
+
+The Logging Interval field triggers time-based logging.
+For example, a logging interval of 60 means that the tag will be logged every 60 seconds.
+A logging interval of zero (0) disables time-based logging.
+
+:::
+
+###### Step 4c
+
+Once configured, click `Update Tag` on the bottom right of the page.
+
+<img src={EwonTagConfigPageHistLogging} alt="Ewon Tag Configuration Page" width="750"/>
+
+###### Step 5
+
+Once all tags have been configured, you may proceed to the [next section](#connector-configuration).
+
+<img src={GreenCheckMark} alt="Green completion checkmark" width="100"/>
+
+:::tip
+
+You may change the `MODE` back to `View` to see the tag values once you are done configuring the
+tags.
+
+:::
+
+#### Connector Configuration
+
+<>The connector configuration is a JSON file stored in the Ewon /usr/ directory with the
+filename {ScDocusaurusConfig.configFileName}. To make any configuration changes,
+modify {ScDocusaurusConfig.configFileName} and ensure changes are saved to the /usr/ directory
+of the Ewon Flexy.</><br/>
+
+##### I. Populate the Configuration File
+
+###### Step 1
+
+Open an FTP connection to the target Ewon device.
+
+###### Step 2
+
+Navigate to the /usr folder on the Ewon device's file system.
+
+###### Step 3
+
+<>Open the previously uploaded {ScDocusaurusConfig.configFileName} file for editing.</><br/>
+
+:::info
+
+Depending on the FTP client used, you may need to download the file to your local machine to edit
+it.
+Once edited, you may upload the file back to the Ewon device.
+
+:::
+
+###### Step 4
+
+Populate the configuration file with the required fields. See the [Configuration](#configuration)
+section for more information.
+
+###### Step 5
+
+Save the file and close the FTP connection.
+
+:::info
+
+If you previously downloaded the configuration file to your local machine for editing in steps 3-4,
+you will need to upload the file back to the Ewon device to save the changes.
+
+:::
+
+###### Step 6
+
+Restart the Ewon Flexy device to apply the configuration changes to the connector.
+
+###### Step 7
+
+Once the Ewon Flexy has restarted, the configuration process is complete and the connector will
+begin sending data.
+
+<img src={GreenCheckMark} alt="Green completion checkmark" width="100"/>

@@ -1,0 +1,33 @@
+import ScDocusaurusConfig from "@site/ScDocusaurusConfig.js";
+
+<>The {ScDocusaurusConfig.title} has been designed to work with the latest versions of Java, and has
+been tested successfully with Java 16+. Older versions of Java may be compatible, but have not been
+tested and are not supported.</><br/><br/>
+
+:::note
+
+During the Maven [package lifecycle](#package-lifecycle), an Ewon-compatible JDK will be
+automatically downloaded and used to compile the resulting source code. This allows for better
+cross-platform developer support, compilation consistency, and enables the use of modern Java and
+Maven environments on the host by isolating source code compilation.
+
+:::
+
+#### Installing a Suitable JDK
+
+If you do not have a suitable JDK installed on your system, follow the vendor instructions to
+download and install one from the following sources:
+
+- [Amazon Corretto (recommended)](https://aws.amazon.com/corretto/)
+- [BellSoft Liberica](https://bell-sw.com/pages/downloads/)
+- [AdoptOpenJDK](https://adoptopenjdk.net/)
+- [Azul Zulu](https://www.azul.com/downloads/zulu-community/)
+- [OpenJDK](https://openjdk.java.net/)
+
+:::tip Recommended JDK
+
+<>If you are unsure which JDK to use, we recommend using the Amazon Corretto JDK. It is free, open
+source, tested successfully, and is the default JDK used by the {ScDocusaurusConfig.title}&nbsp;
+CI/CD pipelines.</>
+
+:::

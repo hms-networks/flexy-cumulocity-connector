@@ -1,0 +1,127 @@
+---
+id: development-environment
+title: Development Environment Information
+sidebar_label: Development Environment Information
+---
+
+import ScDocusaurusConfig from "@site/ScDocusaurusConfig.js";
+import SysReqJava from '@site/static/docs/imported/sys_req/_sys_req_java.mdx';
+import SysReqMaven from '@site/static/docs/imported/sys_req/_sys_req_maven.mdx';
+import SysReqEwonFw from '@site/static/docs/imported/sys_req/_sys_req_ewon_fw.mdx';
+
+## IDEs
+
+This project uses the Maven build system to automatically download libraries and dependencies, and
+to ensure consistent build behavior. As such, this project can be imported into any IDE that
+supports the Maven build system.
+
+### Supported IDEs
+
+|                            IDE                             | General Config Location(s) | Launch Config Location(s)  | Code Style Config Location(s) |                                                                                                                                                                                  Notes                                                                                                                                                                                   |
+|:----------------------------------------------------------:|:--------------------------:|:--------------------------:|:-----------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+|     [Eclipse Foundation IDE](https://www.eclipse.org/)     |  '.project', '.classpath'  | '.eclipse/launch-configs/' |    '.eclipse/code-style/'     |                                                                                                                                                                                   None                                                                                                                                                                                   |
+| [JetBrains IntelliJ IDEA](https://www.jetbrains.com/idea/) |          '.idea/'          | '.idea/runConfigurations/' |      '.idea/codeStyles/'      | The remote debug configuration does not wake  the Ewon debug session from the suspend state. Workaround: Update the remote debug configuration  to use the 'debugNoSuspend' profile. The Ewon will  begin its debug session immediately, therefore,  breakpoints at the beginning of the application  execution may be missed prior to the IDE debug session connecting. |
+|    [Visual Studio Code](https://code.visualstudio.com)     |         '.vscode/'         |    '.vscode/tasks.json'    |       Not yet supported       |                                                                   No support has been included for remote debugging of applications on the Ewon. If desired, a remote JVM debugging session will need to be created as described in the [Deploy Lifecycle (debug)] ( #deploy-lifecycle-debug) section.                                                                   |
+
+:::note
+
+Additional IDEs with support for the Maven build system may be supported by this project, but
+have not been tested.
+
+:::
+
+### IDE-Specific Configuration
+
+#### IntelliJ IDEA
+
+When using IntelliJ IDEA with this project, it is recommended to use the following (free) plugins to
+improve the development experience:
+
+1. [Checkstyle-IDEA](https://plugins.jetbrains.com/plugin/1065-checkstyle-idea)
+2. [Google Java Format](https://plugins.jetbrains.com/plugin/8527-google-java-format)
+3. [Save Actions](https://plugins.jetbrains.com/plugin/7642-save-actions)
+
+:::note
+
+Configuration files for these plugins are already included with this project, and will be
+automatically detected by IntelliJ IDEA.
+
+:::
+
+## Command-Line
+
+Maven includes extensive support for the command-line interface (CLI). For more information about
+Maven command-line
+interface support, please refer
+to [https://maven.apache.org/run.html](https://maven.apache.org/run.html).
+
+## Getting Project Name and Version via Maven
+
+This project includes additional metadata in the JAR file manifest, including the project's name and
+version
+from `pom.xml`.
+
+To alleviate the requirement for including a hardcoded project name or version in source code, you
+can access those properties as described:
+
+```java
+class MavenMetadataExample {
+
+  String projectName = ExampleClass.class.getPackage().getImplementationTitle();
+  String projectVersion = ExampleClass.class.getPackage().getImplementationVersion();
+}
+```
+
+:::note
+
+The required metadata is only included when the project is packaged via Maven. If you package
+the project using the `build.xml` Ant build file, the described method of accessing the project name
+and version may not work or could cause an exception.
+
+:::
+
+## Testing with JUnit
+
+This project includes basic support for unit testing via the JUnit 3.8.1 test framework. An example
+test class has been included in this project at `src/test/java/ExampleTest.java`. For detailed
+information about JUnit 3.8.1 and its capabilities, please refer
+to [http://junit.sourceforge.net/junit3.8.1/](http://junit.sourceforge.net/junit3.8.1/).
+
+For details about the unit testing in this project, refer to
+the [test lifecycle](03-MAVEN_LIFECYCLES.mdx#test-lifecycle) section on
+the [Maven Lifecycles](03-MAVEN_LIFECYCLES.mdx) page.
+
+## Requirements
+
+### Required Java Version
+
+<SysReqJava />
+
+### Required Maven Version
+
+<SysReqMaven />
+
+### Required Ewon Firmware Version
+
+<SysReqEwonFw />
+
+## Contributing
+
+Detailed information about contributing to this project can be found in
+the [Contribution Guidelines](04-CONTRIBUTION_GUIDELINES.mdx).
+
+## Support Notice
+
+While this project is intended to replace the functionality provided by the Ewon JTK's `build.xml`
+Ant build file, the Ewon-supplied `build.xml` Ant build file remains the only officially supported
+environment for Ewon Java development. For more
+information about the official Ewon-supplied `build.xml` Ant build file, please refer
+to [https://developer.ewon.biz/content/java-0](https://developer.ewon.biz/content/java-0).
+
+:::note
+
+This project does not interact with the `build.xml` Ant build file, or the Ant build system.
+Therefore, it is possible to use the official Ewon-supplied `build.xml` Ant build file in
+conjunction with the supplied `pom.xml` Maven build file.
+
+:::

@@ -1,0 +1,159 @@
+import LoggingPartial from '@site/docs/_partial/_logging.mdx';
+
+#### General
+This section contains configuration fields which are used to configure the connector.
+
+##### LogLevel (Log Level)
+Parameter to configure the logging level used in the Ewon Flexy's realtime logs.
+<LoggingPartial/>
+
+##### QueueEnableDiagnosticTags (Queue Enable Diagnostic Tags)
+Parameter to enable and monitor a set of diagnostic tags for the historical data queue.
+These tags are automatically created and are used to monitor the health of the historical data queue
+by displaying a heartbeat with the number of times the queue has been accessed, a trigger to reset
+the
+queue time tracker, and the number of seconds which the queue is running behind by.
+
+##### QueueEnableStringHistory (Queue Enable String History)
+Parameter to configure if string history data should be retrieved from the queue.
+String history requires an additional EBD call in the underlying queue library, and will take extra
+processing time, especially in installations with large string tag counts.
+
+##### UTF8StringSupport (UTF-8 String Support)
+Parameter to enable support for tag names with UTF-8 encoded characters.
+
+##### QueueDataPollSizeMins (Queue Data Poll Size in Minutes)
+Parameter to configure the data poll size (in minutes) of each data queue poll.
+Changing this will modify the amount of data checked during each poll interval.
+
+##### QueueDataPollIntervalMillis (Queue Data Poll Interval in Milliseconds)
+Parameter to configure the maximum speed that the historical data be polled for new data points to
+send.
+
+##### QueueDataAggregationPeriodSecs (Queue Data Aggregation Period in Seconds)
+Parameter to configure the aggregation period (in seconds) for data points processed from the
+historical data queue.
+
+:::note
+A value of "-1" indicates that data aggregation is disabled.
+:::
+
+#### QueueDataAggregationMethod (Queue Data Aggregation Method)
+
+Parameter to configure the data aggregation method for the historical data queue. This parameter is
+used to determine how multiple data points in a single aggregation period are aggregated into a
+single data point. The following aggregation methods are supported:
+
+- 0: Last Recorded Value (Newest)
+- 1: First Recorded Value (Oldest)
+- 2: Minimum Recorded Value (Lowest)
+- 3: Maximum Recorded Value (Highest)
+- 4: Average Recorded Value (Average)
+
+_Note: The aggregation method is only used when queue data aggregation is enabled, as described
+above in the `QueueDataAggregationPeriodSecs` parameter description._
+
+##### QueueDataPollMaxBehindTimeMins (Queue Data Poll Maximum Behind Time in Minutes)`
+Parameter to configure the data poll maximum behind time (in minutes).
+Changing this will modify the maximum number of minutes which the historical queue data polling may
+be running behind by.
+
+:::note
+A value of -1 disables this functionality.
+:::
+
+#### Cumulocity
+
+This section contains configuration fields which are used to configure the connection to Cumulocity.
+
+##### Host (Host)
+
+Parameter to specify the host name of the Cumulocity server. This must be configured prior to
+running the connector.
+
+##### Port (Port)
+
+Optional string parameter to specify the port of the Cumulocity server. Default: "8883"
+
+##### Custom Certificate URL (CustomCertificateUrl)
+
+Optional string parameter to specify the custom certificate URL for the Cumulocity server's
+certificate.
+Default: "https://certs.godaddy.com/repository/gdroot-g2.crt"
+
+:::tip
+This parameter is useful when connecting to Cumulocity Edge servers which use a self-signed
+certificate.
+:::
+
+##### Custom Certificate URL Enabled (CustomCertificateUrlEnabled)
+
+Optional boolean parameter to enable the custom certificate URL for the Cumulocity server's
+certificate.
+Default: false
+
+:::tip
+This parameter is useful when connecting to Cumulocity Edge servers which use a self-signed
+certificate.
+:::
+
+##### Bootstrap Username (BootstrapUsername)
+
+Parameter to specify the bootstrap username to use when registering to Cumulocity. This must be
+configured prior to running the connector.
+
+##### Bootstrap Password (BootstrapPassword)
+
+Parameter to specify the bootstrap password to use when registering to Cumulocity. This must be
+configured prior to running the connector.
+
+##### Bootstrap Tenant (BootstrapTenant)
+
+Parameter to specify the bootstrap tenant to use when registering to Cumulocity. This must be
+configured prior to running the connector.
+
+##### Subscribe to Errors (SubscribeToErrors)
+
+Parameter to enable subscribing to errors from the Cumulocity server.
+
+##### Device Username (DeviceUsername)
+
+This configuration field is filled automatically by the connector application, and is the device
+username used to authenticate with Cumulocity.
+
+##### Device Password (DevicePassword)
+
+This configuration field is filled automatically by the connector application, and is the device
+password used to authenticate with Cumulocity.
+
+##### Device Tenant (DeviceTenant)
+
+This configuration field is filled automatically by the connector application, and is the device
+tenant used to authenticate with Cumulocity.
+
+##### Data Processing Mode (DataProcessingMode)
+
+Parameter to configure the data processing mode.
+This determines how data is processed by Cumulocity.
+The following data processing modes are supported:
+
+- s: Persistent (Default)
+- t: Transient
+- q: Quiescent
+- c: CEP
+
+More information about these data processing modes can be found in
+the [Cumulocity documentation](https://cumulocity.com/guides/concepts/realtime/#implementation).
+
+:::note
+This field is optional, and if not specified, the default value of `s` will be used.
+:::
+
+##### Parent Device Aggregated Payload Type (ParentDeviceAggregatedPayloadType)
+
+Parameter to configure the parent (main/non-child) device aggregated payload type.
+This determines the value for the `type` field in aggregated payloads for the parent device.
+
+:::note
+This field is optional, and if not specified, the default value of `None` will be used.
+:::

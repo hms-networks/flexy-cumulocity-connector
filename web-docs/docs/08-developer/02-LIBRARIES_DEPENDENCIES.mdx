@@ -1,0 +1,102 @@
+---
+id: libraries-and-dependencies
+title: Libraries and Dependencies
+sidebar_label: Libraries and Dependencies
+---
+
+import ScDocusaurusConfig from "@site/ScDocusaurusConfig.js";
+import SysReqJava from '@site/static/docs/imported/sys_req/_sys_req_java.mdx';
+import SysReqMaven from '@site/static/docs/imported/sys_req/_sys_req_maven.mdx';
+import SysReqEwonFw from '@site/static/docs/imported/sys_req/_sys_req_ewon_fw.mdx';
+
+## Libraries and Dependencies
+
+<>This {ScDocusaurusConfig.title} itself does not require any libraries or dependencies. For your
+convenience though, the Ewon ETK is already included as a dependency.</><br/>
+
+### Adding Libraries and Dependencies
+
+As required, you can include additional libraries or dependencies using the Maven build system. To
+include a new library or dependency, add a new `<dependency></dependency>` block in
+the `<dependencies></dependencies>` section of your `pom.xml`. For example,
+
+```xml
+
+<dependencies>
+  ...
+  <dependency>
+    <groupId>commons-lang</groupId>
+    <artifactId>commons-lang</artifactId>
+    <version>2.6</version>
+  </dependency>
+  ...
+</dependencies>
+```
+
+:::info
+
+Additional libraries or dependencies must support Java 1.4, as this is the version of Java supported
+by the Ewon JTK.
+
+:::
+
+:::caution
+
+Adding dependencies may introduce warnings or errors during the Maven build process which are unable
+to be addressed in this project. These warnings and errors can typically be ignored.
+
+If you encounter Javadoc generation errors, please refer to
+the [Javadoc Errors During Build After Updating the POM File](../06-help/02-TROUBLESHOOTING.mdx#3-javadoc-errors-during-build-after-updating-the-pom-file)
+section of the [Troubleshooting](../06-help/02-TROUBLESHOOTING.mdx) page.
+
+:::
+
+### Ewon ETK
+
+If you removed the Ewon ETK dependency, or otherwise need to re-add it, you can include it by adding
+the `<dependency></dependency>` block in the `<dependencies></dependencies>` section of
+your `pom.xml` as follows:
+
+```xml
+
+<dependencies>
+  ...
+  <dependency>
+    <groupId>com.hms_networks.americas.sc.mvnlibs</groupId>
+    <artifactId>ewon-etk</artifactId>
+    <version>1.4.4</version>
+    <scope>provided</scope>
+  </dependency>
+  ...
+</dependencies>
+```
+
+:::note
+
+The scope must be set to 'provided' for the Ewon ETK. This indicates that the library is
+provided by the system and does not need to be included in the packaged JAR file.
+
+:::
+
+### Solution Center Repository
+
+The Ewon ETK and HMS Americas Solution Center libraries are available via the solution center
+repository. For your convenience though, the solution center repository is already included.
+
+If you removed the solution center repository, or otherwise need to re-add it, you can include it by
+adding the following `<repository></repository>` block in the `<repositories></repositories>`
+section of your `pom.xml` as follows:
+
+```xml
+
+<repositories>
+  ...
+  <!-- HMS Networks, MU Americas Solution Center Maven Repo -->
+  <repository>
+    <id>sc-java-maven-repo</id>
+    <name>HMS Networks, MU Americas Solution Center Maven Repo</name>
+    <url>https://github.com/hms-networks/sc-java-maven-repo/raw/main/</url>
+  </repository>
+  ...
+</repositories>
+```
