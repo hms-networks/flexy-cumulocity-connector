@@ -1,5 +1,11 @@
 # Ewon Flexy Cumulocity Connector Changelog
 
+## Version 1.4.2
+### Features
+- Update deployment dependencies
+### Bug Fixes
+- Fixed an issue where the main thread ends, but the event handler thread continues to run
+
 ## Version 1.4.1
 ### Features
 - Added support for globally setting the Cumulocity data processing mode for tag data
