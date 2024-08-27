@@ -621,6 +621,9 @@ public class CConnectorMain {
       }
     }
 
+    // Unregister inventory update tag value event listener
+    InventoryUpdateEvtHandler.shutdown();
+
     // Disable app watchdog
     final int watchDogTimeoutDisabled = 0;
     RuntimeControl.configureAppWatchdog(watchDogTimeoutDisabled);
