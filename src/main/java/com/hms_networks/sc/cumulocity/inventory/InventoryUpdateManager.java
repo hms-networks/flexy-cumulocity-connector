@@ -204,4 +204,16 @@ public class InventoryUpdateManager {
 
     inventoryUpdateThread.start();
   }
+
+  /**
+   * The inventory update functionality was designed to work with files created by basic
+   * applications. Basic applications cannot create directories. Thus, this method creates the
+   * directory if it does not exist.
+   */
+  public static void createInventoryUpdateFolder() {
+    File folder = new File(INVENTORY_UPDATE_PAYLOAD_FOLDER);
+    if (!folder.exists()) {
+      folder.mkdir();
+    }
+  }
 }

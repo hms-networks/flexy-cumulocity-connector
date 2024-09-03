@@ -26,6 +26,7 @@ import com.hms_networks.sc.cumulocity.config.CConnectorConfigFile;
 import com.hms_networks.sc.cumulocity.data.CConnectorAlarmMgr;
 import com.hms_networks.sc.cumulocity.data.CConnectorDataMgr;
 import com.hms_networks.sc.cumulocity.inventory.InventoryUpdateEvtHandler;
+import com.hms_networks.sc.cumulocity.inventory.InventoryUpdateManager;
 import java.util.Date;
 
 /**
@@ -540,6 +541,7 @@ public class CConnectorMain {
 
     // Set inventory object update - triggered by tag value event listener
     if (isRunning) {
+      InventoryUpdateManager.createInventoryUpdateFolder();
       try {
         InventoryUpdateEvtHandler.setup();
         Logger.LOG_CRITICAL("Setup inventory update tag value trigger.");
