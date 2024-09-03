@@ -10,6 +10,7 @@ import com.hms_networks.americas.sc.extensions.mqtt.MqttStatusCode;
 import com.hms_networks.americas.sc.extensions.string.StringUtils;
 import com.hms_networks.sc.cumulocity.CConnectorMain;
 import com.hms_networks.sc.cumulocity.data.CConnectorAlarmMgr;
+import com.hms_networks.sc.cumulocity.data.CConnectorChildUpdate;
 import com.hms_networks.sc.cumulocity.data.CConnectorDataProcessingMode;
 import com.hms_networks.sc.cumulocity.data.CConnectorMessageType;
 import com.hms_networks.sc.cumulocity.data.CConnectorRetryMessage;
@@ -419,7 +420,8 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
    * device has not been registered, it will be registered using the {@link
    * CConnectorApiMessageBuilder#childDeviceCreation_101(String, String)} static template.
    * Registered child devices are added to a list to ensure that they are not registered more than
-   * once per session.
+   * once per session. If child device metadata tags exist, the child device object will be updated
+   * with firmware and hardware information.
    *
    * @param childDevice the child device to verify registration for
    * @throws EWException if an Ewon exception occurs, check the Ewon event log for more details
@@ -435,9 +437,40 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
           CConnectorApiMessageBuilder.childDeviceCreation_101(childDeviceCumulocityId, childDevice);
       mqttPublish(
           CUMULOCITY_MQTT_TOPIC_SUS, childDeviceRegistrationPayload, MQTT_QOS_LEVEL, MQTT_RETAIN);
-      registeredChildDevices.add(childDevice);
       Logger.LOG_INFO("Registered child device " + childDevice + " with Cumulocity.");
+
+      // Update the child object, if specified tags exist
+      String childDeviceObjectUpdatePayload =
+          new CConnectorChildUpdate(childDevice).getChildUpdateData();
+      if (childDeviceObjectUpdatePayload != null) {
+        updateChildDeviceInventoryObject(childDevice, childDeviceObjectUpdatePayload);
+      }
+      // Add child device to list of registered devices. If exceptions are thrown above, the child
+      // will not be added and the registration will be attempted again.
+      registeredChildDevices.add(childDevice);
     }
+  }
+
+  /**
+   * Send a Cumulocity inventory object update message on behalf of the child device.
+   *
+   * @param childDeviceName name of the child device; used to derive the Cumulocity ID for the child
+   * @param childDeviceObjectUpdatePayload the payload to send to Cumulocity for child object update
+   * @throws EWException for Ewon exceptions publishing MQTT messages
+   * @throws UnsupportedEncodingException for string encoding exceptions
+   */
+  public void updateChildDeviceInventoryObject(
+      String childDeviceName, String childDeviceObjectUpdatePayload)
+      throws EWException, UnsupportedEncodingException {
+
+    String childDeviceCumulocityId = getMqttId() + "_" + childDeviceName;
+    mqttPublish(
+        CUMULOCITY_MQTT_TOPIC_AGENT_INFO_PREFIX + childDeviceCumulocityId,
+        childDeviceObjectUpdatePayload,
+        MQTT_QOS_LEVEL,
+        MQTT_RETAIN);
+
+    Logger.LOG_INFO("Updated child device " + childDeviceName + " inventory object.");
   }
 
   /**
