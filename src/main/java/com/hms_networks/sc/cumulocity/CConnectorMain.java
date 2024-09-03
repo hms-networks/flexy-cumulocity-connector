@@ -25,6 +25,7 @@ import com.hms_networks.sc.cumulocity.api.CConnectorWebApiListener;
 import com.hms_networks.sc.cumulocity.config.CConnectorConfigFile;
 import com.hms_networks.sc.cumulocity.data.CConnectorAlarmMgr;
 import com.hms_networks.sc.cumulocity.data.CConnectorDataMgr;
+import com.hms_networks.sc.cumulocity.inventory.InventoryUpdateEvtHandler;
 import java.util.Date;
 
 /**
@@ -533,6 +534,17 @@ public class CConnectorMain {
         Logger.LOG_CRITICAL("Created the tag alarm manager.");
       } catch (Exception e) {
         Logger.LOG_CRITICAL("Failed to create the tag alarm manager!");
+        Logger.LOG_EXCEPTION(e);
+      }
+    }
+
+    // Set inventory object update - triggered by tag value event listener
+    if (isRunning) {
+      try {
+        InventoryUpdateEvtHandler.setup();
+        Logger.LOG_CRITICAL("Setup inventory update tag value trigger.");
+      } catch (Exception e) {
+        Logger.LOG_CRITICAL("Failed to setup inventory update trigger tag event listener!");
         Logger.LOG_EXCEPTION(e);
       }
     }
