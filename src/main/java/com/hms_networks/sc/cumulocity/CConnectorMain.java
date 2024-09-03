@@ -594,7 +594,7 @@ public class CConnectorMain {
     }
   }
 
-  /** Method for performing connector application clean up steps. */
+  /** Method for performing connector application clean up steps. Does not return. */
   private static void cleanUp() {
     Logger.LOG_CRITICAL("Cleaning up " + CONNECTOR_FRIENDLY_NAME + "...");
     boolean cleanUpSuccess = true;
@@ -635,6 +635,8 @@ public class CConnectorMain {
       Logger.LOG_CRITICAL("Restarting device!");
       RuntimeControl.reboot();
     }
+    // System.exit() is required for the event handler thread to stop running
+    System.exit(0);
   }
 
   /**
@@ -672,6 +674,7 @@ public class CConnectorMain {
     // Shutdown and cleanup connector
     shutDown();
     cleanUp();
+    // Do not add code here, cleanUp does not return
   }
 
   /**
