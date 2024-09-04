@@ -61,6 +61,9 @@ linking Ewon devices using a direct data path with a Flexy Java application.
         - [Configured Logging Level](#configured-logging-level)
         - [Logging Performance](#logging-performance)
         - [Adding Log Output](#adding-log-output)
+- [Cumulocity Inventory Objects Update](#cumulocity-inventory-objects-update)
+    - [Inventory Object Update Trigger](#inventory-object-update-trigger)
+    - [Parent Inventory Object Update](#parent-inventory-object-update)
 - [Development Environment](#development-environment)
     - [Libraries and Dependencies](#libraries-and-dependencies)
     - [Source Code](#source-code)
@@ -620,6 +623,19 @@ to `Logger.LOG_CRITICAL(String)` will result in log output that is visible if th
 application log level is set to critical (1/-1) or a higher logging level. A call
 to `Logger.LOG_EXCEPTION(Exception)` will result in log output that is visible if the configured
 application log level is set to trace (6/-6).
+
+# Cumulocity Inventory Objects Update
+For applications that want additional device information to be displayed in Cumulocity, the Ewon Flexy Cumulocity Connector supports the following inventory object update feature. 
+For all valid files found in the `/usr/CumulocityInventoryObjects` directory, the connector will read the file and update the inventory object in Cumulocity. The file should be in JSON format and have the `.json` extension.
+The file name, excluding the `.json` extension, will be used as the device ID for the update. A special file name, `parent.json`, is reserved for inventory object updates for the parent device (the Flexy). 
+All other file names will be used as the device ID for child device updates. 
+The connector does not complete any validation of the file contents. It is the responsibility of the user to ensure the file contents are valid JSON and follow the Cumulocity inventory object schema. 
+
+## Inventory Object Update Trigger
+Inventory object updates are triggered by a special tag named `CumulocityInventoryUpdate`. Users that want to enable this feature should create this tag as a boolean type. To trigger an update, users should set the tag value to `1`. The tag value will be reset to `0` after the update is complete if at least one update was sent without an error. Update failures are logged, and no further action is taken. Therefore, users should retry the update by setting the tag value to `1` again. 
+
+## Parent Inventory Object Update 
+On startup, the parent inventory object update is sent.
 
 ## Development Environment
 
