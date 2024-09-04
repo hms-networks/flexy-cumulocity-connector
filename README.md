@@ -48,6 +48,7 @@ linking Ewon devices using a direct data path with a Flexy Java application.
     - [Child Device Support](#child-device-support)
         - [Child Device Tag Name Syntax](#child-device-tag-name-syntax)
         - [Child Device Tag Name Examples](#child-device-tag-name-examples)
+        - [Child Device Managed Inventory Object Updates](#child-device-managed-inventory-object-updates)
     - [Connector Halt Tag](#connector-halt-tag)
     - [Supported Cumulocity Operations](#supported-cumulocity-operations)
     - [Commands from Cumulocity](#commands-from-cumulocity)
@@ -412,6 +413,23 @@ section, the following examples are valid:
   a. Child Device: "One"<br>
   b. Fragment Name: "Two"<br>
   c. Series: "3"<br>
+
+#### Child Device Inventory Object Updates
+
+The Flexy will perform inventory object updates on behalf of a child device, when unique tag names are found in the tag list. 
+The inventory object updates are related to the c8y objects: `c8y_Hardware`, `c8y_Firmware` and `c8y_isDevice`. Users must add the following tag names to the Flexy's tag list and should set the tag values to the desired value for c8y objects. Note that all of the follow are tags are of type string. 
+The Flexy performs the managed inventory object update on the child device once, the first time it finds a child's tag in the historical data queue.
+
+| c8y Parameter    | Tag Name |
+| -------- | ------- |
+| c8y_Hardware - Model   | \<child device name>/__METADATA/HardwareModel   |
+| c8y_Hardware - Revision   |  \<child device name>/__METADATA/HardwareRevision   |
+| c8y_Hardware - SerialNumber   |  \<child device name>/__METADATA/HardwareSerialNumber   |
+| c8y_Firmware - Name  |  \<child device name>/__METADATA/FirmwareName   |
+| c8y_Firmware - Version  |  \<child device name>/__METADATA/FirmwareVersion   |
+| c8y_Firmware - Url   |  \<child device name>/__METADATA/FirmwareVersion   |
+
+If any of the above tags are found in the tag list, the Flexy will perform a managed inventory object update on the child device and this will include the `c8y_IsDevice` object. 
 
 ### Connector Halt Tag
 
