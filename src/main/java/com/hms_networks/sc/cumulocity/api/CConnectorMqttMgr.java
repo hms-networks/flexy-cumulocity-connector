@@ -14,6 +14,7 @@ import com.hms_networks.sc.cumulocity.data.CConnectorChildUpdate;
 import com.hms_networks.sc.cumulocity.data.CConnectorDataProcessingMode;
 import com.hms_networks.sc.cumulocity.data.CConnectorMessageType;
 import com.hms_networks.sc.cumulocity.data.CConnectorRetryMessage;
+import com.hms_networks.sc.cumulocity.inventory.InventoryUpdateManager;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -278,6 +279,10 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
 
     // Send configuration to Cumulocity
     sendConfigurationFileToCumulocity();
+
+    // Check and send Cumulocity inventory object update for parent
+    final boolean updateOnlyParentFile = true;
+    InventoryUpdateManager.loadInventoryUpdatePayloads(updateOnlyParentFile);
   }
 
   /** Sends basic information about the connector and hardware to Cumulocity. */
@@ -471,6 +476,26 @@ public class CConnectorMqttMgr extends ConstrainedMqttManager {
         MQTT_RETAIN);
 
     Logger.LOG_INFO("Updated child device " + childDeviceName + " inventory object.");
+  }
+
+  /**
+   * Send Inventory object update message for the parent device.
+   *
+   * @param parentDeviceObjectUpdatePayload the payload to send to Cumulocity for inventory object
+   *     update
+   * @throws EWException for Ewon exceptions publishing MQTT messages
+   * @throws UnsupportedEncodingException for string encoding exceptions
+   */
+  public void updateParentDeviceInventoryObject(String parentDeviceObjectUpdatePayload)
+      throws EWException, UnsupportedEncodingException {
+
+    mqttPublish(
+        CUMULOCITY_MQTT_TOPIC_AGENT_INFO_PREFIX + getMqttId(),
+        parentDeviceObjectUpdatePayload,
+        MQTT_QOS_LEVEL,
+        MQTT_RETAIN);
+
+    Logger.LOG_INFO("Updated " + getMqttId() + " metadata with Cumulocity.");
   }
 
   /**
