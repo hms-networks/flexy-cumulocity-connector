@@ -25,6 +25,9 @@ public class InventoryUpdateManager {
   /** File extension for the inventory update files. */
   private static final String INVENTORY_UPDATE_PAYLOAD_FILE_EXT = ".json";
 
+  /** Unique file name for parent device inventory object updates. */
+  private static final String UNIQUE_PARENT_INVENTORY_FILE_NAME = "parent";
+
   /** Single thread for checking and publishing payloads. */
   private static Thread inventoryUpdateThread;
 
@@ -42,8 +45,10 @@ public class InventoryUpdateManager {
   }
 
   /**
-   * Method to update the child device with the contents of the file. This method will verify the
-   * connection status and that the child device is registered before updating the inventory.
+   * Method to update the device inventory object with the contents of the file. This method will
+   * only try to make the update if the connection is established. This method works for both parent
+   * and child updates. For a child device, a registration attempt is made before the inventory
+   * object update.
    *
    * @param targetFile FILE object that was read from the directory
    * @throws IOException for failures reading the file
@@ -51,7 +56,7 @@ public class InventoryUpdateManager {
    * @throws IllegalStateException if the MQTT client is not connected
    * @since 1.0.0
    */
-  public static void updateChildFromFile(File targetFile)
+  public static void updateDeviceInventoryObjectFromFile(File targetFile)
       throws IOException, EWException, IllegalStateException {
 
     CConnectorMqttMgr mqttMgr = CConnectorMain.getMqttMgr();
@@ -63,22 +68,32 @@ public class InventoryUpdateManager {
 
     String childName = getChildNameFromFile(targetFile);
     String fileContents = FileAccessManager.readFileToString(targetFile);
-    // Verify before updating
-    mqttMgr.verifyChildDeviceRegistration(childName);
-    mqttMgr.updateChildDeviceInventoryObject(childName, fileContents);
-    Logger.LOG_INFO("Publishing inventory update payload from : " + childName);
+
+    // Check for parent inventory object update
+    if (childName.equals(UNIQUE_PARENT_INVENTORY_FILE_NAME)) {
+      mqttMgr.updateParentDeviceInventoryObject(fileContents);
+      Logger.LOG_INFO("Publishing parent inventory object update.");
+    } else {
+
+      // not parent, but child - verify before updating
+      mqttMgr.verifyChildDeviceRegistration(childName);
+      mqttMgr.updateChildDeviceInventoryObject(childName, fileContents);
+      Logger.LOG_INFO("Publishing inventory update payload from : " + childName);
+    }
   }
 
   /**
-   * Method to load all inventory update payload files form the designated directory. For all valid
-   * update files, will call {@link updateChildFromFile} to update the child device. Valid files
-   * have .json extension. Exceptions are caught and logged.
+   * Method to load all inventory update payload files form the designated directory. For valid
+   * files, will call {@link #updateDeviceInventoryObjectFromFile}. Valid files have .json
+   * extension. Exceptions are caught and logged.
    *
-   * @return integer array of length 2: number of updates performed without error, number of files
-   *     without error free uploads.
+   * @param onlyParentFile boolean to indicate if only the parent file should be updated. If {@code
+   *     true}, files that do not match the parent file name will be skipped.
+   * @return integer array of length 2: number of updates performed without error, number of errors
+   *     and/or non updates
    * @since 1.0.0
    */
-  public static int[] loadInventoryUpdatePayloads() {
+  public static int[] loadInventoryUpdatePayloads(boolean onlyParentFile) {
     // Load all configuration files from the triggered payloads folder
     File folder = new File(INVENTORY_UPDATE_PAYLOAD_FOLDER);
     File[] files = folder.listFiles();
@@ -100,10 +115,23 @@ public class InventoryUpdateManager {
         continue;
       }
 
-      // Update the child device with the file contents
+      // Now that basic checks are done, send update message for the files
       try {
-        updateChildFromFile(files[i]);
-        updateCount[0]++;
+        // With the onlyParentFile flag, only update the parent device
+        if (onlyParentFile) {
+          if (files[i]
+              .getName()
+              .equals(UNIQUE_PARENT_INVENTORY_FILE_NAME + INVENTORY_UPDATE_PAYLOAD_FILE_EXT)) {
+            updateDeviceInventoryObjectFromFile(files[i]);
+            updateCount[0]++;
+          } else {
+            // was not the parent, skip
+            updateCount[1]++;
+          }
+        } else {
+          updateDeviceInventoryObjectFromFile(files[i]);
+          updateCount[0]++;
+        }
       } catch (IOException e) {
         updateCount[1]++;
         Logger.LOG_CRITICAL("Error reading " + files[i].getName() + ": " + e.getMessage());
@@ -184,7 +212,8 @@ public class InventoryUpdateManager {
         new Thread(
             new Runnable() {
               public void run() {
-                int[] updatesCount = loadInventoryUpdatePayloads();
+                final boolean onlyParentFile = false;
+                int[] updatesCount = loadInventoryUpdatePayloads(onlyParentFile);
                 // check for no files at all, log message
                 if (updatesCount[0] == 0 && updatesCount[1] == 0) {
                   Logger.LOG_INFO("No inventory update files were found.");
