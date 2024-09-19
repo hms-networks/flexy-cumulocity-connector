@@ -1,5 +1,9 @@
 # Ewon Flexy Cumulocity Connector Changelog
 
+## Version 1.4.3
+### Features
+- Added support for Cumulocity inventory updates 
+
 ## Version 1.4.2
 ### Features
 - Update deployment dependencies
