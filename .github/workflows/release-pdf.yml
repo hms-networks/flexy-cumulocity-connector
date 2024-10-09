@@ -1,0 +1,60 @@
+# HMS Networks Solution Center
+# Build Outputs Action for Maven-based Ewon ETK Project Releases
+# Version: 2.0
+#
+# This action is configured to automatically run when a release
+# tag is created in the following syntax: `v*`.
+
+name: Release (Build pdf)
+
+on:
+  push:
+    branches:
+      - 'doc/build'
+      
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  CHANGELOG_FILE_NAME: CHANGELOG.md
+  README_FILE_NAME: README.md
+  README_PDF_FILE_NAME: README.pdf
+  QUICK_START_FILE_NAME: QUICK-START.md
+  QUICK_START_PDF_FILE_NAME: QUICK-START.pdf
+  RELEASE_ZIP_INCLUDED: CHANGELOG.md README.md QUICK-START.md LICENSE src .classpath .project pom.xml build.xml starting-files images
+  RELEASE_JAR_NAME_REGEX: '*-full.jar'
+  RELEASE_JAVADOCS_NAME_REGEX: '*-javadoc.jar'
+  RELEASE_BODY_FILE: RELEASE-BODY.md
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+
+      - name: Setup Node for Markdown conversion to PDF
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install md-to-pdf for Markdown conversion to PDF
+        run: |
+          npm uninstall -g md-to-pdf
+          npm install -g md-to-pdf --unsafe-perm 
+
+      - name: Create PDF of README.md
+        run: md-to-pdf $README_FILE_NAME
+
+      - name: Create PDF of QUICK-START.md
+        run: md-to-pdf $QUICK_START_FILE_NAME
+
+      - name: Get Name of Artifact
+        run: |
+          ARTIFACT_PATHNAME=$(ls target/*-full.jar | head -n 1)
+          ARTIFACT_NAME=$(basename $ARTIFACT_PATHNAME)
+          echo "ARTIFACT_NAME=${ARTIFACT_NAME}" >> $GITHUB_ENV
+          echo "ARTIFACT_PATHNAME=${ARTIFACT_PATHNAME}" >> $GITHUB_ENV
+
+      - name: Get Name of Release (RepoName-Version)
+        run: echo "RELEASE_NAME=${{ github.event.repository.name }}-${{ env.VERSION_NUMBER }}" >> $GITHUB_ENV
