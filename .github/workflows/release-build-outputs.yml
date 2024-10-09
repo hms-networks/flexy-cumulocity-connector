@@ -9,8 +9,9 @@ name: Release (Build Outputs)
 
 on:
   push:
-    tags:
-      - 'v*' # Push events to matching v*, i.e. v1.0
+    branches:
+      - 'doc/build'
+      
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -72,7 +73,7 @@ jobs:
       - name: Setup Node for Markdown conversion to PDF
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 20
 
       - name: Install md-to-pdf for Markdown conversion to PDF
         run: |
