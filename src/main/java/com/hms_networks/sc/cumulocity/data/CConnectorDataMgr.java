@@ -359,7 +359,7 @@ public class CConnectorDataMgr {
         // Get data point information
         String value = datapoint.getValueString();
         String unit = datapoint.getTagUnit();
-        String time = SCTimeUtils.getIso8601FormattedTimestampForDataPoint(datapoint);
+        String time = datapoint.getIso8601Timestamp();
 
         // Build payload string contents
         String payloadString;
