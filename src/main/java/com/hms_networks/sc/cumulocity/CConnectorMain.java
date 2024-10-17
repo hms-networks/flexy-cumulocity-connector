@@ -18,6 +18,7 @@ import com.hms_networks.americas.sc.extensions.system.tags.SCTagUtils;
 import com.hms_networks.americas.sc.extensions.system.threading.SCCountdownLatch;
 import com.hms_networks.americas.sc.extensions.system.time.SCTimeUnit;
 import com.hms_networks.americas.sc.extensions.system.time.SCTimeUtils;
+import com.hms_networks.americas.sc.extensions.system.time.TimeZoneManager;
 import com.hms_networks.sc.cumulocity.api.CConnectorApiCertificateMgr;
 import com.hms_networks.sc.cumulocity.api.CConnectorMqttMgr;
 import com.hms_networks.sc.cumulocity.api.CConnectorProvisionMqttMgr;
@@ -677,6 +678,14 @@ public class CConnectorMain {
       while (isRunning) {
         // Service the watchdog
         RuntimeControl.refreshWatchdog();
+
+        try {
+          TimeZoneManager.checkUpdateTimeZone();
+        } catch (Exception e) {
+          Logger.LOG_SERIOUS(
+              "An error occurred while attempting to check and update the local timezone offset.");
+          Logger.LOG_EXCEPTION(e);
+        }
 
         runMainLoop();
         try {
