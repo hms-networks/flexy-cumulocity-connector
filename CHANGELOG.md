@@ -1,5 +1,11 @@
 # Ewon Flexy Cumulocity Connector Changelog
 
+## Version 1.4.4
+### Features
+- Update extension library to version 1.16.0
+### Bug Fixes
+- Handles changes in timezone UTC offset
+
 ## Version 1.4.3
 ### Features
 - Added support for Cumulocity inventory updates 
