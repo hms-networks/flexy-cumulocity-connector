@@ -270,6 +270,11 @@ of the Ewon is necessary to apply this setting.*
 
 ![Data Source Flow Chart](images/DataSource.png)
 
+#### Record Data in UTC 
+It is recommended to record data in UTC time zone to avoid issues with daylight saving time changes. 
+This can be configured in the Ewon Flexy under System > Main > General > Date and Time. Enabling the 
+"Record data in UTC" option will ensure historical data is recorded relative to UTC.
+
 #### Tag Eligibility
 
 Each tag that should be sent to Cumulocity must have historical logging enabled. Please
