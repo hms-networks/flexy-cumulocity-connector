@@ -43,33 +43,32 @@ create a device registration entry in Cumulocity.
 To create a device registration entry in Cumulocity, you will need to open the Cumulocity UI and
 navigate to the 'Registration' tab under 'Devices'.
 
-Click the 'Register Device' button to begin the registration process.
+Click the 'Register Device' drop down button in the top right corner, then select 'Single Registration - General' to begin the registration process.
 
-![Registration Page Register Device Button](images/RegistrationPage.png)
-
-Select the 'General device registration' option.
+![Registration Page Register Device Button](images/RegistrationScreenshot_1_RegisterGeneralDevice.png)
 
 *Note: You may select the bulk device registration option if you wish to register multiple devices
 at once. These instructions describe only the general device registration process.*
 
-![Registration Page General or Bulk Registration Selection](images/RegistrationGeneralBulk.png)
-
 Enter the device ID of the Ewon Flexy you are registering. The Cumulocity device ID for an Ewon
 device is based on the serial number of the Ewon Flexy, and is formatted as `HMS-Flexy-{SERIAL}`.
 
-![Registration Page Device ID Entry](images/RegistrationDeviceId.png)
+![Registration Page Device ID Entry](images/RegistrationScreenshot_2_GeneralRegistration.png)
 
 After entering the device ID, you may optionally specify a group to add the newly registered device
 to, or register another device.
 
-When finished, click the 'Next' button to finalize device registration, then click the 'Complete'
+When finished, click the 'Next' button to finalize device registration, then click the 'Close'
 button when finished.
 
-![Registration Page Complete Button](images/RegistrationComplete.png)
+![Registration Page Complete Button](images/RegistrationScreenshot_3_DeviceRegistered.png)
 
 After the device registration has been completed and the remaining steps completed as described
 below, you may start up the Ewon Flexy Cumulocity Connector and the device will register itself.
 Once registered, it will be pending acceptance in the Cumulocity device registration portal.
+Select 'Accept to complete the registration process.
+
+![Registration Page Complete Button](images/RegistrationScreenshot_5_PendingAcceptance.png)
 
 ### Connector Configuration File
 
