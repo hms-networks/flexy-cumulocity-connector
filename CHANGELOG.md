@@ -1,5 +1,9 @@
 # Ewon Flexy Cumulocity Connector Changelog
 
+## Version 1.4.5
+### Features
+- Update extension library to version 1.16.3; Update to ConstrainedMqttManager
+
 ## Version 1.4.4
 ### Features
 - Update extension library to version 1.16.0
