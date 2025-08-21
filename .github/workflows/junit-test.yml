@@ -35,7 +35,7 @@ jobs:
         run: mvn test -f pom.xml
 
       - name: Upload Test Report(s)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: JUNIT-TEST-REPORTING-${{ github.sha }}-${{ github.event.repository.name }}
           path: |
