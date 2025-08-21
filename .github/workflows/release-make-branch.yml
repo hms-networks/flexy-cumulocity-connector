@@ -13,6 +13,9 @@ on:
     tags:
       - 'v*' # Push events to matching v*, i.e. v1.0
 
+permissions:
+  contents: write
+
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -32,6 +35,6 @@ jobs:
           echo "SOURCE_TAG=$branchName" >> $GITHUB_ENV
 
       - name: Create Branch
-        uses: peterjgrainger/action-create-branch@v2.3.0
+        uses: peterjgrainger/action-create-branch@v3.0.0
         with:
           branch: ${{ env.SOURCE_TAG }}
