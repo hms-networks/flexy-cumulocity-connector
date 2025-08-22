@@ -25,6 +25,9 @@ env:
   RELEASE_BODY_FILE: RELEASE-BODY.md
 
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
