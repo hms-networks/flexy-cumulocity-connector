@@ -80,10 +80,10 @@ jobs:
           npm install -g md-to-pdf --unsafe-perm 
 
       - name: Create PDF of README.md
-        run: md-to-pdf $README_FILE_NAME
+        run: md-to-pdf $README_FILE_NAME --launch-options '{"args":["--no-sandbox"]}'
 
       - name: Create PDF of QUICK-START.md
-        run: md-to-pdf $QUICK_START_FILE_NAME
+        run: md-to-pdf $QUICK_START_FILE_NAME --launch-options '{"args":["--no-sandbox"]}'
 
       - name: Get Name of Artifact
         run: |
