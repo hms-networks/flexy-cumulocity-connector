@@ -1,5 +1,11 @@
 # Ewon Flexy Cumulocity Connector Changelog
 
+## Version 1.4.6
+### Features
+- Update extension library to version 1.16.4; Add support for isInitValue in DataPoint Classes
+### Misc
+- Update GitHub Actions to use proper write permissions
+
 ## Version 1.4.5
 ### Features
 - Update extension library to version 1.16.3; Update to ConstrainedMqttManager
